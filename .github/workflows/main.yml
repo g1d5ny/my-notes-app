@@ -32,7 +32,7 @@ jobs:
               run: npm install -g expo-cli
 
             - name: Verify Expo project
-              run: expo doctor
+              run: npx expo-doctor
 
             - name: Expo Build Check
               run: expo export --output-dir dist

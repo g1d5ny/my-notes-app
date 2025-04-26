@@ -33,3 +33,9 @@ jobs:
 
             - name: Expo Build Check
               run: npx expo export --output-dir dist
+
+            # - name: Login to Expo
+            #   run: npx expo login -u ${{ secrets.EXPO_USERNAME }} -p ${{ secrets.EXPO_PASSWORD }}
+
+            # - name: Publish to Expo
+            #   run: npx expo publish --non-interactive

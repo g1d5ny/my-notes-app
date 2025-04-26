@@ -1,0 +1,38 @@
+# .github/workflows/main.yml
+name: Expo CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  expo-ci:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install Yarn
+        run: npm install -g yarn
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Install Expo CLI
+        run: npm install -g expo-cli
+
+      - name: Verify Expo project
+        run: expo doctor
+
+      - name: Expo Build Check
+        run: expo export --output-dir dist

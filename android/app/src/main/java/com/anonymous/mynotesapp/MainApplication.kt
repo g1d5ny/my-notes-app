@@ -1,4 +1,4 @@
-package com.anonymous.mynotesapp
+package com.jiwonsuk.mynotesapp
 
 import android.app.Application
 import android.content.res.Configuration

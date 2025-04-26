@@ -1,4 +1,4 @@
-package com.anonymous.mynotesapp
+package com.jiwonsuk.mynotesapp
 import expo.modules.splashscreen.SplashScreenManager
 
 import android.os.Build

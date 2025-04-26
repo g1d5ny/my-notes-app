@@ -86,9 +86,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace 'com.anonymous.mynotesapp'
+    namespace 'com.jiwonsuk.mynotesapp'
     defaultConfig {
-        applicationId 'com.anonymous.mynotesapp'
+        applicationId 'com.jiwonsuk.mynotesapp'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

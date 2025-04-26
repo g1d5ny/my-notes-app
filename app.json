@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "my-notes-app",
+    "name": "폴더노트",
     "slug": "my-notes-app",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -10,14 +10,14 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.mynotesapp"
+      "bundleIdentifier": "com.jiwonsuk.mynotesapp"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.anonymous.mynotesapp"
+      "package": "com.jiwonsuk.mynotesapp"
     },
     "web": {
       "bundler": "metro",

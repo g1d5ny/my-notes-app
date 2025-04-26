@@ -28,9 +28,6 @@ jobs:
             - name: Install dependencies
               run: yarn install
 
-            - name: Install Expo CLI
-              run: npm install -g expo-cli
-
             - name: Verify Expo project
               run: npx expo-doctor || true
 

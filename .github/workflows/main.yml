@@ -2,37 +2,37 @@
 name: Expo CI
 
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+    push:
+        branches:
+            - master
+    pull_request:
+        branches:
+            - master
 
 jobs:
-  expo-ci:
-    runs-on: ubuntu-latest
+    expo-ci:
+        runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
+            - name: Set up Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 18
 
-      - name: Install Yarn
-        run: npm install -g yarn
+            - name: Install Yarn
+              run: npm install -g yarn
 
-      - name: Install dependencies
-        run: yarn install
+            - name: Install dependencies
+              run: yarn install
 
-      - name: Install Expo CLI
-        run: npm install -g expo-cli
+            - name: Install Expo CLI
+              run: npm install -g expo-cli
 
-      - name: Verify Expo project
-        run: expo doctor
+            - name: Verify Expo project
+              run: expo doctor
 
-      - name: Expo Build Check
-        run: expo export --output-dir dist
+            - name: Expo Build Check
+              run: expo export --output-dir dist

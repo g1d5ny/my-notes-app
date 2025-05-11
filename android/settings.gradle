@@ -21,7 +21,7 @@ extensions.configure(com.facebook.react.ReactSettingsExtension) { ex ->
   }
 }
 
-rootProject.name = 'my-notes-app'
+rootProject.name = '폴더노트'
 
 dependencyResolutionManagement {
   versionCatalogs {

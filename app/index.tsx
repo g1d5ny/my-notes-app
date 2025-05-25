@@ -1,5 +1,5 @@
 import { Redirect } from "expo-router"
 
-export default function Home() {
-    return <Redirect href='/folders' />
+export default function Index() {
+    return <Redirect href='/folder' />
 }

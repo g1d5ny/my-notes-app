@@ -1,6 +1,6 @@
 import { createContext, Dispatch, SetStateAction } from "react"
-import { LightTheme } from "../constants/Theme"
-import { ThemeColorPalette } from "../types"
+import { LightTheme } from "../constant/Theme"
+import { ThemeColorPalette } from "../type"
 
 export const ThemeContext = createContext<{
     theme: ThemeColorPalette

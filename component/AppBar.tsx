@@ -1,7 +1,7 @@
 import { useContext } from "react"
 import { Image, Platform, Pressable, StyleSheet, View } from "react-native"
-import { Styles } from "../constants/Style"
-import { ThemeContext } from "../contexts/ThemeContext"
+import { Styles } from "../constant/Style"
+import { ThemeContext } from "../context/ThemeContext"
 
 export default function AppBar() {
     const { theme } = useContext(ThemeContext)

@@ -1,3 +1,12 @@
+import { StyleSheet } from "react-native"
+
+export const Styles = StyleSheet.create({
+    row: {
+        flexDirection: "row",
+        alignItems: "center"
+    }
+})
+
 export const customFontsToLoad = {
     The_Jamsil_Bold: require("@/assets/fonts/The_Jamsil_Bold.otf"),
     The_Jamsil_Medium: require("@/assets/fonts/The_Jamsil_Medium.otf"),
@@ -52,5 +61,16 @@ export const FontStyles = {
         fontFamily: FontFamilies.regular,
         letterSpacing: 0.2,
         fontWeight: "400"
+    }
+}
+
+export const Color = {
+    white: "#fff",
+    black: "#000",
+    cancel: "#c9c9c9",
+    gray: "#6B6B6B",
+    yellow: {
+        1: "#6B6B6B",
+        2: "#FCD53F"
     }
 }

@@ -1,0 +1,28 @@
+{
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "workbench.editor.enablePreview": false,
+    "editor.codeActionsOnSave": {
+        "quickfix.insertSemicolon": "explicit",
+        "source.organizeImports": "always"
+    },
+    "gitlens.advanced.messages": {
+        "suppressGitMissingWarning": true,
+        "suppressLineUncommittedWarning": true
+    },
+    "typescript.updateImportsOnFileMove.enabled": "always",
+    "git.enableSmartCommit": true,
+    "git.confirmSync": false,
+    "javascript.updateImportsOnFileMove.enabled": "always",
+    "diffEditor.ignoreTrimWhitespace": false,
+    "workbench.colorTheme": "Default Dark+",
+    "workbench.iconTheme": "material-icon-theme",
+    "diffEditor.hideUnchangedRegions.enabled": true,
+    "explorer.confirmDragAndDrop": false,
+    "github.copilot.editor.enableAutoCompletions": true,
+    "git.replaceTagsWhenPull": true,
+    "gitlens.views.repositories.files.layout": "tree",
+    "gitlens.views.repositories.showStashes": true,
+    "kotlin.languageServer.enabled": false,
+    "kotlin.debugAdapter.enabled": false
+}

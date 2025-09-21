@@ -1,24 +1,24 @@
 import { FontStyles, Styles } from "@/constant/Style"
 import { router } from "expo-router"
 import React, { useState } from "react"
-import { ColorSchemeName, Image, Pressable, StyleSheet, Text, useColorScheme } from "react-native"
+import { ColorSchemeName, Image, ImageSourcePropType, Pressable, StyleSheet, Text, useColorScheme } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { CustomModal } from "./CustomModal"
 
 const MARGIN = 16
 const ICON_SIZE = 80
 
-const plusIconMap: Record<NonNullable<ColorSchemeName>, number> = {
+const plusIconMap: Record<NonNullable<ColorSchemeName>, ImageSourcePropType> = {
     light: require("@/assets/icons/light/icon_plus.png"),
     dark: require("@/assets/icons/dark/icon_plus.png")
 }
 
-const filePlusIconMap: Record<NonNullable<ColorSchemeName>, number> = {
+const filePlusIconMap: Record<NonNullable<ColorSchemeName>, ImageSourcePropType> = {
     light: require("@/assets/icons/light/icon_file_plus.png"),
     dark: require("@/assets/icons/dark/icon_file_plus.png")
 }
 
-const folderPlusIconMap: Record<NonNullable<ColorSchemeName>, number> = {
+const folderPlusIconMap: Record<NonNullable<ColorSchemeName>, ImageSourcePropType> = {
     light: require("@/assets/icons/light/icon_folder_plus.png"),
     dark: require("@/assets/icons/dark/icon_folder_plus.png")
 }

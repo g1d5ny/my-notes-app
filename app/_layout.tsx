@@ -1,5 +1,6 @@
 import { AddMemo } from "@/component/AddMemo"
 import AppBar from "@/component/AppBar"
+import { CommonToast } from "@/component/CommonToast"
 import RoutingHeader from "@/component/RoutingHeader"
 import { DarkTheme, LightTheme } from "@/constant/Theme"
 import { ThemeContext } from "@/context/ThemeContext"
@@ -24,6 +25,7 @@ export default function RootLayout() {
                         <AppBar />
                         <RoutingHeader />
                         <AddMemo />
+                        <CommonToast />
                         <Slot />
                     </SafeAreaView>
                 </ThemeContext.Provider>

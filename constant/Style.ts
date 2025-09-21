@@ -19,7 +19,7 @@ export const FontFamilies = {
     regular: "The_Jamsil_Regular"
 }
 
-export const FontStyles = {
+export const FontStyles = StyleSheet.create({
     Display: {
         fontSize: 32,
         lineHeight: 40,
@@ -62,7 +62,7 @@ export const FontStyles = {
         letterSpacing: 0.2,
         fontWeight: "400"
     }
-}
+})
 
 export const Color = {
     white: "#fff",

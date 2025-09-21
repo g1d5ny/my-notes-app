@@ -11,10 +11,10 @@ export default function AppBar() {
             <View style={styles.left}></View>
             <View style={[Styles.row, styles.right]}>
                 <Pressable>
-                    <Image source={require("@/assets/icons/icon_search.png")} />
+                    <Image source={require("@/assets/icons/light/icon_search.png")} />
                 </Pressable>
                 <Pressable>
-                    <Image source={require("@/assets/icons/icon_three_dots.png")} />
+                    <Image source={require("@/assets/icons/light/icon_three_dots_horizontal.png")} />
                 </Pressable>
             </View>
         </View>

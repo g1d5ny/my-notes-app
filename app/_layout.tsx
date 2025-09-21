@@ -1,3 +1,4 @@
+import { AddMemo } from "@/component/AddMemo"
 import AppBar from "@/component/AppBar"
 import RoutingHeader from "@/component/RoutingHeader"
 import { DarkTheme, LightTheme } from "@/constant/Theme"
@@ -8,7 +9,6 @@ import { Suspense, useState } from "react"
 import { ActivityIndicator, StyleSheet, useColorScheme } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { ThemeColorPalette } from "../type"
-
 export const DATABASE_NAME = "memo"
 
 export default function RootLayout() {
@@ -23,6 +23,7 @@ export default function RootLayout() {
                     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
                         <AppBar />
                         <RoutingHeader />
+                        <AddMemo />
                         <Slot />
                     </SafeAreaView>
                 </ThemeContext.Provider>

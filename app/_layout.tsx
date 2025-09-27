@@ -2,12 +2,16 @@ import { AddMemo } from "@/component/AddMemo"
 import AppBar from "@/component/AppBar"
 import { CommonToast } from "@/component/CommonToast"
 import RoutingHeader from "@/component/RoutingHeader"
+import { customFontsToLoad } from "@/constant/Style"
 import { DarkTheme, LightTheme } from "@/constant/Theme"
 import { ThemeContext } from "@/context/ThemeContext"
+import { ToastContext } from "@/context/ToastContext"
+import * as Font from "expo-font"
 import { Slot } from "expo-router"
 import { SQLiteDatabase, SQLiteProvider } from "expo-sqlite"
-import { Suspense, useState } from "react"
-import { ActivityIndicator, StyleSheet, useColorScheme } from "react-native"
+import { Suspense, useEffect, useState } from "react"
+import { ActivityIndicator, ColorSchemeName, StyleSheet, useColorScheme } from "react-native"
+import { PaperProvider } from "react-native-paper"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { ThemeColorPalette } from "../type"
 export const DATABASE_NAME = "memo"
@@ -15,19 +19,29 @@ export const DATABASE_NAME = "memo"
 export default function RootLayout() {
     const scheme = useColorScheme()
     const currentTheme = scheme === "dark" ? DarkTheme : LightTheme
+    const [currentScheme, setCurrentScheme] = useState<ColorSchemeName>(scheme)
     const [theme, setTheme] = useState<ThemeColorPalette>(currentTheme)
+    const [message, setMessage] = useState<string>("")
+
+    useEffect(() => {
+        Font.loadAsync(customFontsToLoad)
+    }, [])
 
     return (
         <Suspense fallback={<ActivityIndicator size='large' />}>
             <SQLiteProvider databaseName={DATABASE_NAME} options={{ enableChangeListener: true }} useSuspense onInit={migrateDbIfNeeded}>
-                <ThemeContext.Provider value={{ theme, setTheme }}>
-                    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
-                        <AppBar />
-                        <RoutingHeader />
-                        <AddMemo />
-                        <CommonToast />
-                        <Slot />
-                    </SafeAreaView>
+                <ThemeContext.Provider value={{ theme, setTheme, currentScheme, setCurrentScheme }}>
+                    <ToastContext.Provider value={{ message, setMessage }}>
+                        <PaperProvider>
+                            <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
+                                <AppBar />
+                                <RoutingHeader />
+                                <AddMemo />
+                                <CommonToast />
+                                <Slot />
+                            </SafeAreaView>
+                        </PaperProvider>
+                    </ToastContext.Provider>
                 </ThemeContext.Provider>
             </SQLiteProvider>
         </Suspense>

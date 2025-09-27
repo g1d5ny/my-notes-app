@@ -87,7 +87,7 @@ export const Color = {
         2: "#6B6B6B"
     },
     yellow: {
-        1: "#6B6B6B",
+        1: "#FFB02E",
         2: "#FCD53F"
     },
     background: {

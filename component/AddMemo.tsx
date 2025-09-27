@@ -5,8 +5,8 @@ import { ThemeContext } from "@/context/ThemeContext"
 import { router } from "expo-router"
 import React, { useContext, useState } from "react"
 import { Image, Pressable, StyleSheet, Text } from "react-native"
+import { Modal } from "react-native-paper"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
-import { CustomModal } from "./CustomModal"
 
 const MARGIN = 16
 const ICON_SIZE = 80
@@ -41,7 +41,7 @@ export const AddMemo = () => {
                     <Image source={require("@/assets/icons/icon_plus.png")} style={styles.icon} />
                 </Pressable>
             )}
-            <CustomModal visible={modalVisible} setVisible={setModalVisible}>
+            <Modal visible={modalVisible} onDismiss={closeModal} style={styles.modal}>
                 <Pressable style={[Styles.row, styles.plus, { bottom: bottom + MARGIN + ICON_SIZE * 2 }]} onPress={handleAddFile}>
                     <Text style={styles.text}>파일</Text>
                     <FilePlus theme={theme === LightTheme ? DarkTheme : LightTheme} />
@@ -51,14 +51,18 @@ export const AddMemo = () => {
                     <FolderPlus theme={theme === LightTheme ? DarkTheme : LightTheme} />
                 </Pressable>
                 <Pressable style={[styles.plus, { bottom: bottom + MARGIN }]} onPress={closeModal}>
-                    <Image source={require("@/assets/icons/icon_plus.png")} style={styles.icon} />
+                    <Image source={require("@/assets/icons/icon_plus.png")} style={[styles.icon, { transform: [{ rotate: "45deg" }] }]} />
                 </Pressable>
-            </CustomModal>
+            </Modal>
         </>
     )
 }
 
 const styles = StyleSheet.create({
+    modal: {
+        alignItems: "flex-end",
+        justifyContent: "flex-end"
+    },
     icon: {
         width: ICON_SIZE,
         height: ICON_SIZE

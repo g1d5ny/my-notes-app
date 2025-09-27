@@ -9,12 +9,14 @@ import { ToastContext } from "@/context/ToastContext"
 import * as Font from "expo-font"
 import { Slot } from "expo-router"
 import { SQLiteDatabase, SQLiteProvider } from "expo-sqlite"
-import { Suspense, useEffect, useState } from "react"
+import { Suspense, useState } from "react"
 import { ActivityIndicator, ColorSchemeName, StyleSheet, useColorScheme } from "react-native"
 import { PaperProvider } from "react-native-paper"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { ThemeColorPalette } from "../type"
 export const DATABASE_NAME = "memo"
+
+Font.loadAsync(customFontsToLoad)
 
 export default function RootLayout() {
     const scheme = useColorScheme()
@@ -22,10 +24,6 @@ export default function RootLayout() {
     const [currentScheme, setCurrentScheme] = useState<ColorSchemeName>(scheme)
     const [theme, setTheme] = useState<ThemeColorPalette>(currentTheme)
     const [message, setMessage] = useState<string>("")
-
-    useEffect(() => {
-        Font.loadAsync(customFontsToLoad)
-    }, [])
 
     return (
         <Suspense fallback={<ActivityIndicator size='large' />}>

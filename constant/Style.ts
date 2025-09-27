@@ -61,16 +61,45 @@ export const FontStyles = StyleSheet.create({
         fontFamily: FontFamilies.regular,
         letterSpacing: 0.2,
         fontWeight: "400"
+    },
+    ButtonText1: {
+        fontSize: 16,
+        lineHeight: 24,
+        fontFamily: FontFamilies.bold,
+        letterSpacing: 0.1,
+        fontWeight: "600"
+    },
+    ButtonText2: {
+        fontSize: 14,
+        lineHeight: 20,
+        fontFamily: FontFamilies.medium,
+        letterSpacing: 0.1,
+        fontWeight: "600"
     }
 })
 
 export const Color = {
-    white: "#fff",
-    black: "#000",
+    white: "#FFFFFF",
+    black: "#000000",
     cancel: "#c9c9c9",
-    gray: "#6B6B6B",
+    gray: {
+        1: "#EFEFEF",
+        2: "#6B6B6B"
+    },
     yellow: {
         1: "#6B6B6B",
         2: "#FCD53F"
+    },
+    background: {
+        light: "#FFFFFF",
+        dark: "#212121"
+    },
+    border: {
+        light: "#E1E1E1",
+        dark: "#636364"
+    },
+    text: {
+        light: "#090909",
+        dark: "#EEEEEE"
     }
 }

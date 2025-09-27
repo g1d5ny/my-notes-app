@@ -6,4 +6,5 @@ export interface ThemeColorPalette {
         1: string
         2: string
     }
+    icon: string
 }

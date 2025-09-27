@@ -1,19 +1,23 @@
+import { Color } from "./Style"
+
 export const LightTheme = {
-    background: "#FFFFFF",
-    border: "#E1E1E1",
-    text: "#090909",
+    background: Color.background.light,
+    border: Color.border.light,
+    text: Color.text.light,
     gray: {
-        1: "#EFEFEF",
-        2: "#6B6B6B"
-    }
+        1: Color.gray[1],
+        2: Color.gray[2]
+    },
+    icon: Color.black
 }
 
 export const DarkTheme = {
-    background: "#212121",
-    border: "#636364",
-    text: "#EEEEEE",
+    background: Color.background.dark,
+    border: Color.border.dark,
+    text: Color.text.dark,
     gray: {
-        1: "#EFEFEF",
-        2: "#6B6B6B"
-    }
+        1: Color.gray[1],
+        2: Color.gray[2]
+    },
+    icon: Color.white
 }

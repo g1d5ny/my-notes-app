@@ -10,7 +10,7 @@ import { OptionMenu, OptionMenuList } from "../OptionMenu"
 export const SettingOption = () => {
     const { theme, currentScheme, setTheme, setCurrentScheme } = useContext(ThemeContext)
 
-    const OptionList: OptionMenuList[] = [
+    const optionList: OptionMenuList[] = [
         {
             title: "선택",
             trailingIcon: <CheckOption theme={theme} />,
@@ -110,7 +110,7 @@ export const SettingOption = () => {
         return Platform.OS === "android" ? <VerticalDots theme={theme} /> : <HorizontalDots theme={theme} />
     }
 
-    return <OptionMenu anchor={<Dots />} list={OptionList} />
+    return <OptionMenu anchor={<Dots />} list={optionList} />
 }
 
 const styles = StyleSheet.create({

@@ -5,7 +5,7 @@ import { Platform, Pressable, StyleSheet, View } from "react-native"
 import { Styles } from "../../constant/Style"
 import { SettingOption } from "../option/SettingOption"
 
-export default function MainAppBar() {
+export const MainAppBar = () => {
     const { theme } = useContext(ThemeContext)
     const [pressed, setPressed] = useState(false)
 

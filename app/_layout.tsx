@@ -1,7 +1,7 @@
 import { AddMemo } from "@/component/AddMemo"
 import { FileCreateNullAppBar } from "@/component/appBar/FileCreateNullAppBar"
-import { FileSubmitAppBar } from "@/component/appBar/FileSubmitAppBar"
 import { MainAppBar } from "@/component/appBar/MainAppBar"
+import { PasteAppBar } from "@/component/appBar/PasteAppBar"
 import { CommonToast } from "@/component/CommonToast"
 import RoutingHeader from "@/component/RoutingHeader"
 import { customFontsToLoad } from "@/constant/Style"
@@ -38,7 +38,8 @@ export default function RootLayout() {
                                 {/* <FolderActionAppBar /> */}
                                 {/* <FileEditAppBar /> */}
                                 <FileCreateNullAppBar textLength={100} />
-                                <FileSubmitAppBar textLength={100} />
+                                {/* <FileSubmitAppBar textLength={100} /> */}
+                                <PasteAppBar />
                                 <RoutingHeader />
                                 <AddMemo />
                                 <CommonToast />

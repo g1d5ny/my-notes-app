@@ -1,20 +1,32 @@
-import { AndroidBack, IosBack, Search } from "@/assets/icons/svg/icon"
+import { AndroidBack, Close, IosBack, Paste } from "@/assets/icons/svg/icon"
+import { Styles } from "@/constant/Style"
 import { ThemeContext } from "@/context/ThemeContext"
 import { usePathname, useRouter } from "expo-router"
 import { useContext, useEffect, useState } from "react"
 import { Platform, Pressable, StyleSheet, View } from "react-native"
-import { Styles } from "../../constant/Style"
+import Toast from "react-native-toast-message"
 import { MessageModal } from "../modal/MessageModal"
-import { SettingOption } from "../option/SettingOption"
 import { AppBarForm } from "./AppBarForm"
 
-export const MainAppBar = () => {
+export const PasteAppBar = () => {
     const { theme } = useContext(ThemeContext)
     const router = useRouter()
     const pathname = usePathname()
-    const [pressed, setPressed] = useState(false)
-    const [resetModalVisible, setResetModalVisible] = useState(false)
+    const [cancelModalVisible, setCancelModalVisible] = useState(false)
     const [canBack, setCanBack] = useState(pathname.split("/").length > 2)
+
+    const paste = () => {
+        Toast.show({
+            text1: "붙여넣기 되었습니다.",
+            type: "customToast",
+            position: "bottom",
+            visibilityTime: 5000
+        })
+    }
+
+    const cancel = () => {
+        setCancelModalVisible(true)
+    }
 
     useEffect(() => {
         setCanBack(pathname.split("/").length > 2)
@@ -31,13 +43,15 @@ export const MainAppBar = () => {
                     )}
                 </View>
                 <View style={[Styles.row, styles.right]}>
-                    <Pressable onPress={() => setPressed(true)}>
-                        <Search theme={theme} />
+                    <Pressable onPress={cancel}>
+                        <Close theme={theme} />
                     </Pressable>
-                    <SettingOption setResetModalVisible={setResetModalVisible} />
+                    <Pressable onPress={paste}>
+                        <Paste theme={theme} />
+                    </Pressable>
                 </View>
             </AppBarForm>
-            <MessageModal message={"데이터를 초기화하시겠습니까?"} visible={resetModalVisible} onDismiss={() => setResetModalVisible(false)} onConfirm={() => setResetModalVisible(false)} confirmText={"초기화"} />
+            <MessageModal message={"붙여넣기를 취소하시겠습니까?"} visible={cancelModalVisible} onDismiss={() => setCancelModalVisible(false)} onConfirm={() => setCancelModalVisible(false)} confirmText={"취소"} />
         </>
     )
 }
@@ -53,14 +67,5 @@ const styles = StyleSheet.create({
     },
     left: {
         flex: 1
-    },
-    container: {
-        width: "100%",
-        height: Platform.OS === "ios" ? 44 : 56,
-        paddingVertical: Platform.OS === "ios" ? 8 : 12,
-        paddingHorizontal: 16,
-        alignItems: "center",
-        justifyContent: "space-between",
-        borderBottomWidth: 1
     }
 })

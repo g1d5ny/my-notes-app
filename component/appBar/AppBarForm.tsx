@@ -9,14 +9,19 @@ interface DefaultAppBarProps {
 export const AppBarForm = ({ children }: DefaultAppBarProps) => {
     const { theme } = useContext(ThemeContext)
 
-    return <View style={[Styles.row, styles.container, { backgroundColor: theme.background, borderColor: theme.border }]}>{children}</View>
+    return <View style={[Styles.row, Platform.OS === "ios" ? styles.iosContainer : styles.androidContainer, { backgroundColor: theme.background, borderColor: theme.border }]}>{children}</View>
 }
 
 const styles = StyleSheet.create({
-    container: {
+    iosContainer: {
         width: "100%",
-        // height: Platform.OS === "ios" ? 44 : 56,
-        paddingVertical: Platform.OS === "ios" ? 8 : 12,
+        paddingVertical: 8,
+        paddingHorizontal: 16,
+        borderBottomWidth: 1
+    },
+    androidContainer: {
+        width: "100%",
+        paddingVertical: 12,
         paddingHorizontal: 16,
         borderBottomWidth: 1
     }

@@ -1,7 +1,6 @@
 import { AddMemo } from "@/component/AddMemo"
 import { MainAppBar } from "@/component/appBar/MainAppBar"
 import { CommonToast } from "@/component/CommonToast"
-import RoutingHeader from "@/component/RoutingHeader"
 import { customFontsToLoad } from "@/constant/Style"
 import { DarkTheme, LightTheme } from "@/constant/Theme"
 import { ThemeContext } from "@/context/ThemeContext"
@@ -38,7 +37,7 @@ export default function RootLayout() {
                                 {/* <FileCreateNullAppBar textLength={100} /> */}
                                 {/* <FileSubmitAppBar textLength={100} /> */}
                                 {/* <PasteAppBar /> */}
-                                <RoutingHeader />
+                                {/* <RoutingHeader /> */}
                                 <AddMemo />
                                 <CommonToast />
                                 <Slot />
@@ -87,15 +86,16 @@ export async function migrateDbIfNeeded(db: SQLiteDatabase) {
 
         // ✅ 3단계: 초기 더미 데이터 삽입 (옵션)
         const now = Math.floor(Date.now() / 1000)
-        await db.runAsync(
-            `INSERT INTO memo (type, title, content, parentId, path, createdAt, updatedAt)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-            ["note", "환영합니다!", "이건 기본 메모입니다. 자유롭게 수정하거나 삭제해보세요.", null, "/환영합니다", now, now]
-        )
+        //     await db.runAsync(
+        //         `INSERT INTO memo (type, title, content, parentId, path, createdAt, updatedAt)
+        //    VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        //         ["note", "환영합니다!", "이건 기본 메모입니다. 자유롭게 수정하거나 삭제해보세요.", null, "/환영합니다", now, now]
+        //     )
 
         // ✅ 4단계: DB 버전 업데이트
-        await db.execAsync(`PRAGMA user_version = ${DATABASE_VERSION}`)
+        // await db.execAsync(`PRAGMA user_version = ${DATABASE_VERSION}`)
     }
+    await db.runAsync(`DELETE FROM memo`)
 
     // TODO: currentDbVersion === 1일 경우 추가 마이그레이션
 }

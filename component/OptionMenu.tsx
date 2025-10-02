@@ -35,9 +35,9 @@ export const OptionMenu = ({ anchor, list }: OptionMenuProps) => {
                             trailingIcon={() => {
                                 return item?.trailingIcon
                             }}
-                            leadingIcon={() => {
-                                return item?.leadingIcon
-                            }}
+                            {...(item.leadingIcon && {
+                                leadingIcon: () => item.leadingIcon
+                            })}
                             style={styles.menuItem}
                             titleStyle={[FontStyles.ButtonText2, { color: theme.text }]}
                             containerStyle={styles.containerStyle}
@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
         height: 1
     },
     menuItem: {
-        height: 40,
-        paddingHorizontal: 16
+        height: 40
+        // paddingHorizontal: 16
     }
 })

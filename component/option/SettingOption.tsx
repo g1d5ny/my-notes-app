@@ -1,20 +1,14 @@
-import { HorizontalDots, Search, VerticalDots } from "@/assets/icons/svg/icon"
+import { HorizontalDots, VerticalDots } from "@/assets/icons/svg/icon"
 import { CheckOption, ResetOption, SortOption, ThemeOption } from "@/assets/icons/svg/option/icon"
+import { FontStyles } from "@/constant/Style"
 import { DarkTheme, LightTheme } from "@/constant/Theme"
-import { useContext, useState } from "react"
-import { Image, Platform, Pressable, StyleSheet, Text, View } from "react-native"
-import { FontStyles, Styles } from "../constant/Style"
-import { ThemeContext } from "../context/ThemeContext"
-import { MessageModal } from "./modal/MessageModal"
-import { OptionMenu, OptionMenuList } from "./OptionMenu"
+import { ThemeContext } from "@/context/ThemeContext"
+import { useContext } from "react"
+import { Image, Platform, StyleSheet, Text } from "react-native"
+import { OptionMenu, OptionMenuList } from "../OptionMenu"
 
-export default function AppBar() {
+export const SettingOption = () => {
     const { theme, currentScheme, setTheme, setCurrentScheme } = useContext(ThemeContext)
-    const [modalVisible, setModalVisible] = useState(false)
-
-    const Dots = () => {
-        return Platform.OS === "android" ? <VerticalDots theme={theme} /> : <HorizontalDots theme={theme} />
-    }
 
     const OptionList: OptionMenuList[] = [
         {
@@ -112,41 +106,16 @@ export default function AppBar() {
         }
     ]
 
-    return (
-        <>
-            <View style={[Styles.row, styles.container, { backgroundColor: theme.background, borderColor: theme.border }]}>
-                <View style={styles.left} />
-                <View style={[Styles.row, styles.right]}>
-                    <Pressable onPress={() => setModalVisible(true)}>
-                        <Search theme={theme} />
-                    </Pressable>
-                    <OptionMenu anchor={<Dots />} list={OptionList} />
-                </View>
-            </View>
-            <MessageModal message='정말 삭제하시겠습니까?' visible={modalVisible} onDismiss={() => setModalVisible(false)} onConfirm={() => {}} />
-        </>
-    )
+    const Dots = () => {
+        return Platform.OS === "android" ? <VerticalDots theme={theme} /> : <HorizontalDots theme={theme} />
+    }
+
+    return <OptionMenu anchor={<Dots />} list={OptionList} />
 }
 
 const styles = StyleSheet.create({
     icon: {
         width: 24,
         height: 24
-    },
-    left: {
-        flex: 1
-    },
-    right: {
-        alignItems: "center",
-        alignSelf: "flex-end",
-        gap: 8
-    },
-    container: {
-        width: "100%",
-        paddingVertical: Platform.OS === "ios" ? 8 : 12,
-        paddingHorizontal: 16,
-        alignItems: "center",
-        justifyContent: "space-between",
-        borderBottomWidth: 1
     }
 })

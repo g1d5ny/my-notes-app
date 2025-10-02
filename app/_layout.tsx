@@ -1,5 +1,5 @@
 import { AddMemo } from "@/component/AddMemo"
-import AppBar from "@/component/AppBar"
+import MainAppBar from "@/component/appBar/MainAppBar"
 import { CommonToast } from "@/component/CommonToast"
 import RoutingHeader from "@/component/RoutingHeader"
 import { customFontsToLoad } from "@/constant/Style"
@@ -32,7 +32,7 @@ export default function RootLayout() {
                     <ToastContext.Provider value={{ message, setMessage }}>
                         <PaperProvider>
                             <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
-                                <AppBar />
+                                <MainAppBar />
                                 <RoutingHeader />
                                 <AddMemo />
                                 <CommonToast />

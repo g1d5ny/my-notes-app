@@ -5,7 +5,7 @@ interface Props {
     theme: ThemeColorPalette
 }
 
-export const Prev = ({ theme }: Props) => {
+export const IosBack = ({ theme }: Props) => {
     return (
         <Svg width='24' height='24' viewBox='0 0 24 24' fill='none'>
             <Path
@@ -16,7 +16,7 @@ export const Prev = ({ theme }: Props) => {
     )
 }
 
-export const Back = ({ theme }: Props) => {
+export const AndroidBack = ({ theme }: Props) => {
     return (
         <Svg width='24' height='24' viewBox='0 0 24 24' fill='none'>
             <Path
@@ -78,7 +78,7 @@ export const Search = ({ theme }: Props) => {
     )
 }
 
-export const HorizontalDots = ({ theme }: Props) => {
+export const IosDots = ({ theme }: Props) => {
     return (
         <Svg width='24' height='24' viewBox='0 0 24 24' fill='none'>
             <Path
@@ -89,7 +89,7 @@ export const HorizontalDots = ({ theme }: Props) => {
     )
 }
 
-export const VerticalDots = ({ theme }: Props) => {
+export const AndroidDots = ({ theme }: Props) => {
     return (
         <Svg width='24' height='24' viewBox='0 0 24 24' fill='none'>
             <Path

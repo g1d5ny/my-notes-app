@@ -1,4 +1,4 @@
-import { HorizontalDots, VerticalDots } from "@/assets/icons/svg/icon"
+import { AndroidDots, IosDots } from "@/assets/icons/svg/icon"
 import { CopyOption, DeleteOption, ExportOption, InfoOption, SortOption } from "@/assets/icons/svg/option/icon"
 import { ThemeContext } from "@/context/ThemeContext"
 import { Dispatch, SetStateAction, useContext, useState } from "react"
@@ -68,7 +68,7 @@ export const FileEditOption = ({ setDeleteModalVisible, setInfoModalVisible }: F
     ]
 
     const Dots = () => {
-        return Platform.OS === "android" ? <VerticalDots theme={theme} /> : <HorizontalDots theme={theme} />
+        return Platform.OS === "android" ? <AndroidDots theme={theme} /> : <IosDots theme={theme} />
     }
 
     return <OptionMenu anchor={<Dots />} list={fileEditOptionList} menuVisible={menuVisible} setMenuVisible={setMenuVisible} />

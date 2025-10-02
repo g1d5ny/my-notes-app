@@ -1,4 +1,4 @@
-import { HorizontalDots, VerticalDots } from "@/assets/icons/svg/icon"
+import { AndroidDots, IosDots } from "@/assets/icons/svg/icon"
 import { CheckOption, ResetOption, SortOption, ThemeOption } from "@/assets/icons/svg/option/icon"
 import { FontStyles } from "@/constant/Style"
 import { DarkTheme, LightTheme } from "@/constant/Theme"
@@ -132,7 +132,7 @@ export const SettingOption = ({ setResetModalVisible }: SettingOptionProps) => {
     ]
 
     const Dots = () => {
-        return Platform.OS === "android" ? <VerticalDots theme={theme} /> : <HorizontalDots theme={theme} />
+        return Platform.OS === "android" ? <AndroidDots theme={theme} /> : <IosDots theme={theme} />
     }
 
     return <OptionMenu anchor={<Dots />} list={mainOptionList} menuVisible={menuVisible} setMenuVisible={setMenuVisible} />

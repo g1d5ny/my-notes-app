@@ -1,11 +1,12 @@
 import { Search } from "@/assets/icons/svg/icon"
 import { ThemeContext } from "@/context/ThemeContext"
 import { useContext, useState } from "react"
-import { Platform, Pressable, StyleSheet, View } from "react-native"
+import { Pressable, StyleSheet, View } from "react-native"
 import { Styles } from "../../constant/Style"
 import { InfoModal } from "../modal/InfoModal"
 import { MessageModal } from "../modal/MessageModal"
 import { FileEditOption } from "../option/FileEditOption"
+import { AppBarForm } from "./AppBarForm"
 
 export const FileEditAppBar = () => {
     const { theme } = useContext(ThemeContext)
@@ -15,7 +16,7 @@ export const FileEditAppBar = () => {
 
     return (
         <>
-            <View style={[Styles.row, styles.container, { backgroundColor: theme.background, borderColor: theme.border }]}>
+            <AppBarForm>
                 <View style={styles.left} />
                 <View style={[Styles.row, styles.right]}>
                     <Pressable onPress={() => setPressed(true)}>
@@ -23,7 +24,7 @@ export const FileEditAppBar = () => {
                     </Pressable>
                     <FileEditOption setDeleteModalVisible={setDeleteModalVisible} setInfoModalVisible={setInfoModalVisible} />
                 </View>
-            </View>
+            </AppBarForm>
             <MessageModal message={"정말 삭제하시겠습니까?"} visible={deleteModalVisible} onDismiss={() => setDeleteModalVisible(false)} onConfirm={() => setDeleteModalVisible(false)} confirmText={"삭제"} />
             <InfoModal visible={infoModalVisible} onDismiss={() => setInfoModalVisible(false)} recentCreatedAt={"2025/04/26"} recentUpdatedAt={"2025/04/26"} recentViewedAt={"2025/04/26"} />
         </>
@@ -38,14 +39,5 @@ const styles = StyleSheet.create({
     },
     left: {
         flex: 1
-    },
-    container: {
-        width: "100%",
-        height: 56,
-        paddingVertical: Platform.OS === "ios" ? 8 : 12,
-        paddingHorizontal: 16,
-        alignItems: "center",
-        justifyContent: "space-between",
-        borderBottomWidth: 1
     }
 })

@@ -1,6 +1,4 @@
 import { Color, FontStyles } from "@/constant/Style"
-import { ToastContext } from "@/context/ToastContext"
-import { useContext, useEffect } from "react"
 import Toast, { BaseToast, BaseToastProps } from "react-native-toast-message"
 
 const toastConfig = {
@@ -22,17 +20,5 @@ const toastConfig = {
 }
 
 export const CommonToast = () => {
-    const { message, setMessage } = useContext(ToastContext)
-
-    useEffect(() => {
-        setMessage("toast!")
-
-        Toast.show({
-            text1: message,
-            type: "customToast",
-            position: "bottom",
-            visibilityTime: 5000
-        })
-    }, [])
     return <Toast config={toastConfig} />
 }

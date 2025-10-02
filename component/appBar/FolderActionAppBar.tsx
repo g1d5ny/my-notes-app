@@ -2,8 +2,9 @@ import { Close, Copy, Cut, Delete } from "@/assets/icons/svg/icon"
 import { Styles } from "@/constant/Style"
 import { ThemeContext } from "@/context/ThemeContext"
 import { useContext, useState } from "react"
-import { Platform, Pressable, StyleSheet, View } from "react-native"
+import { Pressable, StyleSheet, View } from "react-native"
 import { MessageModal } from "../modal/MessageModal"
+import { AppBarForm } from "./AppBarForm"
 
 export const FolderActionAppBar = () => {
     const { theme } = useContext(ThemeContext)
@@ -27,7 +28,7 @@ export const FolderActionAppBar = () => {
 
     return (
         <>
-            <View style={[Styles.row, styles.container, { backgroundColor: theme.background, borderColor: theme.border }]}>
+            <AppBarForm>
                 <Pressable onPress={() => setPressed(true)}>
                     <Close theme={theme} />
                 </Pressable>
@@ -38,7 +39,7 @@ export const FolderActionAppBar = () => {
                         </Pressable>
                     ))}
                 </View>
-            </View>
+            </AppBarForm>
             <MessageModal message={"정말 삭제하시겠습니까?"} visible={visible} onDismiss={() => setVisible(false)} onConfirm={() => setVisible(false)} confirmText={"삭제"} />
         </>
     )
@@ -49,15 +50,5 @@ const styles = StyleSheet.create({
         alignItems: "center",
         alignSelf: "flex-end",
         gap: 8
-    },
-
-    container: {
-        width: "100%",
-        height: 56,
-        paddingVertical: Platform.OS === "ios" ? 8 : 12,
-        paddingHorizontal: 16,
-        alignItems: "center",
-        justifyContent: "space-between",
-        borderBottomWidth: 1
     }
 })

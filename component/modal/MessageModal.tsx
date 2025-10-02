@@ -19,7 +19,7 @@ export const MessageModal = ({ message, visible, onDismiss, onConfirm, confirmTe
         <Modal visible={visible} onDismiss={onDismiss} contentContainerStyle={styles.modalContainer} style={{ alignItems: "center", justifyContent: "center" }}>
             <View style={[styles.modal, { backgroundColor: theme.background }]}>
                 <View style={styles.messageContainer}>
-                    <Text style={[FontStyles.Body, { color: theme.text }]}>{message}</Text>
+                    <Text style={[FontStyles.Body, { color: theme.text, textAlign: "center" }]}>{message}</Text>
                 </View>
                 <View style={[styles.bottom, { borderColor: theme.border }]}>
                     <TouchableOpacity style={[styles.bottomOption, { borderRightWidth: 1, borderColor: theme.border }]} onPress={onDismiss}>

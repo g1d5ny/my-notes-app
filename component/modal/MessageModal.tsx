@@ -4,7 +4,15 @@ import { useContext } from "react"
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native"
 import { Modal } from "react-native-paper"
 
-export const MessageModal = ({ message, visible, onDismiss, onConfirm }: { message: string; visible: boolean; onDismiss: () => void; onConfirm: () => void }) => {
+interface MessageModalProps {
+    message: string
+    visible: boolean
+    onDismiss: () => void
+    onConfirm: () => void
+    confirmText: string
+}
+
+export const MessageModal = ({ message, visible, onDismiss, onConfirm, confirmText }: MessageModalProps) => {
     const { theme } = useContext(ThemeContext)
 
     return (
@@ -24,7 +32,7 @@ export const MessageModal = ({ message, visible, onDismiss, onConfirm }: { messa
                             onDismiss()
                         }}
                     >
-                        <Text style={[FontStyles.SubTitle, { color: Color.yellow[1] }]}>삭제</Text>
+                        <Text style={[FontStyles.SubTitle, { color: Color.yellow[1] }]}>{confirmText}</Text>
                     </TouchableOpacity>
                 </View>
             </View>

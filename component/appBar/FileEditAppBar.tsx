@@ -3,13 +3,15 @@ import { ThemeContext } from "@/context/ThemeContext"
 import { useContext, useState } from "react"
 import { Platform, Pressable, StyleSheet, View } from "react-native"
 import { Styles } from "../../constant/Style"
+import { InfoModal } from "../modal/InfoModal"
 import { MessageModal } from "../modal/MessageModal"
-import { SettingOption } from "../option/SettingOption"
+import { FileEditOption } from "../option/FileEditOption"
 
-export const MainAppBar = () => {
+export const FileEditAppBar = () => {
     const { theme } = useContext(ThemeContext)
     const [pressed, setPressed] = useState(false)
-    const [resetModalVisible, setResetModalVisible] = useState(false)
+    const [deleteModalVisible, setDeleteModalVisible] = useState(false)
+    const [infoModalVisible, setInfoModalVisible] = useState(false)
 
     return (
         <>
@@ -19,10 +21,11 @@ export const MainAppBar = () => {
                     <Pressable onPress={() => setPressed(true)}>
                         <Search theme={theme} />
                     </Pressable>
-                    <SettingOption setResetModalVisible={setResetModalVisible} />
+                    <FileEditOption setDeleteModalVisible={setDeleteModalVisible} setInfoModalVisible={setInfoModalVisible} />
                 </View>
             </View>
-            <MessageModal message={"데이터를 초기화하시겠습니까?"} visible={resetModalVisible} onDismiss={() => setResetModalVisible(false)} onConfirm={() => setResetModalVisible(false)} confirmText={"초기화"} />
+            <MessageModal message={"정말 삭제하시겠습니까?"} visible={deleteModalVisible} onDismiss={() => setDeleteModalVisible(false)} onConfirm={() => setDeleteModalVisible(false)} confirmText={"삭제"} />
+            <InfoModal visible={infoModalVisible} onDismiss={() => setInfoModalVisible(false)} recentCreatedAt={"2025/04/26"} recentUpdatedAt={"2025/04/26"} recentViewedAt={"2025/04/26"} />
         </>
     )
 }

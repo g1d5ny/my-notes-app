@@ -1,6 +1,6 @@
 import { FontStyles } from "@/constant/Style"
 import { ThemeContext } from "@/context/ThemeContext"
-import { useContext, useState } from "react"
+import { Dispatch, SetStateAction, useContext } from "react"
 import { Pressable, StyleSheet, View } from "react-native"
 import { Divider, Menu } from "react-native-paper"
 
@@ -17,10 +17,11 @@ export interface OptionMenuList {
 interface OptionMenuProps {
     anchor: React.ReactNode
     list: OptionMenuList[]
+    menuVisible: boolean
+    setMenuVisible: Dispatch<SetStateAction<boolean>>
 }
-export const OptionMenu = ({ anchor, list }: OptionMenuProps) => {
+export const OptionMenu = ({ anchor, list, menuVisible, setMenuVisible }: OptionMenuProps) => {
     const { theme } = useContext(ThemeContext)
-    const [menuVisible, setMenuVisible] = useState(false)
     const openMenu = () => setMenuVisible(true)
     const closeMenu = () => setMenuVisible(false)
 
@@ -30,6 +31,7 @@ export const OptionMenu = ({ anchor, list }: OptionMenuProps) => {
                 return (
                     <View key={index}>
                         <Menu.Item
+                            disabled={item.disabled}
                             onPress={item.onPress}
                             title={item.title}
                             trailingIcon={() => {

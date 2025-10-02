@@ -83,8 +83,8 @@ export const Color = {
     black: "#000000",
     cancel: "#c9c9c9",
     gray: {
-        1: "#EFEFEF",
-        2: "#6B6B6B"
+        1: "#6B6B6B",
+        2: "#EFEFEF"
     },
     yellow: {
         1: "#FFB02E",

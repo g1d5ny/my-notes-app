@@ -37,10 +37,9 @@ export const FolderActionAppBar = () => {
                             {icon.icon}
                         </Pressable>
                     ))}
-                    {/* <FolderActionOption /> */}
                 </View>
             </View>
-            <MessageModal message={"정말 삭제하시겠습니까?"} visible={visible} onDismiss={() => setVisible(false)} onConfirm={() => setVisible(false)} />
+            <MessageModal message={"정말 삭제하시겠습니까?"} visible={visible} onDismiss={() => setVisible(false)} onConfirm={() => setVisible(false)} confirmText={"삭제"} />
         </>
     )
 }

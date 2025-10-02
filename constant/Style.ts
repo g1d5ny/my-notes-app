@@ -50,7 +50,7 @@ export const FontStyles = StyleSheet.create({
     },
     BodySmall: {
         fontSize: 14,
-        lineHeight: 20,
+        // lineHeight: 20,
         fontFamily: FontFamilies.regular,
         letterSpacing: 0.1,
         fontWeight: "400"

@@ -1,3 +1,5 @@
+import { RelativePathString } from "expo-router"
+
 export interface ThemeColorPalette {
     background: string
     border: string
@@ -16,7 +18,7 @@ export interface Memo {
     title: string
     content: string
     parentId: string
-    path: string
+    path: RelativePathString
     createdAt: number
     updatedAt: number
 }

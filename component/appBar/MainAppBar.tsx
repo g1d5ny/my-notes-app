@@ -40,7 +40,7 @@ export const MainAppBar = () => {
     const [resetModalVisible, setResetModalVisible] = useState(false)
     const [canBack, setCanBack] = useState(pathname.split("/").length > 2)
     const { width } = useWindowDimensions()
-    const translateX = useSharedValue(-width) // 초기값을 화면 밖으로 설정
+    const translateX = useSharedValue(-width) // 초기값을 화면 너비만큼 밖으로 설정
 
     const isInputVisible = useDerivedValue(() => {
         return translateX.value > -width
@@ -103,7 +103,8 @@ const styles = StyleSheet.create({
         borderColor: "rgba(0, 0, 0, 0.6)"
     },
     input: {
-        color: "rgba(0, 0, 0, 0.6)"
+        color: "rgba(0, 0, 0, 0.6)",
+        textAlign: "center"
     },
     back: {
         alignSelf: "flex-start"

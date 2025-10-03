@@ -2,7 +2,6 @@ import { FilePlus, FolderPlus } from "@/assets/icons/svg/icon"
 import { FontStyles, Styles } from "@/constant/Style"
 import { DarkTheme, LightTheme } from "@/constant/Theme"
 import { ThemeContext } from "@/context/ThemeContext"
-import { router } from "expo-router"
 import React, { useContext, useState } from "react"
 import { Image, Pressable, StyleSheet, Text } from "react-native"
 import { Modal } from "react-native-paper"
@@ -11,11 +10,15 @@ import { useSafeAreaInsets } from "react-native-safe-area-context"
 const MARGIN = 16
 const ICON_SIZE = 80
 
-export const AddMemo = () => {
-    const { theme } = useContext(ThemeContext)
+interface AddMemoProps {
+    onAddFile: () => void
+    onAddFolder: () => void
+}
 
-    const [modalVisible, setModalVisible] = useState(false)
+export const AddMemo = ({ onAddFile, onAddFolder }: AddMemoProps) => {
+    const { theme } = useContext(ThemeContext)
     const { bottom } = useSafeAreaInsets()
+    const [modalVisible, setModalVisible] = useState(false)
 
     const closeModal = () => {
         setModalVisible(false)
@@ -27,11 +30,12 @@ export const AddMemo = () => {
 
     const handleAddFile = () => {
         closeModal()
-        router.push("/add/AddFile")
+        onAddFile()
     }
 
     const handleAddFolder = () => {
         closeModal()
+        onAddFolder()
     }
 
     return (
@@ -74,6 +78,6 @@ const styles = StyleSheet.create({
     plus: {
         position: "absolute",
         right: MARGIN,
-        zIndex: 20
+        zIndex: 0
     }
 })

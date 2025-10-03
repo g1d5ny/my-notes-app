@@ -8,7 +8,7 @@ import { MessageModal } from "../modal/MessageModal"
 import { FileEditOption } from "../option/FileEditOption"
 import { AppBarForm } from "./AppBarForm"
 
-export const FileEditAppBar = () => {
+export const FileDetailAppBar = () => {
     const { theme } = useContext(ThemeContext)
     const [pressed, setPressed] = useState(false)
     const [deleteModalVisible, setDeleteModalVisible] = useState(false)

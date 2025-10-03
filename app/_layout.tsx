@@ -1,6 +1,5 @@
-import { AddMemo } from "@/component/AddMemo"
-import { MainAppBar } from "@/component/appBar/MainAppBar"
 import { CommonToast } from "@/component/CommonToast"
+import { AddMemoController } from "@/component/modal/add"
 import { customFontsToLoad } from "@/constant/Style"
 import { DarkTheme, LightTheme } from "@/constant/Theme"
 import { ThemeContext } from "@/context/ThemeContext"
@@ -10,6 +9,7 @@ import { Slot } from "expo-router"
 import { SQLiteDatabase, SQLiteProvider } from "expo-sqlite"
 import { Suspense, useState } from "react"
 import { ActivityIndicator, ColorSchemeName, StyleSheet, useColorScheme } from "react-native"
+import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { PaperProvider } from "react-native-paper"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { ThemeColorPalette } from "../type"
@@ -25,28 +25,23 @@ export default function RootLayout() {
     const [message, setMessage] = useState<string>("")
 
     return (
-        <Suspense fallback={<ActivityIndicator size='large' />}>
-            <SQLiteProvider databaseName={DATABASE_NAME} options={{ enableChangeListener: true }} useSuspense onInit={migrateDbIfNeeded}>
-                <ThemeContext.Provider value={{ theme, setTheme, currentScheme, setCurrentScheme }}>
-                    <ToastContext.Provider value={{ message, setMessage }}>
-                        <PaperProvider>
-                            <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
-                                <MainAppBar />
-                                {/* <FolderActionAppBar /> */}
-                                {/* <FileEditAppBar /> */}
-                                {/* <FileCreateNullAppBar textLength={100} /> */}
-                                {/* <FileSubmitAppBar textLength={100} /> */}
-                                {/* <PasteAppBar /> */}
-                                {/* <RoutingHeader /> */}
-                                <AddMemo />
-                                <CommonToast />
-                                <Slot />
-                            </SafeAreaView>
-                        </PaperProvider>
-                    </ToastContext.Provider>
-                </ThemeContext.Provider>
-            </SQLiteProvider>
-        </Suspense>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+            <Suspense fallback={<ActivityIndicator size='large' />}>
+                <SQLiteProvider databaseName={DATABASE_NAME} options={{ enableChangeListener: true }} useSuspense onInit={migrateDbIfNeeded}>
+                    <ThemeContext.Provider value={{ theme, setTheme, currentScheme, setCurrentScheme }}>
+                        <ToastContext.Provider value={{ message, setMessage }}>
+                            <PaperProvider>
+                                <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
+                                    <Slot />
+                                    <AddMemoController />
+                                    <CommonToast />
+                                </SafeAreaView>
+                            </PaperProvider>
+                        </ToastContext.Provider>
+                    </ThemeContext.Provider>
+                </SQLiteProvider>
+            </Suspense>
+        </GestureHandlerRootView>
     )
 }
 
@@ -85,7 +80,7 @@ export async function migrateDbIfNeeded(db: SQLiteDatabase) {
     `)
 
         // ✅ 3단계: 초기 더미 데이터 삽입 (옵션)
-        const now = Math.floor(Date.now() / 1000)
+        // const now = Math.floor(Date.now() / 1000)
         //     await db.runAsync(
         //         `INSERT INTO memo (type, title, content, parentId, path, createdAt, updatedAt)
         //    VALUES (?, ?, ?, ?, ?, ?, ?)`,
@@ -93,9 +88,9 @@ export async function migrateDbIfNeeded(db: SQLiteDatabase) {
         //     )
 
         // ✅ 4단계: DB 버전 업데이트
-        // await db.execAsync(`PRAGMA user_version = ${DATABASE_VERSION}`)
+        await db.execAsync(`PRAGMA user_version = ${DATABASE_VERSION}`)
     }
-    await db.runAsync(`DELETE FROM memo`)
+    // await db.runAsync(`DELETE FROM memo`)
 
     // TODO: currentDbVersion === 1일 경우 추가 마이그레이션
 }

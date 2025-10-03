@@ -9,3 +9,14 @@ export interface ThemeColorPalette {
     gray: string
     icon: string
 }
+
+export interface Memo {
+    id: number
+    type: string
+    title: string
+    content: string
+    parentId: string
+    path: string
+    createdAt: number
+    updatedAt: number
+}

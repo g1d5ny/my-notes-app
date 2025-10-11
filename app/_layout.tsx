@@ -3,6 +3,8 @@ import { customFontsToLoad } from "@/constant/Style"
 import { DarkTheme, LightTheme } from "@/constant/Theme"
 import { ThemeContext } from "@/context/ThemeContext"
 import { ToastContext } from "@/context/ToastContext"
+import { queryClient } from "@/store"
+import { QueryClientProvider } from "@tanstack/react-query"
 import * as Font from "expo-font"
 import { Slot } from "expo-router"
 import { SQLiteDatabase, SQLiteProvider } from "expo-sqlite"
@@ -23,22 +25,24 @@ export default function RootLayout() {
     const [message, setMessage] = useState<string>("")
 
     return (
-        <GestureHandlerRootView style={{ flex: 1 }}>
-            <Suspense fallback={<ActivityIndicator size='large' />}>
-                <SQLiteProvider databaseName={DATABASE_NAME} options={{ enableChangeListener: true }} useSuspense onInit={migrateDbIfNeeded}>
-                    <ThemeContext.Provider value={{ theme, setTheme, currentScheme, setCurrentScheme }}>
-                        <ToastContext.Provider value={{ message, setMessage }}>
-                            <PaperProvider>
-                                <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
-                                    <Slot />
-                                    <CommonToast />
-                                </SafeAreaView>
-                            </PaperProvider>
-                        </ToastContext.Provider>
-                    </ThemeContext.Provider>
-                </SQLiteProvider>
-            </Suspense>
-        </GestureHandlerRootView>
+        <QueryClientProvider client={queryClient}>
+            <GestureHandlerRootView style={{ flex: 1 }}>
+                <Suspense fallback={<ActivityIndicator size='large' />}>
+                    <SQLiteProvider databaseName={DATABASE_NAME} options={{ enableChangeListener: true }} useSuspense onInit={migrateDbIfNeeded}>
+                        <ThemeContext.Provider value={{ theme, setTheme, currentScheme, setCurrentScheme }}>
+                            <ToastContext.Provider value={{ message, setMessage }}>
+                                <PaperProvider>
+                                    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
+                                        <Slot />
+                                        <CommonToast />
+                                    </SafeAreaView>
+                                </PaperProvider>
+                            </ToastContext.Provider>
+                        </ThemeContext.Provider>
+                    </SQLiteProvider>
+                </Suspense>
+            </GestureHandlerRootView>
+        </QueryClientProvider>
     )
 }
 
@@ -64,7 +68,7 @@ export async function migrateDbIfNeeded(db: SQLiteDatabase) {
 
         // ✅ 2단계: memo 테이블 생성
         await db.execAsync(`
-      CREATE TABLE IF NOT EXISTS memo (
+      CREATE TABLE IF NOT EXISTS ${DATABASE_NAME} (
         id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
         type TEXT NOT NULL,
         title TEXT NOT NULL,
@@ -72,7 +76,8 @@ export async function migrateDbIfNeeded(db: SQLiteDatabase) {
         parentId TEXT,
         path TEXT NOT NULL,
         createdAt INTEGER NOT NULL,
-        updatedAt INTEGER NOT NULL
+        updatedAt INTEGER NOT NULL,
+        viewedAt INTEGER NOT NULL
       );
     `)
 
@@ -88,6 +93,7 @@ export async function migrateDbIfNeeded(db: SQLiteDatabase) {
         await db.execAsync(`PRAGMA user_version = ${DATABASE_VERSION}`)
     }
     // await db.runAsync(`DELETE FROM memo`)
+    // await db.execAsync(`DROP TABLE IF EXISTS memo`)
 
     // TODO: currentDbVersion === 1일 경우 추가 마이그레이션
 }

@@ -5,7 +5,8 @@ export const folder = sqliteTable("folder", {
     title: text("title").notNull(),
     parentId: text("parentId"),
     createdAt: integer("createdAt").notNull(),
-    updatedAt: integer("updatedAt").notNull()
+    updatedAt: integer("updatedAt").notNull(),
+    viewedAt: integer("viewedAt").notNull()
 })
 
 export const file = sqliteTable("file", {
@@ -14,7 +15,8 @@ export const file = sqliteTable("file", {
     content: text("content").notNull(),
     parentId: text("parentId"),
     createdAt: integer("createdAt").notNull(),
-    updatedAt: integer("updatedAt").notNull()
+    updatedAt: integer("updatedAt").notNull(),
+    viewedAt: integer("viewedAt").notNull()
 })
 
 export type Folder = typeof folder.$inferSelect

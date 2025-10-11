@@ -21,8 +21,10 @@ interface FileCreateAppBarProps {
     handleSubmit: UseFormHandleSubmit<FormValues, FormValues>
     close: () => void
     back: () => void
+    inputBlur: () => void
+    loadMemos: () => Promise<void>
 }
-export const FileCreateAppBar = ({ textLength, handleSubmit, close, back }: FileCreateAppBarProps) => {
+export const FileCreateAppBar = ({ textLength, handleSubmit, close, back, inputBlur, loadMemos }: FileCreateAppBarProps) => {
     const pathname = usePathname()
     const { theme } = useContext(ThemeContext)
     const { top } = useSafeAreaInsets()
@@ -36,7 +38,7 @@ export const FileCreateAppBar = ({ textLength, handleSubmit, close, back }: File
                     const now = Math.floor(Date.now() / 1000)
                     const result = await db.runAsync(
                         `INSERT INTO ${DATABASE_NAME} (type, title, content, parentId, path, createdAt, updatedAt, viewedAt)
-                   VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
                         ["file", data.title, data.content, parentId, `/`, now, now, now]
                     )
 
@@ -46,10 +48,10 @@ export const FileCreateAppBar = ({ textLength, handleSubmit, close, back }: File
 
                     await db.runAsync(`UPDATE ${DATABASE_NAME} SET path = ? WHERE id = ?`, [newPath, newId])
 
-                    // 저장 후 데이터 확인
-                    // await db.getAllAsync("SELECT * FROM memo")
-
+                    inputBlur()
+                    await loadMemos()
                     back()
+
                     Toast.show({
                         text1: "작성된 글이 저장되었습니다.",
                         type: "customToast",
@@ -78,7 +80,6 @@ export const FileCreateAppBar = ({ textLength, handleSubmit, close, back }: File
             }
         )()
     }
-
     return (
         <AppBarForm>
             <View style={[Styles.row, styles.container, { paddingTop: top }]}>

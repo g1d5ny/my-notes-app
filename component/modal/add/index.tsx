@@ -1,9 +1,12 @@
 import BottomSheet from "@gorhom/bottom-sheet"
 import { useRef } from "react"
-import AddFile from "./file"
+import { AddFile } from "./file"
 import { AddMemo } from "./memo"
 
-export const AddMemoController = () => {
+interface AddMemoControllerProps {
+    loadMemos: () => Promise<void>
+}
+export const AddMemoController = ({ loadMemos }: AddMemoControllerProps) => {
     const bottomSheetRef = useRef<BottomSheet>(null)
 
     const handleAddFile = () => {
@@ -17,7 +20,7 @@ export const AddMemoController = () => {
     return (
         <>
             <AddMemo onAddFile={handleAddFile} onAddFolder={handleAddFolder} />
-            <AddFile ref={bottomSheetRef} />
+            <AddFile ref={bottomSheetRef} loadMemos={loadMemos} />
         </>
     )
 }

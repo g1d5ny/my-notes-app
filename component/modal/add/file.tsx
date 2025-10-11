@@ -4,6 +4,7 @@ import { TitleInput } from "@/component/input/TitleInput"
 import { ThemeContext } from "@/context/ThemeContext"
 import BottomSheet, { BottomSheetScrollView } from "@gorhom/bottom-sheet"
 import { BottomSheetMethods } from "@gorhom/bottom-sheet/lib/typescript/types"
+import { useSQLiteContext } from "expo-sqlite"
 import { forwardRef, useContext, useRef, useState } from "react"
 import { Controller, useForm } from "react-hook-form"
 import { Keyboard, StyleSheet, TextInput, View } from "react-native"
@@ -15,9 +16,12 @@ type FormValues = {
     content: string
 }
 
-const AddFile = forwardRef<BottomSheetMethods>((props, ref) => {
+export const AddFile = forwardRef<BottomSheetMethods, { loadMemos: () => Promise<void> }>((props, ref) => {
     const { theme } = useContext(ThemeContext)
     const { bottom } = useSafeAreaInsets()
+    const db = useSQLiteContext()
+
+    const titleRef = useRef<TextInput>(null)
     const contentRef = useRef<TextInput>(null)
     const [showDeleteModal, setShowDeleteModal] = useState(false)
 
@@ -27,7 +31,12 @@ const AddFile = forwardRef<BottomSheetMethods>((props, ref) => {
 
     const contentText = watch("content")
 
-    const back = () => {
+    const inputBlur = () => {
+        titleRef.current?.blur()
+        contentRef.current?.blur()
+    }
+
+    const back = async () => {
         if (ref && typeof ref !== "function" && ref.current) {
             ref.current.close()
             resetField("title")
@@ -46,7 +55,7 @@ const AddFile = forwardRef<BottomSheetMethods>((props, ref) => {
             <BottomSheet
                 ref={ref}
                 index={-1}
-                handleComponent={() => <FileCreateAppBar textLength={contentText.length} handleSubmit={handleSubmit} close={close} back={back} />}
+                handleComponent={() => <FileCreateAppBar textLength={contentText.length} handleSubmit={handleSubmit} close={close} back={back} inputBlur={inputBlur} loadMemos={props.loadMemos} />}
                 snapPoints={["100%"]}
                 backgroundStyle={{ backgroundColor: theme.background }}
                 enablePanDownToClose={true}
@@ -58,7 +67,7 @@ const AddFile = forwardRef<BottomSheetMethods>((props, ref) => {
                         control={control}
                         name='title'
                         rules={{ required: true }}
-                        render={({ field: { onChange, onBlur, value } }) => <TitleInput onBlur={onBlur} onChangeText={onChange} value={value} onSubmitEditing={() => contentRef.current?.focus()} />}
+                        render={({ field: { onChange, onBlur, value } }) => <TitleInput ref={titleRef} onBlur={onBlur} onChangeText={onChange} value={value} onSubmitEditing={() => contentRef.current?.focus()} />}
                     />
                     <BottomSheetScrollView showsVerticalScrollIndicator>
                         <Controller control={control} name='content' rules={{ required: true }} render={({ field: { onChange, onBlur, value } }) => <ContentInput ref={contentRef} onBlur={onBlur} onChangeText={onChange} value={value} />} />
@@ -80,7 +89,6 @@ const AddFile = forwardRef<BottomSheetMethods>((props, ref) => {
 })
 
 AddFile.displayName = "AddFile"
-export default AddFile
 
 const styles = StyleSheet.create({
     contentContainer: {

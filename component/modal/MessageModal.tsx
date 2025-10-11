@@ -16,7 +16,7 @@ export const MessageModal = ({ message, visible, onDismiss, onConfirm, confirmTe
     const { theme } = useContext(ThemeContext)
 
     return (
-        <Modal visible={visible} onDismiss={onDismiss} contentContainerStyle={styles.modalContainer} style={{ alignItems: "center", justifyContent: "center" }}>
+        <Modal visible={visible} onDismiss={onDismiss} contentContainerStyle={styles.modalContainer} style={styles.center}>
             <View style={[styles.modal, { backgroundColor: theme.background }]}>
                 <View style={styles.messageContainer}>
                     <Text style={[FontStyles.Body, { color: theme.text, textAlign: "center" }]}>{message}</Text>
@@ -41,6 +41,10 @@ export const MessageModal = ({ message, visible, onDismiss, onConfirm, confirmTe
 }
 
 const styles = StyleSheet.create({
+    center: {
+        alignItems: "center",
+        justifyContent: "center"
+    },
     messageContainer: {
         flex: 1,
         justifyContent: "center"

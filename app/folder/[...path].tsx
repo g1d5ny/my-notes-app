@@ -1,18 +1,20 @@
-import { FileDetailAppBar } from "@/component/appBar/FileDetailAppBar"
+import { FileDetailAppBar, ModalVisible } from "@/component/appBar/FileDetailAppBar"
 import { ContentInput } from "@/component/input/ContentInput"
 import { TitleInput } from "@/component/input/TitleInput"
-import { ThemeContext } from "@/context/ThemeContext"
+import { InfoModal } from "@/component/modal/InfoModal"
+import { MessageModal } from "@/component/modal/MessageModal"
 import { DATABASE_NAME, Memo } from "@/type"
-import { usePathname } from "expo-router"
+import { router, usePathname } from "expo-router"
 import { useSQLiteContext } from "expo-sqlite"
-import { useContext, useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { ScrollView, StyleSheet, TextInput } from "react-native"
+import Toast from "react-native-toast-message"
 
 export default function FolderScreen() {
     const pathname = usePathname()
-    const { theme } = useContext(ThemeContext)
     const db = useSQLiteContext()
     const titleRef = useRef<TextInput>(null)
+    const [{ deleteModalVisible, infoModalVisible }, setModalVisible] = useState<ModalVisible>({ deleteModalVisible: false, infoModalVisible: false })
     const [memo, setMemo] = useState<Memo>({} as Memo)
 
     const onChangeTitle = (text: string) => {
@@ -31,6 +33,22 @@ export default function FolderScreen() {
         db.runAsync(`UPDATE ${DATABASE_NAME} SET content = ? WHERE id = ?`, [memo?.content, memo?.id])
     }
 
+    const deleteFile = async () => {
+        try {
+            await db.runAsync(`DELETE FROM ${DATABASE_NAME} WHERE id = ?`, [memo.id])
+            setModalVisible(prev => ({ ...prev, infoModalVisible: false }))
+            Toast.show({
+                text1: "삭제되었습니다.",
+                type: "customToast",
+                position: "bottom",
+                visibilityTime: 3000
+            })
+            router.back()
+        } catch (error) {
+            console.error("메모 삭제 실패:", error)
+        }
+    }
+
     const loadMemoAndUpdateViewedAt = async () => {
         const result = await db.getAllAsync(`SELECT * FROM ${DATABASE_NAME} WHERE path = ?`, [pathname])
         setMemo(result[0] as Memo)
@@ -44,15 +62,13 @@ export default function FolderScreen() {
 
     return (
         <>
-            <FileDetailAppBar memo={memo} titleRef={titleRef} />
+            <FileDetailAppBar memo={memo} titleRef={titleRef} setModalVisible={setModalVisible} />
             <ScrollView contentContainerStyle={styles.container}>
-                <TitleInput ref={titleRef} onChangeText={onChangeTitle} onBlur={saveTitle}>
-                    {memo?.title}
-                </TitleInput>
-                <ContentInput onChangeText={onChangeContent} onBlur={saveContent}>
-                    {memo?.content}
-                </ContentInput>
+                <TitleInput ref={titleRef} value={memo?.title} onChangeText={onChangeTitle} onBlur={saveTitle} />
+                <ContentInput value={memo?.content} onChangeText={onChangeContent} onBlur={saveContent} />
             </ScrollView>
+            <MessageModal message={"정말 삭제하시겠습니까?"} visible={deleteModalVisible} onDismiss={() => setModalVisible(prev => ({ ...prev, deleteModalVisible: false }))} onConfirm={deleteFile} confirmText={"삭제"} />
+            <InfoModal visible={infoModalVisible} onDismiss={() => setModalVisible(prev => ({ ...prev, infoModalVisible: false }))} createdAt={memo.createdAt} updatedAt={memo.updatedAt} viewedAt={memo.viewedAt} />
         </>
     )
 }

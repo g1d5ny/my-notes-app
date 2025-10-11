@@ -27,15 +27,15 @@ export const InfoModal = ({ visible, onDismiss, createdAt, updatedAt, viewedAt }
     return (
         <Modal visible={visible} onDismiss={onDismiss} contentContainerStyle={styles.modalContainer} style={styles.center}>
             <View style={[styles.modal, { backgroundColor: theme.background }]}>
-                <View style={[Styles.row, styles.messageContainer]}>
+                <View style={[Styles.row, styles.dateContainer]}>
                     <Text style={[FontStyles.BodySmall, { color: theme.gray }]}>최근 생성 시간</Text>
                     <Text style={[FontStyles.BodySmall, { color: theme.gray }]}>{formatUnixTime(createdAt)}</Text>
                 </View>
-                <View style={[Styles.row, styles.messageContainer]}>
+                <View style={[Styles.row, styles.dateContainer]}>
                     <Text style={[FontStyles.BodySmall, { color: theme.gray }]}>최근 수정 시간</Text>
                     <Text style={[FontStyles.BodySmall, { color: theme.gray }]}>{formatUnixTime(updatedAt)}</Text>
                 </View>
-                <View style={[Styles.row, styles.messageContainer]}>
+                <View style={[Styles.row, styles.dateContainer]}>
                     <Text style={[FontStyles.BodySmall, { color: theme.gray }]}>최근 조회 시간</Text>
                     <Text style={[FontStyles.BodySmall, { color: theme.gray }]}>{formatUnixTime(viewedAt)}</Text>
                 </View>
@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center"
     },
-    messageContainer: {
+    dateContainer: {
         width: "100%",
         height: 36,
         paddingVertical: 8,

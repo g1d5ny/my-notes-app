@@ -1,9 +1,11 @@
 import { AndroidBack, IosBack } from "@/assets/icons/svg/icon"
 import { ThemeContext } from "@/context/ThemeContext"
+import { DATABASE_NAME, Memo } from "@/type"
 import { router } from "expo-router"
 import { useSQLiteContext } from "expo-sqlite"
 import { useContext, useState } from "react"
-import { Platform, Pressable, StyleSheet, View } from "react-native"
+import { Platform, Pressable, StyleSheet, TextInput, View } from "react-native"
+import { useSafeAreaInsets } from "react-native-safe-area-context"
 import Toast from "react-native-toast-message"
 import { Styles } from "../../constant/Style"
 import { InfoModal } from "../modal/InfoModal"
@@ -11,14 +13,32 @@ import { MessageModal } from "../modal/MessageModal"
 import { FileEditOption } from "../option/FileEditOption"
 import { AppBarForm } from "./AppBarForm"
 
-export const FileDetailAppBar = ({ id }: { id: number }) => {
+interface FileDetailAppBarProps {
+    memo: Memo
+    titleRef: React.RefObject<TextInput>
+}
+export const FileDetailAppBar = ({ memo, titleRef }: FileDetailAppBarProps) => {
     const { theme } = useContext(ThemeContext)
     const db = useSQLiteContext()
+    const { top } = useSafeAreaInsets()
     const [deleteModalVisible, setDeleteModalVisible] = useState(false)
     const [infoModalVisible, setInfoModalVisible] = useState(false)
 
+    const editFile = () => {
+        titleRef.current?.focus()
+    }
+
+    const showDeleteModal = () => {
+        setDeleteModalVisible(true)
+    }
+
     const deleteFile = async () => {
-        await db.runAsync("DELETE FROM memo WHERE id = ?", [id])
+        try {
+            console.log("memo.id: ", memo.id)
+            await db.runAsync(`DELETE FROM ${DATABASE_NAME} WHERE id = ?`, [memo.id])
+        } catch (error) {
+            console.error("메모 삭제 실패:", error)
+        }
         setInfoModalVisible(false)
         Toast.show({
             text1: "삭제되었습니다.",
@@ -26,7 +46,15 @@ export const FileDetailAppBar = ({ id }: { id: number }) => {
             position: "bottom",
             visibilityTime: 3000
         })
-        router.back()
+        back()
+    }
+
+    const copyFile = () => {}
+
+    const exportFile = () => {}
+
+    const showInfoModal = () => {
+        setInfoModalVisible(true)
     }
 
     const back = () => {
@@ -36,26 +64,20 @@ export const FileDetailAppBar = ({ id }: { id: number }) => {
     return (
         <>
             <AppBarForm>
-                <View style={styles.left}>
+                <View style={[Styles.row, styles.container]}>
                     <Pressable onPress={back}>{Platform.OS === "ios" ? <IosBack theme={theme} /> : <AndroidBack theme={theme} />}</Pressable>
-                </View>
-                <View style={[Styles.row, styles.right]}>
-                    <FileEditOption setDeleteModalVisible={setDeleteModalVisible} setInfoModalVisible={setInfoModalVisible} />
+                    <FileEditOption editFile={editFile} showDeleteModal={showDeleteModal} copyFile={copyFile} exportFile={exportFile} showInfoModal={showInfoModal} />
                 </View>
             </AppBarForm>
             <MessageModal message={"정말 삭제하시겠습니까?"} visible={deleteModalVisible} onDismiss={() => setDeleteModalVisible(false)} onConfirm={deleteFile} confirmText={"삭제"} />
-            <InfoModal visible={infoModalVisible} onDismiss={() => setInfoModalVisible(false)} recentCreatedAt={"2025/04/26"} recentUpdatedAt={"2025/04/26"} recentViewedAt={"2025/04/26"} />
+            <InfoModal visible={infoModalVisible} onDismiss={() => setInfoModalVisible(false)} createdAt={memo.createdAt} updatedAt={memo.updatedAt} viewedAt={memo.viewedAt} />
         </>
     )
 }
 
 const styles = StyleSheet.create({
-    right: {
-        alignItems: "center",
-        alignSelf: "flex-end",
-        gap: 8
-    },
-    left: {
-        flex: 1
+    container: {
+        width: "100%",
+        justifyContent: "space-between"
     }
 })

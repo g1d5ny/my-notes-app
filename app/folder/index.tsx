@@ -2,9 +2,10 @@
 import { File, Folder } from "@/assets/icons/svg/icon"
 import { MainAppBar } from "@/component/appBar/MainAppBar"
 import { EmptyMemo } from "@/component/EmptyMemo"
+import { AddMemoController } from "@/component/modal/add"
 import { FontStyles } from "@/constant/Style"
 import { ThemeContext } from "@/context/ThemeContext"
-import { Memo } from "@/type"
+import { DATABASE_NAME, Memo } from "@/type"
 import { useFocusEffect } from "@react-navigation/native"
 import { RelativePathString, router } from "expo-router"
 import { useSQLiteContext } from "expo-sqlite"
@@ -17,7 +18,7 @@ export default function FolderIndex() {
     const [memos, setMemos] = useState<Memo[]>([])
 
     const loadMemos = useCallback(async () => {
-        const result = await db.getAllAsync("SELECT * FROM memo")
+        const result = await db.getAllAsync(`SELECT * FROM ${DATABASE_NAME}`)
         setMemos(result as Memo[])
     }, [])
 
@@ -61,6 +62,7 @@ export default function FolderIndex() {
                     return <View key={index} style={styles.item} />
                 })}
             </View>
+            <AddMemoController />
         </>
     )
 }

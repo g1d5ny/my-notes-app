@@ -1,24 +1,28 @@
 import { AndroidDots, IosDots } from "@/assets/icons/svg/icon"
-import { CopyOption, DeleteOption, ExportOption, InfoOption, SortOption } from "@/assets/icons/svg/option/icon"
+import { CopyOption, DeleteOption, EditOption, ExportOption, InfoOption } from "@/assets/icons/svg/option/icon"
 import { ThemeContext } from "@/context/ThemeContext"
-import { Dispatch, SetStateAction, useContext, useState } from "react"
+import { useContext, useState } from "react"
 import { Platform } from "react-native"
 import { OptionMenu, OptionMenuList } from "../OptionMenu"
 
 interface FileEditOptionProps {
-    setDeleteModalVisible: Dispatch<SetStateAction<boolean>>
-    setInfoModalVisible: Dispatch<SetStateAction<boolean>>
+    editFile: () => void
+    showDeleteModal: () => void
+    copyFile: () => void
+    exportFile: () => void
+    showInfoModal: () => void
 }
-export const FileEditOption = ({ setDeleteModalVisible, setInfoModalVisible }: FileEditOptionProps) => {
+export const FileEditOption = ({ editFile, showDeleteModal, copyFile, exportFile, showInfoModal }: FileEditOptionProps) => {
     const { theme } = useContext(ThemeContext)
     const [menuVisible, setMenuVisible] = useState(false)
 
     const fileEditOptionList: OptionMenuList[] = [
         {
             title: "편집하기",
-            trailingIcon: <SortOption theme={theme} />,
+            trailingIcon: <EditOption theme={theme} />,
             disabled: false,
             onPress: () => {
+                editFile()
                 setMenuVisible(false)
             },
             dividerWidth: 1,
@@ -29,7 +33,7 @@ export const FileEditOption = ({ setDeleteModalVisible, setInfoModalVisible }: F
             trailingIcon: <DeleteOption theme={theme} />,
             disabled: false,
             onPress: () => {
-                setDeleteModalVisible(true)
+                showDeleteModal()
                 setMenuVisible(false)
             },
             dividerWidth: 1,
@@ -40,6 +44,7 @@ export const FileEditOption = ({ setDeleteModalVisible, setInfoModalVisible }: F
             trailingIcon: <CopyOption theme={theme} />,
             disabled: false,
             onPress: () => {
+                copyFile()
                 setMenuVisible(false)
             },
             dividerWidth: 1,
@@ -50,6 +55,7 @@ export const FileEditOption = ({ setDeleteModalVisible, setInfoModalVisible }: F
             trailingIcon: <ExportOption theme={theme} />,
             disabled: false,
             onPress: () => {
+                exportFile()
                 setMenuVisible(false)
             },
             dividerWidth: 1,
@@ -60,7 +66,7 @@ export const FileEditOption = ({ setDeleteModalVisible, setInfoModalVisible }: F
             trailingIcon: <InfoOption theme={theme} />,
             disabled: false,
             onPress: () => {
-                setInfoModalVisible(true)
+                showInfoModal()
                 setMenuVisible(false)
             },
             hasDivider: false

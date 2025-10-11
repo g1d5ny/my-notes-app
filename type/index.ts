@@ -1,5 +1,7 @@
 import { RelativePathString } from "expo-router"
 
+export const DATABASE_NAME = "memo"
+
 export interface ThemeColorPalette {
     background: string
     border: string
@@ -21,4 +23,5 @@ export interface Memo {
     path: RelativePathString
     createdAt: number
     updatedAt: number
+    viewedAt: number
 }

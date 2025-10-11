@@ -1,46 +1,65 @@
 import { FileDetailAppBar } from "@/component/appBar/FileDetailAppBar"
-import { FontStyles } from "@/constant/Style"
+import { ContentInput } from "@/component/input/ContentInput"
+import { TitleInput } from "@/component/input/TitleInput"
 import { ThemeContext } from "@/context/ThemeContext"
-import { Memo } from "@/type"
+import { DATABASE_NAME, Memo } from "@/type"
 import { usePathname } from "expo-router"
 import { useSQLiteContext } from "expo-sqlite"
-import { useContext, useEffect, useState } from "react"
-import { ScrollView, StyleSheet, Text } from "react-native"
+import { useContext, useEffect, useRef, useState } from "react"
+import { ScrollView, StyleSheet, TextInput } from "react-native"
 
 export default function FolderScreen() {
     const pathname = usePathname()
     const { theme } = useContext(ThemeContext)
     const db = useSQLiteContext()
+    const titleRef = useRef<TextInput>(null)
+    const [memo, setMemo] = useState<Memo>({} as Memo)
 
-    const segments = pathname.split("/").filter(Boolean).slice(1)
-    const type = segments.includes("/folder") ? "folder" : "file"
-    const [memo, setMemo] = useState<Memo[]>([])
+    const onChangeTitle = (text: string) => {
+        setMemo(prev => ({ ...prev, title: text }))
+    }
+
+    const saveTitle = () => {
+        db.runAsync(`UPDATE ${DATABASE_NAME} SET title = ? WHERE id = ?`, [memo?.title, memo?.id])
+    }
+
+    const onChangeContent = (text: string) => {
+        setMemo(prev => ({ ...prev, content: text }))
+    }
+
+    const saveContent = () => {
+        db.runAsync(`UPDATE ${DATABASE_NAME} SET content = ? WHERE id = ?`, [memo?.content, memo?.id])
+    }
+
+    const loadMemoAndUpdateViewedAt = async () => {
+        const result = await db.getAllAsync(`SELECT * FROM ${DATABASE_NAME} WHERE path = ?`, [pathname])
+        setMemo(result[0] as Memo)
+
+        await db.runAsync(`UPDATE ${DATABASE_NAME} SET viewedAt = ? WHERE id = ?`, [Math.floor(Date.now() / 1000), (result[0] as Memo)?.id])
+    }
 
     useEffect(() => {
-        db.getAllAsync("SELECT * FROM memo WHERE path = ?", [pathname]).then(result => {
-            setMemo(result as Memo[])
-        })
+        loadMemoAndUpdateViewedAt()
     }, [pathname])
 
     return (
         <>
-            <FileDetailAppBar id={memo[0]?.id ?? 0} />
+            <FileDetailAppBar memo={memo} titleRef={titleRef} />
             <ScrollView contentContainerStyle={styles.container}>
-                <Text style={[styles.title, { color: theme.text }]}>{memo[0]?.title}</Text>
-                <Text style={[styles.content, { color: theme.text }]}>{memo[0]?.content}</Text>
+                <TitleInput ref={titleRef} onChangeText={onChangeTitle} onBlur={saveTitle}>
+                    {memo?.title}
+                </TitleInput>
+                <ContentInput onChangeText={onChangeContent} onBlur={saveContent}>
+                    {memo?.content}
+                </ContentInput>
             </ScrollView>
         </>
     )
 }
 
 const styles = StyleSheet.create({
-    content: {
-        ...FontStyles.SubTitle
-    },
-    title: {
-        ...FontStyles.Title
-    },
     container: {
+        flex: 1,
         padding: 16,
         gap: 12
     }

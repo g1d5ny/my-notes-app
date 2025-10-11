@@ -1,5 +1,4 @@
 import { CommonToast } from "@/component/CommonToast"
-import { AddMemoController } from "@/component/modal/add"
 import { customFontsToLoad } from "@/constant/Style"
 import { DarkTheme, LightTheme } from "@/constant/Theme"
 import { ThemeContext } from "@/context/ThemeContext"
@@ -12,8 +11,7 @@ import { ActivityIndicator, ColorSchemeName, StyleSheet, useColorScheme } from "
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { PaperProvider } from "react-native-paper"
 import { SafeAreaView } from "react-native-safe-area-context"
-import { ThemeColorPalette } from "../type"
-export const DATABASE_NAME = "memo"
+import { DATABASE_NAME, ThemeColorPalette } from "../type"
 
 Font.loadAsync(customFontsToLoad)
 
@@ -33,7 +31,6 @@ export default function RootLayout() {
                             <PaperProvider>
                                 <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
                                     <Slot />
-                                    <AddMemoController />
                                     <CommonToast />
                                 </SafeAreaView>
                             </PaperProvider>

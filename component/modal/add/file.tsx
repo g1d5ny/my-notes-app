@@ -1,11 +1,12 @@
 import { FileCreateAppBar } from "@/component/appBar/FileCreateAppBar"
-import { FontStyles } from "@/constant/Style"
+import { ContentInput } from "@/component/input/ContentInput"
+import { TitleInput } from "@/component/input/TitleInput"
 import { ThemeContext } from "@/context/ThemeContext"
 import BottomSheet, { BottomSheetScrollView } from "@gorhom/bottom-sheet"
 import { BottomSheetMethods } from "@gorhom/bottom-sheet/lib/typescript/types"
 import { forwardRef, useContext, useRef, useState } from "react"
 import { Controller, useForm } from "react-hook-form"
-import { StyleSheet, TextInput } from "react-native"
+import { Keyboard, StyleSheet, TextInput, View } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { MessageModal } from "../MessageModal"
 
@@ -32,10 +33,12 @@ const AddFile = forwardRef<BottomSheetMethods>((props, ref) => {
             resetField("title")
             resetField("content")
         }
+        Keyboard.dismiss()
     }
 
     const close = () => {
         setShowDeleteModal(true)
+        Keyboard.dismiss()
     }
 
     return (
@@ -49,51 +52,18 @@ const AddFile = forwardRef<BottomSheetMethods>((props, ref) => {
                 enablePanDownToClose={true}
                 enableContentPanningGesture={false}
                 enableHandlePanningGesture={false}
-                style={styles.container}
             >
-                <Controller
-                    control={control}
-                    name='title'
-                    rules={{ required: true }}
-                    render={({ field: { onChange, onBlur, value } }) => (
-                        <TextInput
-                            style={[FontStyles.Title, styles.title, { color: theme.text }]}
-                            placeholder='제목을 입력해주세요.'
-                            placeholderTextColor={theme.gray}
-                            onBlur={onBlur}
-                            onChangeText={onChange}
-                            value={value}
-                            returnKeyType='next'
-                            onSubmitEditing={() => contentRef.current?.focus()}
-                            autoFocus
-                            multiline={false}
-                            numberOfLines={1}
-                            maxLength={30}
-                        />
-                    )}
-                />
-                <BottomSheetScrollView style={styles.container} contentContainerStyle={[styles.contentContainer, { paddingBottom: bottom }]} showsVerticalScrollIndicator>
+                <View style={[styles.container, { paddingBottom: bottom }]}>
                     <Controller
                         control={control}
-                        name='content'
+                        name='title'
                         rules={{ required: true }}
-                        render={({ field: { onChange, onBlur, value } }) => (
-                            <TextInput
-                                ref={contentRef}
-                                style={[FontStyles.SubTitle, { color: theme.text }]}
-                                placeholder='내용을 입력해주세요.'
-                                placeholderTextColor={theme.gray}
-                                onBlur={onBlur}
-                                onChangeText={onChange}
-                                value={value}
-                                scrollEnabled={false}
-                                multiline
-                                textAlignVertical='top'
-                                maxLength={1000}
-                            />
-                        )}
+                        render={({ field: { onChange, onBlur, value } }) => <TitleInput onBlur={onBlur} onChangeText={onChange} value={value} onSubmitEditing={() => contentRef.current?.focus()} />}
                     />
-                </BottomSheetScrollView>
+                    <BottomSheetScrollView showsVerticalScrollIndicator>
+                        <Controller control={control} name='content' rules={{ required: true }} render={({ field: { onChange, onBlur, value } }) => <ContentInput ref={contentRef} onBlur={onBlur} onChangeText={onChange} value={value} />} />
+                    </BottomSheetScrollView>
+                </View>
             </BottomSheet>
             <MessageModal
                 message={"뒤로 가시면 작성된 글이 삭제됩니다.\n뒤로 가시겠습니까?"}
@@ -116,11 +86,9 @@ const styles = StyleSheet.create({
     contentContainer: {
         marginHorizontal: 16
     },
-    title: {
-        textAlignVertical: "center",
-        margin: 16
-    },
     container: {
-        flex: 1
+        flex: 1,
+        margin: 16,
+        gap: 12
     }
 })

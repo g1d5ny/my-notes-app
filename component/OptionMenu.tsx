@@ -1,7 +1,8 @@
+import { AndroidDots, IosDots } from "@/assets/icons/svg/icon"
 import { FontStyles } from "@/constant/Style"
 import { ThemeContext } from "@/context/ThemeContext"
 import { Dispatch, SetStateAction, useContext } from "react"
-import { Pressable, StyleSheet, View } from "react-native"
+import { Platform, Pressable, StyleSheet, View } from "react-native"
 import { Divider, Menu } from "react-native-paper"
 
 export interface OptionMenuList {
@@ -15,18 +16,21 @@ export interface OptionMenuList {
 }
 
 interface OptionMenuProps {
-    anchor: React.ReactNode
     list: OptionMenuList[]
     menuVisible: boolean
     setMenuVisible: Dispatch<SetStateAction<boolean>>
 }
-export const OptionMenu = ({ anchor, list, menuVisible, setMenuVisible }: OptionMenuProps) => {
+export const OptionMenu = ({ list, menuVisible, setMenuVisible }: OptionMenuProps) => {
     const { theme } = useContext(ThemeContext)
     const openMenu = () => setMenuVisible(true)
     const closeMenu = () => setMenuVisible(false)
 
+    const Dots = () => {
+        return Platform.OS === "android" ? <AndroidDots theme={theme} /> : <IosDots theme={theme} />
+    }
+
     return (
-        <Menu visible={menuVisible} onDismiss={closeMenu} anchor={<Pressable onPress={openMenu}>{anchor}</Pressable>} contentStyle={[styles.contentStyle, { backgroundColor: theme.background }]}>
+        <Menu visible={menuVisible} onDismiss={closeMenu} anchor={<Pressable onPress={openMenu}>{<Dots />}</Pressable>} contentStyle={[styles.contentStyle, { backgroundColor: theme.background }]}>
             {list.map((item, index) => {
                 return (
                     <View key={index}>

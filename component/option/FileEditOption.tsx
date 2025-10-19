@@ -1,8 +1,6 @@
-import { AndroidDots, IosDots } from "@/assets/icons/svg/icon"
-import { CopyOption, DeleteOption, EditOption, ExportOption, InfoOption } from "@/assets/icons/svg/option/icon"
+import { DeleteOption, EditOption, ExportOption, InfoOption } from "@/assets/icons/svg/option/icon"
 import { ThemeContext } from "@/context/ThemeContext"
 import { useContext, useState } from "react"
-import { Platform } from "react-native"
 import { OptionMenu, OptionMenuList } from "../OptionMenu"
 
 interface FileEditOptionProps {
@@ -40,17 +38,6 @@ export const FileEditOption = ({ editFile, showDeleteModal, copyFile, exportFile
             hasDivider: true
         },
         {
-            title: "사본 만들기",
-            trailingIcon: <CopyOption theme={theme} />,
-            disabled: false,
-            onPress: () => {
-                copyFile()
-                setMenuVisible(false)
-            },
-            dividerWidth: 1,
-            hasDivider: true
-        },
-        {
             title: "내보내기",
             trailingIcon: <ExportOption theme={theme} />,
             disabled: false,
@@ -73,9 +60,5 @@ export const FileEditOption = ({ editFile, showDeleteModal, copyFile, exportFile
         }
     ]
 
-    const Dots = () => {
-        return Platform.OS === "android" ? <AndroidDots theme={theme} /> : <IosDots theme={theme} />
-    }
-
-    return <OptionMenu anchor={<Dots />} list={fileEditOptionList} menuVisible={menuVisible} setMenuVisible={setMenuVisible} />
+    return <OptionMenu list={fileEditOptionList} menuVisible={menuVisible} setMenuVisible={setMenuVisible} />
 }

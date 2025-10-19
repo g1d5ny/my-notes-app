@@ -1,10 +1,9 @@
-import { AndroidDots, IosDots } from "@/assets/icons/svg/icon"
 import { CheckOption, ResetOption, SortOption, ThemeOption } from "@/assets/icons/svg/option/icon"
 import { FontStyles } from "@/constant/Style"
 import { DarkTheme, LightTheme } from "@/constant/Theme"
 import { ThemeContext } from "@/context/ThemeContext"
 import { Dispatch, SetStateAction, useContext, useState } from "react"
-import { Image, Platform, StyleSheet, Text } from "react-native"
+import { Image, StyleSheet, Text } from "react-native"
 import { OptionMenu, OptionMenuList } from "../OptionMenu"
 
 interface SettingOptionProps {
@@ -131,11 +130,7 @@ export const SettingOption = ({ setResetModalVisible }: SettingOptionProps) => {
         }
     ]
 
-    const Dots = () => {
-        return Platform.OS === "android" ? <AndroidDots theme={theme} /> : <IosDots theme={theme} />
-    }
-
-    return <OptionMenu anchor={<Dots />} list={mainOptionList} menuVisible={menuVisible} setMenuVisible={setMenuVisible} />
+    return <OptionMenu list={mainOptionList} menuVisible={menuVisible} setMenuVisible={setMenuVisible} />
 }
 
 const styles = StyleSheet.create({

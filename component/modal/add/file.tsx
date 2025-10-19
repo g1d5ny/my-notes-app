@@ -4,7 +4,6 @@ import { TitleInput } from "@/component/input/TitleInput"
 import { ThemeContext } from "@/context/ThemeContext"
 import BottomSheet, { BottomSheetScrollView } from "@gorhom/bottom-sheet"
 import { BottomSheetMethods } from "@gorhom/bottom-sheet/lib/typescript/types"
-import { useSQLiteContext } from "expo-sqlite"
 import { forwardRef, useContext, useRef, useState } from "react"
 import { Controller, useForm } from "react-hook-form"
 import { Keyboard, StyleSheet, TextInput, View } from "react-native"
@@ -19,7 +18,6 @@ type FormValues = {
 export const AddFile = forwardRef<BottomSheetMethods, { loadMemos: () => Promise<void> }>((props, ref) => {
     const { theme } = useContext(ThemeContext)
     const { bottom } = useSafeAreaInsets()
-    const db = useSQLiteContext()
 
     const titleRef = useRef<TextInput>(null)
     const contentRef = useRef<TextInput>(null)

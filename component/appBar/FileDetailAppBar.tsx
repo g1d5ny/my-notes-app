@@ -36,7 +36,7 @@ export const FileDetailAppBar = ({ memo, titleRef, setModalVisible }: FileDetail
         try {
             const title = memo.title.split("\n")[0]
             const fileUri = FileSystem.cacheDirectory + `${title}.txt`
-            await FileSystem.writeAsStringAsync(fileUri, memo.content)
+            await FileSystem.writeAsStringAsync(fileUri, memo.content ?? "")
             await Sharing.shareAsync(fileUri)
         } catch (error) {
             console.error("파일 내보내기 실패:", error)

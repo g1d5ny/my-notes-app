@@ -1,8 +1,6 @@
-import { Slot, useRouter } from "expo-router"
+import { Slot } from "expo-router"
 
 export default function FolderLayout() {
-    const router = useRouter()
-
     return (
         <Slot />
         // <View style={{ padding: 20 }}>

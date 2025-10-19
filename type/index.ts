@@ -14,14 +14,19 @@ export interface ThemeColorPalette {
     icon: string
 }
 
+export enum MemoType {
+    FILE = "file",
+    FOLDER = "folder"
+}
+
 export interface Memo {
     id: number
-    type: string
+    type: MemoType
     title: string
-    content: string
+    content?: string
     parentId: string
     path: RelativePathString
-    createdAt: number
-    updatedAt: number
-    viewedAt: number
+    createdAt?: number
+    updatedAt?: number
+    viewedAt?: number
 }

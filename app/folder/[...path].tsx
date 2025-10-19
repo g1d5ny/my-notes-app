@@ -3,7 +3,7 @@ import { ContentInput } from "@/component/input/ContentInput"
 import { TitleInput } from "@/component/input/TitleInput"
 import { InfoModal } from "@/component/modal/InfoModal"
 import { MessageModal } from "@/component/modal/MessageModal"
-import { DATABASE_NAME, Memo } from "@/type"
+import { Memo, MemoType } from "@/type"
 import { router, usePathname } from "expo-router"
 import { useSQLiteContext } from "expo-sqlite"
 import { useEffect, useRef, useState } from "react"
@@ -22,7 +22,7 @@ export default function FolderScreen() {
     }
 
     const saveTitle = () => {
-        db.runAsync(`UPDATE ${DATABASE_NAME} SET title = ? WHERE id = ?`, [memo?.title, memo?.id])
+        db.runAsync(`UPDATE ${MemoType.FILE} SET title = ? WHERE id = ?`, [memo?.title, memo?.id])
     }
 
     const onChangeContent = (text: string) => {
@@ -30,12 +30,12 @@ export default function FolderScreen() {
     }
 
     const saveContent = () => {
-        db.runAsync(`UPDATE ${DATABASE_NAME} SET content = ? WHERE id = ?`, [memo?.content, memo?.id])
+        db.runAsync(`UPDATE ${MemoType.FILE} SET content = ? WHERE id = ?`, [memo?.content ?? "", memo?.id])
     }
 
     const deleteFile = async () => {
         try {
-            await db.runAsync(`DELETE FROM ${DATABASE_NAME} WHERE id = ?`, [memo.id])
+            await db.runAsync(`DELETE FROM ${MemoType.FILE} WHERE id = ?`, [memo.id])
             setModalVisible(prev => ({ ...prev, infoModalVisible: false }))
             Toast.show({
                 text1: "삭제되었습니다.",
@@ -50,10 +50,9 @@ export default function FolderScreen() {
     }
 
     const loadMemoAndUpdateViewedAt = async () => {
-        const result = await db.getAllAsync(`SELECT * FROM ${DATABASE_NAME} WHERE path = ?`, [pathname])
+        const result = await db.getAllAsync(`SELECT * FROM ${MemoType.FILE} WHERE path = ?`, [pathname])
         setMemo(result[0] as Memo)
-
-        await db.runAsync(`UPDATE ${DATABASE_NAME} SET viewedAt = ? WHERE id = ?`, [Math.floor(Date.now() / 1000), (result[0] as Memo)?.id])
+        await db.runAsync(`UPDATE ${MemoType.FILE} SET viewedAt = ? WHERE id = ?`, [Math.floor(Date.now() / 1000), (result[0] as Memo)?.id])
     }
 
     useEffect(() => {
@@ -68,7 +67,9 @@ export default function FolderScreen() {
                 <ContentInput value={memo?.content} onChangeText={onChangeContent} onBlur={saveContent} />
             </ScrollView>
             <MessageModal message={"정말 삭제하시겠습니까?"} visible={deleteModalVisible} onDismiss={() => setModalVisible(prev => ({ ...prev, deleteModalVisible: false }))} onConfirm={deleteFile} confirmText={"삭제"} />
-            <InfoModal visible={infoModalVisible} onDismiss={() => setModalVisible(prev => ({ ...prev, infoModalVisible: false }))} createdAt={memo.createdAt} updatedAt={memo.updatedAt} viewedAt={memo.viewedAt} />
+            {memo?.type === MemoType.FILE && (
+                <InfoModal visible={infoModalVisible} onDismiss={() => setModalVisible(prev => ({ ...prev, infoModalVisible: false }))} createdAt={memo?.createdAt ?? 0} updatedAt={memo?.updatedAt ?? 0} viewedAt={memo?.viewedAt ?? 0} />
+            )}
         </>
     )
 }

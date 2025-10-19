@@ -1,7 +1,7 @@
 import { AndroidBack, Check, Close, IosBack } from "@/assets/icons/svg/icon"
 import { FontStyles, Styles } from "@/constant/Style"
 import { ThemeContext } from "@/context/ThemeContext"
-import { DATABASE_NAME } from "@/type"
+import { MemoType } from "@/type"
 import { usePathname } from "expo-router"
 import { useSQLiteContext } from "expo-sqlite"
 import { useContext } from "react"
@@ -37,16 +37,16 @@ export const FileCreateAppBar = ({ textLength, handleSubmit, close, back, inputB
                 try {
                     const now = Math.floor(Date.now() / 1000)
                     const result = await db.runAsync(
-                        `INSERT INTO ${DATABASE_NAME} (type, title, content, parentId, path, createdAt, updatedAt, viewedAt)
+                        `INSERT INTO ${MemoType.FILE} (type, title, content, parentId, path, createdAt, updatedAt, viewedAt)
                         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-                        ["file", data.title, data.content, parentId, `/`, now, now, now]
+                        [MemoType.FILE, data.title, data.content, parentId, `/`, now, now, now]
                     )
 
                     // 생성된 ID를 가져와서 path 업데이트
                     const newId = result.lastInsertRowId
                     const newPath = `${pathname}/${newId}`
 
-                    await db.runAsync(`UPDATE ${DATABASE_NAME} SET path = ? WHERE id = ?`, [newPath, newId])
+                    await db.runAsync(`UPDATE ${MemoType.FILE} SET path = ? WHERE id = ?`, [newPath, newId])
 
                     inputBlur()
                     await loadMemos()

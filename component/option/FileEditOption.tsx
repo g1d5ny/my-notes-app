@@ -6,11 +6,10 @@ import { OptionMenu, OptionMenuList } from "../OptionMenu"
 interface FileEditOptionProps {
     editFile: () => void
     showDeleteModal: () => void
-    copyFile: () => void
     exportFile: () => void
     showInfoModal: () => void
 }
-export const FileEditOption = ({ editFile, showDeleteModal, copyFile, exportFile, showInfoModal }: FileEditOptionProps) => {
+export const FileEditOption = ({ editFile, showDeleteModal, exportFile, showInfoModal }: FileEditOptionProps) => {
     const { theme } = useContext(ThemeContext)
     const [menuVisible, setMenuVisible] = useState(false)
 

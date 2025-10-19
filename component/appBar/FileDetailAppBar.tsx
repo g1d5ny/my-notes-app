@@ -1,9 +1,12 @@
 import { AndroidBack, IosBack } from "@/assets/icons/svg/icon"
 import { ThemeContext } from "@/context/ThemeContext"
 import { Memo } from "@/type"
+import * as FileSystem from "expo-file-system"
 import { router } from "expo-router"
+import * as Sharing from "expo-sharing"
 import { Dispatch, SetStateAction, useContext } from "react"
 import { Platform, Pressable, StyleSheet, TextInput, View } from "react-native"
+import Toast from "react-native-toast-message"
 import { Styles } from "../../constant/Style"
 import { FileEditOption } from "../option/FileEditOption"
 import { AppBarForm } from "./AppBarForm"
@@ -29,9 +32,22 @@ export const FileDetailAppBar = ({ memo, titleRef, setModalVisible }: FileDetail
         setModalVisible(prev => ({ ...prev, deleteModalVisible: true }))
     }
 
-    const copyFile = () => {}
-
-    const exportFile = () => {}
+    const exportFile = async () => {
+        try {
+            const title = memo.title.split("\n")[0]
+            const fileUri = FileSystem.cacheDirectory + `${title}.txt`
+            await FileSystem.writeAsStringAsync(fileUri, memo.content)
+            await Sharing.shareAsync(fileUri)
+        } catch (error) {
+            console.error("파일 내보내기 실패:", error)
+            Toast.show({
+                text1: "파일 내보내기 실패했습니다.",
+                type: "customToast",
+                position: "bottom",
+                visibilityTime: 3000
+            })
+        }
+    }
 
     const showInfoModal = () => {
         setModalVisible(prev => ({ ...prev, infoModalVisible: true }))
@@ -45,7 +61,7 @@ export const FileDetailAppBar = ({ memo, titleRef, setModalVisible }: FileDetail
         <AppBarForm>
             <View style={[Styles.row, styles.container]}>
                 <Pressable onPress={back}>{Platform.OS === "ios" ? <IosBack theme={theme} /> : <AndroidBack theme={theme} />}</Pressable>
-                <FileEditOption editFile={editFile} showDeleteModal={showDeleteModal} copyFile={copyFile} exportFile={exportFile} showInfoModal={showInfoModal} />
+                <FileEditOption editFile={editFile} showDeleteModal={showDeleteModal} exportFile={exportFile} showInfoModal={showInfoModal} />
             </View>
         </AppBarForm>
     )

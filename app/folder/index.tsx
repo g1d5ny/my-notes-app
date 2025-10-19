@@ -46,6 +46,7 @@ export default function FolderIndex() {
         if (memos.length === 0) {
             return <EmptyMemo />
         }
+
         return (
             <>
                 <MainAppBar />
@@ -60,7 +61,7 @@ export default function FolderIndex() {
                             </Pressable>
                         )
                     })}
-                    {Array.from({ length: Number(Math.max(0, getItemsPerRow() - memos.length / getItemsPerRow())) }).map((_, index) => {
+                    {Array.from({ length: Number(Math.max(0, getItemsPerRow() - (memos.length % getItemsPerRow()))) }).map((_, index) => {
                         return <View key={index} style={styles.item} />
                     })}
                 </ScrollView>
@@ -88,13 +89,12 @@ const styles = StyleSheet.create({
         textAlign: "center"
     },
     container: {
-        flex: 1,
         flexDirection: "row",
         alignItems: "flex-start",
         justifyContent: "space-between",
         flexWrap: "wrap",
         padding: 16,
-        gap: 16
+        rowGap: 16
     },
     item: {
         width: 76,

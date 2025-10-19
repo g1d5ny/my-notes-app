@@ -9,7 +9,7 @@ import * as Font from "expo-font"
 import { Slot } from "expo-router"
 import { SQLiteDatabase, SQLiteProvider } from "expo-sqlite"
 import { Suspense, useState } from "react"
-import { ActivityIndicator, ColorSchemeName, StyleSheet, useColorScheme } from "react-native"
+import { ColorSchemeName, Platform, StatusBar, StyleSheet, useColorScheme } from "react-native"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { PaperProvider } from "react-native-paper"
 import { SafeAreaView } from "react-native-safe-area-context"
@@ -24,14 +24,22 @@ export default function RootLayout() {
     const [theme, setTheme] = useState<ThemeColorPalette>(currentTheme)
     const [message, setMessage] = useState<string>("")
 
+    const barStyle = () => {
+        if (Platform.OS === "android") {
+            return "dark-content"
+        }
+        return currentScheme === "dark" ? "light-content" : "dark-content"
+    }
+
     return (
         <QueryClientProvider client={queryClient}>
             <GestureHandlerRootView style={{ flex: 1 }}>
-                <Suspense fallback={<ActivityIndicator size='large' />}>
+                <Suspense fallback={<></>}>
                     <SQLiteProvider databaseName={DATABASE_NAME} options={{ enableChangeListener: true }} useSuspense onInit={migrateDbIfNeeded}>
                         <ThemeContext.Provider value={{ theme, setTheme, currentScheme, setCurrentScheme }}>
                             <ToastContext.Provider value={{ message, setMessage }}>
                                 <PaperProvider>
+                                    <StatusBar barStyle={barStyle()} />
                                     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
                                         <Slot />
                                         <CommonToast />

@@ -36,17 +36,11 @@ export const FileCreateAppBar = ({ textLength, handleSubmit, close, back, inputB
             async data => {
                 try {
                     const now = Math.floor(Date.now() / 1000)
-                    const result = await db.runAsync(
-                        `INSERT INTO ${MemoType.FILE} (type, title, content, parentId, path, createdAt, updatedAt, viewedAt)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-                        [MemoType.FILE, data.title, data.content, parentId, `/`, now, now, now]
+                    await db.runAsync(
+                        `INSERT INTO ${MemoType.FILE} (type, title, content, parentId, createdAt, updatedAt, viewedAt)
+                        VALUES (?, ?, ?, ?, ?, ?, ?)`,
+                        [MemoType.FILE, data.title, data.content, parentId, now, now, now]
                     )
-
-                    // 생성된 ID를 가져와서 path 업데이트
-                    const newId = result.lastInsertRowId
-                    const newPath = `${pathname}/${newId}`
-
-                    await db.runAsync(`UPDATE ${MemoType.FILE} SET path = ? WHERE id = ?`, [newPath, newId])
 
                     inputBlur()
                     await loadMemos()

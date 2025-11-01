@@ -4,7 +4,6 @@ CREATE TABLE `file` (
 	`title` text NOT NULL,
 	`content` text NOT NULL,
 	`parentId` text,
-	`path` text NOT NULL,
 	`createdAt` integer NOT NULL,
 	`updatedAt` integer NOT NULL,
 	`viewedAt` integer NOT NULL
@@ -15,5 +14,4 @@ CREATE TABLE `folder` (
 	`type` text NOT NULL,
 	`title` text NOT NULL,
 	`parentId` text,
-	`path` text NOT NULL
 );

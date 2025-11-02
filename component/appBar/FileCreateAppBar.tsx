@@ -1,6 +1,7 @@
 import { AndroidBack, Check, Close, IosBack } from "@/assets/icons/svg/icon"
 import { FontStyles, Styles } from "@/constant/Style"
 import { ThemeContext } from "@/context/ThemeContext"
+import { invalidateQueries } from "@/store"
 import { MemoType } from "@/type"
 import { useLocalSearchParams } from "expo-router"
 import { useSQLiteContext } from "expo-sqlite"
@@ -41,6 +42,12 @@ export const FileCreateAppBar = ({ textLength, handleSubmit, close, back, inputB
 
                     inputBlur()
                     back()
+
+                    if (parentId) {
+                        await invalidateQueries([parentId])
+                    } else {
+                        await invalidateQueries([MemoType.FOLDER, MemoType.FILE])
+                    }
 
                     Toast.show({
                         text1: "작성된 글이 저장되었습니다.",

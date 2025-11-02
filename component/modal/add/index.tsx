@@ -1,7 +1,7 @@
 import { invalidateQueries } from "@/store"
 import { MemoType } from "@/type"
 import BottomSheet from "@gorhom/bottom-sheet"
-import { useLocalSearchParams, usePathname } from "expo-router"
+import { useLocalSearchParams } from "expo-router"
 import { useSQLiteContext } from "expo-sqlite"
 import { useRef } from "react"
 import { AddFile } from "./file"
@@ -10,7 +10,6 @@ import { AddMemo } from "./memo"
 export const AddMemoController = () => {
     const bottomSheetRef = useRef<BottomSheet>(null)
     const db = useSQLiteContext()
-    const pathname = usePathname()
     const params = useLocalSearchParams()
     const parentId = params.id ? Number(params.id) : null
 

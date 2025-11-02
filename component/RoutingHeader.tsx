@@ -6,11 +6,14 @@ import { StyleSheet, Text, View } from "react-native"
 
 export default function RoutingHeader() {
     const pathname = usePathname()
+    const rootName = pathname.replace("/folder", "/root")
     const { theme } = useContext(ThemeContext)
 
     return (
         <View style={styles.container}>
-            <Text style={[FontStyles.SubTitle, { color: theme.text }]}>현재 경로: {pathname}</Text>
+            <Text style={[FontStyles.SubTitle, { color: theme.text }]} numberOfLines={3} ellipsizeMode='middle'>
+                현재 경로: {rootName}
+            </Text>
         </View>
     )
 }

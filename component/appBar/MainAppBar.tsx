@@ -2,7 +2,7 @@ import { AndroidBack, Close, IosBack, Search } from "@/assets/icons/svg/icon"
 import { ThemeContext } from "@/context/ThemeContext"
 import { usePathname, useRouter } from "expo-router"
 import { Dispatch, SetStateAction, useContext, useEffect, useState } from "react"
-import { Platform, Pressable, StyleSheet, TextInput, useWindowDimensions, View } from "react-native"
+import { Platform, Pressable, StyleSheet, Text, TextInput, useWindowDimensions, View } from "react-native"
 import Animated, { useAnimatedStyle, useDerivedValue, useSharedValue, withTiming } from "react-native-reanimated"
 import { FontStyles, Styles } from "../../constant/Style"
 import { SettingOption } from "../option/SettingOption"
@@ -15,6 +15,7 @@ export const MainAppBar = ({ setResetModalVisible }: MainAppBarProps) => {
     const { theme } = useContext(ThemeContext)
     const router = useRouter()
     const pathname = usePathname()
+    const lastPathname = pathname.split("/").pop()
     const [canBack, setCanBack] = useState(pathname.split("/").length > 2)
     const { width } = useWindowDimensions()
     const translateX = useSharedValue(-width) // 초기값을 화면 너비만큼 밖으로 설정
@@ -37,11 +38,16 @@ export const MainAppBar = ({ setResetModalVisible }: MainAppBarProps) => {
     return (
         <>
             <AppBarForm>
-                <View style={styles.left}>
+                <View style={[Styles.row, styles.left]}>
                     {canBack && (
-                        <Pressable style={styles.back} onPress={() => router.back()}>
-                            {Platform.OS === "ios" ? <IosBack theme={theme} /> : <AndroidBack theme={theme} />}
-                        </Pressable>
+                        <>
+                            <Pressable style={styles.back} onPress={() => router.back()}>
+                                {Platform.OS === "ios" ? <IosBack theme={theme} /> : <AndroidBack theme={theme} />}
+                            </Pressable>
+                            <Text style={[styles.lastPathname, { color: theme.text }]} numberOfLines={1} ellipsizeMode='tail'>
+                                {lastPathname}
+                            </Text>
+                        </>
                     )}
                 </View>
                 <View style={[Styles.row, styles.right]}>
@@ -66,6 +72,11 @@ export const MainAppBar = ({ setResetModalVisible }: MainAppBarProps) => {
 }
 
 const styles = StyleSheet.create({
+    lastPathname: {
+        ...FontStyles.SubTitle,
+        flex: 1,
+        marginHorizontal: 8
+    },
     inputContainer: {
         flex: 1,
         height: 40,

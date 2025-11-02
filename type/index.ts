@@ -24,9 +24,14 @@ export interface Memo {
     type: MemoType
     title: string
     content?: string
-    parentId: string
+    parentId: number | null
     path: RelativePathString
     createdAt?: number
     updatedAt?: number
     viewedAt?: number
+}
+
+export type FormValues = {
+    title: string
+    content: string
 }

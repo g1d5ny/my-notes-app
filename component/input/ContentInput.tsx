@@ -15,7 +15,7 @@ export const ContentInput = forwardRef<TextInput, TextInputProps>((props, ref) =
             scrollEnabled={false}
             multiline
             textAlignVertical='top'
-            maxLength={1000}
+            maxLength={10000}
             {...props}
         />
     )

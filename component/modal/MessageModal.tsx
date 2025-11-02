@@ -8,7 +8,7 @@ interface MessageModalProps {
     message: string
     visible: boolean
     onDismiss: () => void
-    onConfirm: () => void
+    onConfirm: () => Promise<void> | void
     confirmText: string
 }
 
@@ -27,8 +27,8 @@ export const MessageModal = ({ message, visible, onDismiss, onConfirm, confirmTe
                     </TouchableOpacity>
                     <TouchableOpacity
                         style={styles.bottomOption}
-                        onPress={() => {
-                            onConfirm()
+                        onPress={async () => {
+                            await onConfirm()
                             onDismiss()
                         }}
                     >

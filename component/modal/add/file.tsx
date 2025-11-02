@@ -2,6 +2,7 @@ import { FileCreateAppBar } from "@/component/appBar/FileCreateAppBar"
 import { ContentInput } from "@/component/input/ContentInput"
 import { TitleInput } from "@/component/input/TitleInput"
 import { ThemeContext } from "@/context/ThemeContext"
+import { FormValues } from "@/type"
 import BottomSheet, { BottomSheetScrollView } from "@gorhom/bottom-sheet"
 import { BottomSheetMethods } from "@gorhom/bottom-sheet/lib/typescript/types"
 import { forwardRef, useContext, useRef, useState } from "react"
@@ -10,12 +11,7 @@ import { Keyboard, StyleSheet, TextInput, View } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { MessageModal } from "../MessageModal"
 
-type FormValues = {
-    title: string
-    content: string
-}
-
-export const AddFile = forwardRef<BottomSheetMethods, { loadMemos: () => Promise<void> }>((props, ref) => {
+export const AddFile = forwardRef<BottomSheetMethods>((_, ref) => {
     const { theme } = useContext(ThemeContext)
     const { bottom } = useSafeAreaInsets()
 
@@ -53,7 +49,7 @@ export const AddFile = forwardRef<BottomSheetMethods, { loadMemos: () => Promise
             <BottomSheet
                 ref={ref}
                 index={-1}
-                handleComponent={() => <FileCreateAppBar textLength={contentText.length} handleSubmit={handleSubmit} close={close} back={back} inputBlur={inputBlur} loadMemos={props.loadMemos} />}
+                handleComponent={() => <FileCreateAppBar textLength={contentText.length} handleSubmit={handleSubmit} close={close} back={back} inputBlur={inputBlur} />}
                 snapPoints={["100%"]}
                 backgroundStyle={{ backgroundColor: theme.background }}
                 enablePanDownToClose={true}
@@ -65,7 +61,7 @@ export const AddFile = forwardRef<BottomSheetMethods, { loadMemos: () => Promise
                         control={control}
                         name='title'
                         rules={{ required: true }}
-                        render={({ field: { onChange, onBlur, value } }) => <TitleInput ref={titleRef} onBlur={onBlur} onChangeText={onChange} value={value} onSubmitEditing={() => contentRef.current?.focus()} />}
+                        render={({ field: { onChange, onBlur, value } }) => <TitleInput ref={titleRef} value={value} onBlur={onBlur} onChangeText={onChange} onSubmitEditing={() => contentRef.current?.focus()} />}
                     />
                     <BottomSheetScrollView showsVerticalScrollIndicator>
                         <Controller control={control} name='content' rules={{ required: true }} render={({ field: { onChange, onBlur, value } }) => <ContentInput ref={contentRef} onBlur={onBlur} onChangeText={onChange} value={value} />} />

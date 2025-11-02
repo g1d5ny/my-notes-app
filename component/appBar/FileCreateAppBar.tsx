@@ -1,14 +1,12 @@
 import { AndroidBack, Check, Close, IosBack } from "@/assets/icons/svg/icon"
 import { FontStyles, Styles } from "@/constant/Style"
 import { ThemeContext } from "@/context/ThemeContext"
-import { queryClient } from "@/store"
 import { MemoType } from "@/type"
-import { useLocalSearchParams, usePathname } from "expo-router"
+import { useLocalSearchParams } from "expo-router"
 import { useSQLiteContext } from "expo-sqlite"
 import { useContext } from "react"
 import { UseFormHandleSubmit } from "react-hook-form"
 import { Platform, Pressable, StyleSheet, Text, View } from "react-native"
-import { useSafeAreaInsets } from "react-native-safe-area-context"
 import Toast from "react-native-toast-message"
 import { AppBarForm } from "./AppBarForm"
 
@@ -23,12 +21,9 @@ interface FileCreateAppBarProps {
     close: () => void
     back: () => void
     inputBlur: () => void
-    loadMemos: () => Promise<void>
 }
-export const FileCreateAppBar = ({ textLength, handleSubmit, close, back, inputBlur, loadMemos }: FileCreateAppBarProps) => {
-    const pathname = usePathname()
+export const FileCreateAppBar = ({ textLength, handleSubmit, close, back, inputBlur }: FileCreateAppBarProps) => {
     const { theme } = useContext(ThemeContext)
-    const { top } = useSafeAreaInsets()
     const db = useSQLiteContext()
     const params = useLocalSearchParams()
     const parentId = params.id ? Number(params.id) : null
@@ -45,7 +40,6 @@ export const FileCreateAppBar = ({ textLength, handleSubmit, close, back, inputB
                     )
 
                     inputBlur()
-                    await queryClient.invalidateQueries({ queryKey: [parentId] })
                     back()
 
                     Toast.show({
@@ -71,14 +65,14 @@ export const FileCreateAppBar = ({ textLength, handleSubmit, close, back, inputB
                     text1: errorText,
                     type: "customToast",
                     position: "bottom",
-                    visibilityTime: 2000
+                    visibilityTime: 1000
                 })
             }
         )()
     }
     return (
         <AppBarForm>
-            <View style={[Styles.row, styles.container, { paddingTop: top }]}>
+            <View style={[Styles.row, styles.container]}>
                 <View style={[Styles.row, styles.back]}>
                     {textLength > 0 ? (
                         <Pressable onPress={close}>

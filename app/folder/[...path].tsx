@@ -1,34 +1,39 @@
 import { FileDetail } from "@/component/FileDetail"
 import { FolderDetail } from "@/component/FolderDetail"
+import { invalidateQueries } from "@/store"
 import { Memo, MemoType } from "@/type"
+import { useFocusEffect } from "@react-navigation/native"
 import { useQuery } from "@tanstack/react-query"
 import { useLocalSearchParams } from "expo-router"
 import { useSQLiteContext } from "expo-sqlite"
-import { StyleSheet } from "react-native"
+import { useCallback } from "react"
 
 export default function FolderScreen() {
     const params = useLocalSearchParams()
-    const parentId = Number(params.id)
     const db = useSQLiteContext()
+    const currentId = params.id ? Number(params?.id) : null
+    const currentType = params.type
 
     const { data: memo = [], isFetched } = useQuery({
-        queryKey: [parentId],
+        queryKey: [currentId, currentType],
         queryFn: async () => {
-            const folderResult: Memo[] = await db.getAllAsync(`SELECT * FROM ${MemoType.FOLDER} WHERE parentId = ?`, [parentId])
-            const fileResult: Memo[] = await db.getAllAsync(`SELECT * FROM ${MemoType.FILE} WHERE parentId = ?`, [parentId])
-            return [...folderResult, ...fileResult]
+            if (currentType === MemoType.FILE) {
+                const fileResult = await db.getAllAsync(`SELECT * FROM ${MemoType.FILE} WHERE id = ?`, [currentId])
+                return fileResult[0] as Memo
+            }
+            const folderResult: Memo[] = await db.getAllAsync(`SELECT * FROM ${MemoType.FOLDER} WHERE parentId = ?`, [currentId])
+            const fileResult: Memo[] = await db.getAllAsync(`SELECT * FROM ${MemoType.FILE} WHERE parentId = ?`, [currentId])
+            return [...folderResult, ...fileResult] as Memo[]
         }
     })
 
-    const fileMemo = memo.find(item => item.type === MemoType.FILE) as Memo
+    useFocusEffect(
+        useCallback(() => {
+            if (currentId && currentType) {
+                invalidateQueries([currentId, currentType])
+            }
+        }, [currentId, currentType])
+    )
 
-    return isFetched ? params?.type === MemoType.FILE ? <FileDetail memo={fileMemo} /> : <FolderDetail memo={memo} parentId={parentId} /> : <></>
+    return isFetched ? currentType === MemoType.FILE ? <FileDetail memo={memo as Memo} /> : <FolderDetail memo={memo as Memo[]} parentId={currentId} /> : <></>
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: 16,
-        gap: 12
-    }
-})

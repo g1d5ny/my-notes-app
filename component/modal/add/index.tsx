@@ -1,7 +1,7 @@
 import { queryClient } from "@/store"
 import { MemoType } from "@/type"
 import BottomSheet from "@gorhom/bottom-sheet"
-import { usePathname } from "expo-router"
+import { useLocalSearchParams, usePathname } from "expo-router"
 import { useSQLiteContext } from "expo-sqlite"
 import { useRef } from "react"
 import { AddFile } from "./file"
@@ -14,7 +14,8 @@ export const AddMemoController = ({ loadMemos }: AddMemoControllerProps) => {
     const bottomSheetRef = useRef<BottomSheet>(null)
     const db = useSQLiteContext()
     const pathname = usePathname()
-    const parentId = pathname.split("/").pop() ?? ""
+    const params = useLocalSearchParams()
+    const parentId = params.id ? Number(params.id) : null
 
     const handleAddFile = () => {
         bottomSheetRef.current?.expand()
@@ -29,7 +30,7 @@ export const AddMemoController = ({ loadMemos }: AddMemoControllerProps) => {
                 [MemoType.FOLDER, "새 폴더", parentId]
             )
 
-            await queryClient.invalidateQueries({ queryKey: [MemoType.FOLDER] })
+            await queryClient.invalidateQueries({ queryKey: [parentId] })
         } catch (error) {
             console.error("폴더 추가 실패:", error)
         }

@@ -1,7 +1,7 @@
 // app/folder/index.tsx
-import { File, Folder } from "@/assets/icons/svg/icon"
 import { MainAppBar } from "@/component/appBar/MainAppBar"
 import { EmptyMemo } from "@/component/EmptyMemo"
+import { FolderList } from "@/component/FolderList"
 import { AddMemoController } from "@/component/modal/add"
 import { MessageModal } from "@/component/modal/MessageModal"
 import RoutingHeader from "@/component/RoutingHeader"
@@ -14,7 +14,7 @@ import { useQuery } from "@tanstack/react-query"
 import { RelativePathString, router } from "expo-router"
 import { useSQLiteContext } from "expo-sqlite"
 import { useCallback, useContext, useState } from "react"
-import { Dimensions, Pressable, ScrollView, StyleSheet, Text, View } from "react-native"
+import { Dimensions, StyleSheet } from "react-native"
 
 export default function FolderIndex() {
     const { theme } = useContext(ThemeContext)
@@ -24,9 +24,8 @@ export default function FolderIndex() {
     const { data: memos = [] } = useQuery({
         queryKey: [MemoType.FOLDER, MemoType.FILE],
         queryFn: async () => {
-            const folders = await db.getAllAsync(`SELECT * FROM ${MemoType.FOLDER}`)
-            const files = await db.getAllAsync(`SELECT * FROM ${MemoType.FILE}`)
-
+            const folders = await db.getAllAsync(`SELECT * FROM ${MemoType.FOLDER} WHERE parentId IS NULL`)
+            const files = await db.getAllAsync(`SELECT * FROM ${MemoType.FILE} WHERE parentId IS NULL`)
             return [...folders, ...files] as Memo[]
         }
     })
@@ -50,24 +49,10 @@ export default function FolderIndex() {
 
     const MemoList = useCallback(() => {
         return (
-            <View style={styles.container}>
+            <>
                 <RoutingHeader />
-                <ScrollView contentContainerStyle={styles.contentContainerStyle} showsVerticalScrollIndicator={false}>
-                    {memos.map(({ title, type, path }, index) => {
-                        return (
-                            <Pressable key={index} style={styles.item} onPress={() => open(path)}>
-                                {type === MemoType.FILE ? <File /> : <Folder />}
-                                <Text style={[styles.title, { color: theme.text }]} numberOfLines={2}>
-                                    {title}
-                                </Text>
-                            </Pressable>
-                        )
-                    })}
-                    {Array.from({ length: Number(Math.max(0, getItemsPerRow() - (memos.length % getItemsPerRow()))) }).map((_, index) => {
-                        return <View key={index} style={styles.item} />
-                    })}
-                </ScrollView>
-            </View>
+                <FolderList memos={memos} />
+            </>
         )
     }, [memos, theme])
 

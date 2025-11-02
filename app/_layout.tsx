@@ -76,7 +76,7 @@ export async function migrateDbIfNeeded(db: SQLiteDatabase) {
                 id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                 type TEXT NOT NULL,
                 title TEXT NOT NULL,
-                parentId TEXT NOT NULL,
+                parentId INTEGER,
                 FOREIGN KEY (parentId) REFERENCES ${MemoType.FOLDER}(id) ON DELETE CASCADE
             );
         `)
@@ -87,7 +87,7 @@ export async function migrateDbIfNeeded(db: SQLiteDatabase) {
                 type TEXT NOT NULL,
                 title TEXT NOT NULL,
                 content TEXT NOT NULL,
-                parentId TEXT NOT NULL,
+                parentId INTEGER,
                 createdAt INTEGER NOT NULL,
                 updatedAt INTEGER NOT NULL,
                 viewedAt INTEGER NOT NULL,

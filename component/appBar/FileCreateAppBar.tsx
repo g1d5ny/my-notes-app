@@ -1,8 +1,9 @@
 import { AndroidBack, Check, Close, IosBack } from "@/assets/icons/svg/icon"
 import { FontStyles, Styles } from "@/constant/Style"
 import { ThemeContext } from "@/context/ThemeContext"
+import { queryClient } from "@/store"
 import { MemoType } from "@/type"
-import { usePathname } from "expo-router"
+import { useLocalSearchParams, usePathname } from "expo-router"
 import { useSQLiteContext } from "expo-sqlite"
 import { useContext } from "react"
 import { UseFormHandleSubmit } from "react-hook-form"
@@ -29,7 +30,8 @@ export const FileCreateAppBar = ({ textLength, handleSubmit, close, back, inputB
     const { theme } = useContext(ThemeContext)
     const { top } = useSafeAreaInsets()
     const db = useSQLiteContext()
-    const parentId = pathname.split("/").pop() ?? ""
+    const params = useLocalSearchParams()
+    const parentId = params.id ? Number(params.id) : null
 
     const submitFile = () => {
         handleSubmit(
@@ -43,7 +45,7 @@ export const FileCreateAppBar = ({ textLength, handleSubmit, close, back, inputB
                     )
 
                     inputBlur()
-                    await loadMemos()
+                    await queryClient.invalidateQueries({ queryKey: [parentId] })
                     back()
 
                     Toast.show({

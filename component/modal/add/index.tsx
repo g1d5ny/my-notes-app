@@ -1,6 +1,6 @@
-import { invalidateQueries } from "@/store"
 import { MemoType } from "@/type"
 import BottomSheet from "@gorhom/bottom-sheet"
+import { useQueryClient } from "@tanstack/react-query"
 import { useLocalSearchParams } from "expo-router"
 import { useSQLiteContext } from "expo-sqlite"
 import { useRef } from "react"
@@ -11,6 +11,7 @@ export const AddMemoController = () => {
     const bottomSheetRef = useRef<BottomSheet>(null)
     const db = useSQLiteContext()
     const params = useLocalSearchParams()
+    const queryClient = useQueryClient()
     const parentId = params.id ? Number(params.id) : null
 
     const handleAddFile = () => {
@@ -26,11 +27,8 @@ export const AddMemoController = () => {
                 [MemoType.FOLDER, "새 폴더", parentId]
             )
 
-            if (parentId) {
-                await invalidateQueries([parentId])
-            } else {
-                await invalidateQueries([MemoType.FOLDER, MemoType.FILE])
-            }
+            // queryKey 구조에 맞게 수정
+            await queryClient.invalidateQueries({ queryKey: [MemoType.FOLDER, parentId] })
         } catch (error) {
             console.error("폴더 추가 실패:", error)
         }

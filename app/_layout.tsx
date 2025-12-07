@@ -1,10 +1,10 @@
 import { CommonToast } from "@/component/CommonToast"
+import { AddMemoController } from "@/component/modal/add"
 import { customFontsToLoad } from "@/constant/Style"
 import { DarkTheme, LightTheme } from "@/constant/Theme"
 import { ThemeContext } from "@/context/ThemeContext"
 import { ToastContext } from "@/context/ToastContext"
-import { queryClient } from "@/store"
-import { QueryClientProvider } from "@tanstack/react-query"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import * as Font from "expo-font"
 import { Slot } from "expo-router"
 import { SQLiteDatabase, SQLiteProvider } from "expo-sqlite"
@@ -16,6 +16,7 @@ import { SafeAreaView } from "react-native-safe-area-context"
 import { DATABASE_NAME, MemoType, ThemeColorPalette } from "../type"
 
 Font.loadAsync(customFontsToLoad)
+const queryClient = new QueryClient()
 
 export default function RootLayout() {
     const scheme = useColorScheme()
@@ -42,6 +43,7 @@ export default function RootLayout() {
                                 <PaperProvider>
                                     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
                                         <Slot />
+                                        <AddMemoController />
                                         <CommonToast />
                                     </SafeAreaView>
                                 </PaperProvider>

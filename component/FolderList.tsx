@@ -2,9 +2,8 @@
 import { EmptyFolder, File, FilledFolder } from "@/assets/icons/svg/icon"
 import { FontStyles } from "@/constant/Style"
 import { ThemeContext } from "@/context/ThemeContext"
-import { invalidateQueries } from "@/store"
 import { Memo, MemoType } from "@/type"
-import { useQuery } from "@tanstack/react-query"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { RelativePathString, router, usePathname } from "expo-router"
 import { useSQLiteContext } from "expo-sqlite"
 import { useContext, useMemo, useRef } from "react"
@@ -17,14 +16,17 @@ type FormValues = {
 
 const ITEM_WIDTH = 76
 const PADDING = 16
-export const FolderList = ({ memos }: { memos: Memo[] }) => {
+export const FolderList = ({ memos = [] }: { memos: Memo[] }) => {
     const db = useSQLiteContext()
     const { theme } = useContext(ThemeContext)
+    const queryClient = useQueryClient()
     const titleRef = useRef<TextInput>(null)
 
-    const { control } = useForm<FormValues>({
+    const { control, watch } = useForm<FormValues>({
         defaultValues: { title: "" }
     })
+
+    const title = watch("title")
 
     const getItemsPerRow = () => {
         const screenWidth = Dimensions.get("window").width
@@ -45,7 +47,11 @@ export const FolderList = ({ memos }: { memos: Memo[] }) => {
 
     const saveTitle = async (id: number, title: string, type: MemoType) => {
         await db.runAsync(`UPDATE ${type} SET title = ? WHERE id = ?`, [title, id])
-        await invalidateQueries([MemoType.FOLDER, MemoType.FILE])
+        // 제목 수정 시에는 부모 폴더의 목록을 invalidate해야 함
+        // 현재 경로에서 parentId를 가져와야 하는데, 이건 params에서 가져와야 함
+        // 일단 현재는 해당 항목의 상세 쿼리만 invalidate
+        await queryClient.invalidateQueries({ queryKey: [type, id] })
+        // 부모 폴더 목록도 invalidate 필요 - 이건 상위 컴포넌트에서 처리하는 게 나을 수 있음
     }
 
     // 각 폴더 아이템마다 내용이 있는지 체크
@@ -60,7 +66,7 @@ export const FolderList = ({ memos }: { memos: Memo[] }) => {
     }
 
     // 각 폴더 아이템마다 내용이 있는지 체크
-    const folderIds = useMemo(() => memos.filter(m => m.type === MemoType.FOLDER).map(m => m.id), [memos])
+    const folderIds = useMemo(() => memos?.filter(m => m.type === MemoType.FOLDER).map(m => m.id), [memos])
 
     const { data: folderContentMap = {} } = useQuery({
         queryKey: [folderIds],
@@ -73,7 +79,7 @@ export const FolderList = ({ memos }: { memos: Memo[] }) => {
             )
             return map
         },
-        enabled: folderIds.length > 0
+        enabled: folderIds?.length > 0
     })
 
     return (
@@ -104,8 +110,8 @@ export const FolderList = ({ memos }: { memos: Memo[] }) => {
                                             }}
                                             onChangeText={onChange}
                                             value={value ?? title}
-                                            numberOfLines={2}
-                                            multiline
+                                            // numberOfLines={2}
+                                            // multiline
                                             onSubmitEditing={() => titleRef.current?.blur()}
                                             style={[styles.title, { color: theme.text }]}
                                             scrollEnabled={false}

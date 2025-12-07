@@ -1,6 +1,8 @@
 import { AndroidBack, IosBack } from "@/assets/icons/svg/icon"
 import { ThemeContext } from "@/context/ThemeContext"
+import { useGetMemo } from "@/hook/useGetMemo"
 import { Memo } from "@/type"
+import { UseQueryResult } from "@tanstack/react-query"
 import * as FileSystem from "expo-file-system"
 import { router } from "expo-router"
 import * as Sharing from "expo-sharing"
@@ -17,12 +19,12 @@ export interface ModalVisible {
 }
 
 interface FileDetailAppBarProps {
-    memo: Memo
     titleRef: React.RefObject<TextInput>
     setModalVisible: Dispatch<SetStateAction<ModalVisible>>
 }
-export const FileDetailAppBar = ({ memo, titleRef, setModalVisible }: FileDetailAppBarProps) => {
+export const FileDetailAppBar = ({ titleRef, setModalVisible }: FileDetailAppBarProps) => {
     const { theme } = useContext(ThemeContext)
+    const { data: memo } = useGetMemo() as UseQueryResult<Memo, Error>
 
     const editFile = () => {
         titleRef.current?.focus()
@@ -34,9 +36,9 @@ export const FileDetailAppBar = ({ memo, titleRef, setModalVisible }: FileDetail
 
     const exportFile = async () => {
         try {
-            const title = memo.title.split("\n")[0]
+            const title = memo?.title?.split("\n")[0] ?? ""
             const fileUri = FileSystem.cacheDirectory + `${title}.txt`
-            await FileSystem.writeAsStringAsync(fileUri, memo.content ?? "")
+            await FileSystem.writeAsStringAsync(fileUri, memo?.content ?? "")
             await Sharing.shareAsync(fileUri)
         } catch (error) {
             console.error("파일 내보내기 실패:", error)

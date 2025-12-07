@@ -1,8 +1,8 @@
 import { AndroidBack, Check, Close, IosBack } from "@/assets/icons/svg/icon"
 import { FontStyles, Styles } from "@/constant/Style"
 import { ThemeContext } from "@/context/ThemeContext"
-import { invalidateQueries } from "@/store"
 import { MemoType } from "@/type"
+import { useQueryClient } from "@tanstack/react-query"
 import { useLocalSearchParams } from "expo-router"
 import { useSQLiteContext } from "expo-sqlite"
 import { useContext } from "react"
@@ -27,6 +27,8 @@ export const FileCreateAppBar = ({ textLength, handleSubmit, close, back, inputB
     const { theme } = useContext(ThemeContext)
     const db = useSQLiteContext()
     const params = useLocalSearchParams()
+    const queryClient = useQueryClient()
+    const currentType = params.type as MemoType
     const parentId = params.id ? Number(params.id) : null
 
     const submitFile = () => {
@@ -43,11 +45,7 @@ export const FileCreateAppBar = ({ textLength, handleSubmit, close, back, inputB
                     inputBlur()
                     back()
 
-                    if (parentId) {
-                        await invalidateQueries([parentId])
-                    } else {
-                        await invalidateQueries([MemoType.FOLDER, MemoType.FILE])
-                    }
+                    await queryClient.invalidateQueries({ queryKey: [currentType, parentId] })
 
                     Toast.show({
                         text1: "작성된 글이 저장되었습니다.",

@@ -1,6 +1,7 @@
 // app/folder/FolderDetail.tsx
 import { FolderList } from "@/component/FolderList"
 import { useGetMemo } from "@/hook/useGetMemo"
+import { useResetMemo } from "@/hook/useResetMemo"
 import { Memo } from "@/type"
 import { UseQueryResult } from "@tanstack/react-query"
 import { useState } from "react"
@@ -12,6 +13,7 @@ import { MessageModal } from "./modal/MessageModal"
 export const FolderDetail = () => {
     const { data: memo = [] } = useGetMemo() as UseQueryResult<Memo[], Error>
     const [resetModalVisible, setResetModalVisible] = useState(false)
+    const { mutate: resetMemo } = useResetMemo()
 
     return (
         <>
@@ -23,10 +25,7 @@ export const FolderDetail = () => {
                 visible={resetModalVisible}
                 onDismiss={() => setResetModalVisible(false)}
                 onConfirm={async () => {
-                    // TODO db 아예 초기화하는 방법으로 교체
-                    // await db.runAsync(`DELETE FROM ${MemoType.FOLDER}`)
-                    // await db.runAsync(`DELETE FROM ${MemoType.FILE}`)
-                    // await queryClient.invalidateQueries({ queryKey: [currentType, currentId] })
+                    resetMemo()
                     setResetModalVisible(false)
                 }}
                 confirmText={"초기화"}

@@ -4,6 +4,7 @@ import { TitleInput } from "@/component/input/TitleInput"
 import { InfoModal } from "@/component/modal/InfoModal"
 import { MessageModal } from "@/component/modal/MessageModal"
 import { useGetMemo } from "@/hook/useGetMemo"
+import { useSaveMemo } from "@/hook/useSaveMemo"
 import { FormValues, Memo, MemoType } from "@/type"
 import { useQueryClient, UseQueryResult } from "@tanstack/react-query"
 import { router, useLocalSearchParams } from "expo-router"
@@ -19,6 +20,7 @@ export const FileDetail = () => {
     const queryClient = useQueryClient()
     const params = useLocalSearchParams()
     const parentId = params.parentId ? Number(params.parentId) : null
+    const { saveTitle } = useSaveMemo()
 
     const titleRef = useRef<TextInput>(null)
     const [{ deleteModalVisible, infoModalVisible }, setModalVisible] = useState<ModalVisible>({ deleteModalVisible: false, infoModalVisible: false })
@@ -30,14 +32,6 @@ export const FileDetail = () => {
 
     const title = watch("title")
     const content = watch("content")
-
-    const saveTitle = async () => {
-        await db.runAsync(`UPDATE ${MemoType.FILE} SET title = ? WHERE id = ?`, [title, memo?.id ?? 0])
-        // 부모 폴더 목록 invalidate
-        await queryClient.invalidateQueries({ queryKey: [MemoType.FOLDER, parentId] })
-        // 파일 상세도 invalidate
-        await queryClient.invalidateQueries({ queryKey: [MemoType.FILE, memo?.id] })
-    }
 
     const saveContent = async () => {
         await db.runAsync(`UPDATE ${MemoType.FILE} SET content = ? WHERE id = ?`, [content, memo?.id ?? 0])
@@ -72,7 +66,12 @@ export const FileDetail = () => {
         <>
             <FileDetailAppBar titleRef={titleRef} setModalVisible={setModalVisible} />
             <ScrollView contentContainerStyle={styles.container}>
-                <Controller control={control} name='title' rules={{ required: true }} render={({ field: { onChange, value } }) => <TitleInput ref={titleRef} value={value} onChangeText={onChange} onBlur={saveTitle} />} />
+                <Controller
+                    control={control}
+                    name='title'
+                    rules={{ required: true }}
+                    render={({ field: { onChange, value } }) => <TitleInput ref={titleRef} value={value} onChangeText={onChange} onBlur={() => saveTitle(title, memo?.id ?? 0)} />}
+                />
                 <Controller control={control} name='content' rules={{ required: true }} render={({ field: { onChange, value } }) => <ContentInput value={value} onChangeText={onChange} onBlur={saveContent} />} />
             </ScrollView>
             <MessageModal message={"정말 삭제하시겠습니까?"} visible={deleteModalVisible} onDismiss={() => setModalVisible(prev => ({ ...prev, deleteModalVisible: false }))} onConfirm={deleteFile} confirmText={"삭제"} />

@@ -9,8 +9,10 @@ export const useGetMemo = () => {
     const currentId = params.id ? Number(params?.id) : 0
     const currentType = (params.type as MemoType) ?? MemoType.FOLDER
 
-    // queryKey 구조 통일: 폴더 목록은 ['folder', id], 파일 상세는 ['file', id]
+    // TODO: 메모, 파일간 이동할 때는 getQueryData로 cache값 가져오게 처리
+
     return useQuery({
+        // queryKey 구조 통일: 폴더 목록은 ['folder', id], 파일 상세는 ['file', id]
         queryKey: [currentType, currentId],
         queryFn: async () => {
             // root인 경우

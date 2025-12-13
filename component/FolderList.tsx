@@ -18,6 +18,15 @@ type FormValues = {
 
 const ITEM_WIDTH = 76
 const PADDING = 16
+
+const getItemsPerRow = () => {
+    const screenWidth = Dimensions.get("window").width
+    const padding = PADDING * 2 // 좌우 패딩 16 * 2
+    const availableWidth = screenWidth - padding
+    const itemWidth = ITEM_WIDTH + PADDING // 아이템 너비 + gap
+    return Math.floor(availableWidth / itemWidth)
+}
+
 export const FolderList = () => {
     const theme = useAtomValue(themeAtom)
     const sortType = useAtomValue(sortAtom)
@@ -32,14 +41,6 @@ export const FolderList = () => {
     const { control } = useForm<FormValues>({
         defaultValues: { title: "" }
     })
-
-    const getItemsPerRow = () => {
-        const screenWidth = Dimensions.get("window").width
-        const padding = PADDING * 2 // 좌우 패딩 16 * 2
-        const availableWidth = screenWidth - padding
-        const itemWidth = ITEM_WIDTH + PADDING // 아이템 너비 + gap
-        return Math.floor(availableWidth / itemWidth)
-    }
 
     const itemsPerRow = useMemo(() => getItemsPerRow(), [])
 

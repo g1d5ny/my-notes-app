@@ -1,5 +1,5 @@
 import { DeleteOption, ExportOption, InfoOption } from "@/assets/icons/svg/option/icon"
-import { useEditMemo } from "@/hook/useUpdateMemo"
+import { useDeleteMemo } from "@/hook/useDeleteMemo"
 import { infoModalVisibleAtom, modalAtom, themeAtom } from "@/store"
 import { useGlobalSearchParams } from "expo-router"
 import { useAtomValue, useSetAtom } from "jotai"
@@ -16,7 +16,7 @@ export const FileEditOption = ({ exportFile }: FileEditOptionProps) => {
     const [menuVisible, setMenuVisible] = useState(false)
     const params = useGlobalSearchParams()
     const currentId = params.id ? Number(params?.id) : 0
-    const { deleteMemo } = useEditMemo()
+    const { deleteFile } = useDeleteMemo()
 
     const fileEditOptionList: OptionMenuList[] = [
         {
@@ -28,7 +28,7 @@ export const FileEditOption = ({ exportFile }: FileEditOptionProps) => {
                     visible: true,
                     message: "정말 삭제하시겠습니까?",
                     onConfirm: () => {
-                        deleteMemo({ memoId: currentId, parentId: params.parentId ? Number(params.parentId) : null })
+                        deleteFile({ memoId: currentId, parentId: params.parentId ? Number(params.parentId) : null })
                     },
                     confirmText: "삭제"
                 })

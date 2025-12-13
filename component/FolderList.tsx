@@ -45,19 +45,19 @@ export const FolderList = () => {
 
     const itemsPerRow = useMemo(() => getItemsPerRow(), [])
 
-    const open = (id: number, type: MemoType, title: string, parentId: number | null) => {
+    const open = (id: number, type: MemoType, title: string, content: string | undefined, parentId: number | null) => {
         const path = (currentPath + `/${title}`) as RelativePathString
-        router.push({ pathname: path, params: { type, id, title, parentId } })
+        router.push({ pathname: path, params: { type, id, title, content, parentId } })
     }
 
     return (
         <View style={styles.container}>
             <ScrollView contentContainerStyle={styles.contentContainerStyle} showsVerticalScrollIndicator={false}>
-                {memos.map(({ id, title, type, parentId }, index) => {
+                {memos.map(({ id, title, type, content, parentId }, index) => {
                     return (
                         <View key={index} style={styles.item}>
-                            <Pressable onPress={() => open(id, type, title, parentId)}>{type === MemoType.FILE ? <File /> : filledFolder[id] ? <FilledFolder /> : <EmptyFolder />}</Pressable>
-                            <Pressable style={styles.titleContainer} onPress={() => open(id, type, title, parentId)}>
+                            <Pressable onPress={() => open(id, type, title, content, parentId)}>{type === MemoType.FILE ? <File /> : filledFolder[id] ? <FilledFolder /> : <EmptyFolder />}</Pressable>
+                            <Pressable style={styles.titleContainer} onPress={() => open(id, type, title, content, parentId)}>
                                 <Controller
                                     name={`${id}-${type}` as FieldPath<FormValues>}
                                     control={control}
@@ -70,9 +70,9 @@ export const FolderList = () => {
                                                 const currentValue = value
                                                 if (currentValue && currentValue !== title) {
                                                     if (type === MemoType.FILE) {
-                                                        updateFileTitle({ title: currentValue, memoId: id, parentId })
+                                                        updateFileTitle({ title: currentValue, memoId: id, parentId: parentId ?? 0 })
                                                     } else {
-                                                        updateFolderTitle({ title: currentValue, memoId: id, parentId })
+                                                        updateFolderTitle({ title: currentValue, memoId: id, parentId: parentId ?? 0 })
                                                     }
                                                 } else {
                                                     onChange(title)

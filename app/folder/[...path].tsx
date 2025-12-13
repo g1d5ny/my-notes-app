@@ -7,5 +7,5 @@ export default function FolderScreen() {
     const params = useLocalSearchParams()
     const currentType = params.type as MemoType
 
-    return currentType === MemoType.FILE ? <FileDetail /> : <FolderDetail />
+    return currentType === MemoType.FILE ? <FileDetail id={Number(params.id)} title={String(params.title)} content={String(params.content)} parentId={Number(params.parentId ?? 0)} /> : <FolderDetail />
 }

@@ -1,7 +1,7 @@
 import { sortAtom } from "@/store"
 import { Memo, MemoType, SortType } from "@/type"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
-import { useLocalSearchParams } from "expo-router"
+import { useGlobalSearchParams } from "expo-router"
 import { useSQLiteContext } from "expo-sqlite"
 import { useAtomValue } from "jotai"
 
@@ -25,7 +25,7 @@ const sort = (memos: Memo[], sortType: SortType) => {
 
 export const useReadMemo = () => {
     const db = useSQLiteContext()
-    const params = useLocalSearchParams()
+    const params = useGlobalSearchParams()
     const queryClient = useQueryClient()
     const sortType = useAtomValue(sortAtom)
     const currentId = params.id ? Number(params?.id) : 0

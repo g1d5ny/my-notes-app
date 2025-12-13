@@ -3,7 +3,7 @@ import { EmptyFolder, File, FilledFolder } from "@/assets/icons/svg/icon"
 import { FontStyles } from "@/constant/Style"
 import { useCheckFilledMemo } from "@/hook/useCheckFilledMemo"
 import { useEditMemo } from "@/hook/useEditMemo"
-import { themeAtom } from "@/store"
+import { sortAtom, themeAtom } from "@/store"
 import { Memo, MemoType } from "@/type"
 import { useQueryClient } from "@tanstack/react-query"
 import { RelativePathString, router, useLocalSearchParams, usePathname } from "expo-router"
@@ -20,12 +20,13 @@ const ITEM_WIDTH = 76
 const PADDING = 16
 export const FolderList = () => {
     const theme = useAtomValue(themeAtom)
+    const sortType = useAtomValue(sortAtom)
     const queryClient = useQueryClient()
     const params = useLocalSearchParams()
     const { saveTitle } = useEditMemo()
     const titleRef = useRef<TextInput>(null)
     const currentId = params.id ? Number(params?.id) : 0
-    const memos = queryClient.getQueryData<Memo[]>([MemoType.FOLDER, currentId]) ?? []
+    const memos = queryClient.getQueryData<Memo[]>([MemoType.FOLDER, currentId, sortType]) ?? []
     const { data: filledFolder = [] } = useCheckFilledMemo(memos)
 
     const { control } = useForm<FormValues>({
@@ -113,7 +114,9 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 16,
-        gap: 12
+        gap: 12,
+        borderWidth: 1,
+        borderColor: "green"
     },
     contentContainerStyle: {
         flexDirection: "row",

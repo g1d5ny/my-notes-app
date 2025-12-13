@@ -18,7 +18,7 @@ export const useCreateMemo = () => {
     // parentId와 그 부모(parentId의 parentId)만 invalidate하는 함수
     const invalidateParentAndGrandparent = async (parentId: number | null) => {
         // parentId 자체 invalidate
-        await queryClient.invalidateQueries({ queryKey: [MemoType.FOLDER, parentId] })
+        await queryClient.invalidateQueries({ queryKey: [MemoType.FOLDER, parentId ?? 0] })
 
         // parentId가 null이 아니면 그 부모도 찾아서 invalidate
         if (parentId !== null) {

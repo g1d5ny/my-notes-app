@@ -2,17 +2,21 @@ import { CheckOption, ResetOption, SortOption, ThemeOption } from "@/assets/icon
 import { FontStyles } from "@/constant/Style"
 import { DarkTheme, LightTheme } from "@/constant/Theme"
 import { useResetMemo } from "@/hook/useResetMemo"
-import { modalAtom, schemeAtom, themeAtom } from "@/store"
-import { useAtom, useSetAtom } from "jotai"
+import { useSort } from "@/hook/useSort"
+import { modalAtom, schemeAtom, sortAtom, themeAtom } from "@/store"
+import { SortType } from "@/type"
+import { useAtom, useAtomValue, useSetAtom } from "jotai"
 import { useState } from "react"
 import { Image, StyleSheet, Text } from "react-native"
 import { OptionMenu, OptionMenuList } from "../OptionMenu"
 
 export const SettingOption = () => {
     const [theme, setTheme] = useAtom(themeAtom)
-    const [scheme, setScheme] = useAtom(schemeAtom)
+    const setScheme = useSetAtom(schemeAtom)
     const setModalVisible = useSetAtom(modalAtom)
+    const sort = useAtomValue(sortAtom)
     const { mutate: resetMemo } = useResetMemo()
+    const { sortCreatedAt, sortUpdatedAt, sortTitle } = useSort()
     const [menuVisible, setMenuVisible] = useState(false)
 
     const mainOptionList: OptionMenuList[] = [
@@ -30,17 +34,15 @@ export const SettingOption = () => {
             title: "정렬",
             trailingIcon: <SortOption theme={theme} />,
             disabled: true,
-            onPress: () => {
-                setMenuVisible(false)
-            },
             dividerWidth: 1,
             hasDivider: true
         },
         {
             title: "생성 시간 순",
-            leadingIcon: <Image source={require("@/assets/icons/icon_selected.png")} style={styles.icon} />,
+            leadingIcon: sort === SortType.CREATED_AT ? <Image source={require("@/assets/icons/icon_selected.png")} style={styles.icon} /> : <></>,
             disabled: false,
             onPress: () => {
+                sortCreatedAt()
                 setMenuVisible(false)
             },
             dividerWidth: 1,
@@ -48,9 +50,10 @@ export const SettingOption = () => {
         },
         {
             title: "수정 시간 순",
-            leadingIcon: <Image source={require("@/assets/icons/icon_selected.png")} style={styles.icon} />,
+            leadingIcon: sort === SortType.UPDATED_AT ? <Image source={require("@/assets/icons/icon_selected.png")} style={styles.icon} /> : <></>,
             disabled: false,
             onPress: () => {
+                sortUpdatedAt()
                 setMenuVisible(false)
             },
             dividerWidth: 1,
@@ -58,22 +61,13 @@ export const SettingOption = () => {
         },
         {
             title: "제목 순",
-            leadingIcon: <Image source={require("@/assets/icons/icon_selected.png")} style={styles.icon} />,
+            leadingIcon: sort === SortType.TITLE ? <Image source={require("@/assets/icons/icon_selected.png")} style={styles.icon} /> : <></>,
             disabled: false,
             onPress: () => {
+                sortTitle()
                 setMenuVisible(false)
             },
             dividerWidth: 1,
-            hasDivider: true
-        },
-        {
-            title: "자유 배치",
-            leadingIcon: <Image source={require("@/assets/icons/icon_selected.png")} style={styles.icon} />,
-            disabled: false,
-            onPress: () => {
-                setMenuVisible(false)
-            },
-            dividerWidth: 2,
             hasDivider: true
         },
         {
@@ -88,7 +82,7 @@ export const SettingOption = () => {
         },
         {
             title: "라이트 모드",
-            leadingIcon: scheme === "light" ? <Image source={require("@/assets/icons/icon_selected.png")} style={styles.icon} /> : <></>,
+            leadingIcon: theme === LightTheme ? <Image source={require("@/assets/icons/icon_selected.png")} style={styles.icon} /> : <></>,
             disabled: false,
             onPress: () => {
                 setTheme(LightTheme)
@@ -100,7 +94,7 @@ export const SettingOption = () => {
         },
         {
             title: "다크 모드",
-            leadingIcon: scheme === "dark" ? <Image source={require("@/assets/icons/icon_selected.png")} style={styles.icon} /> : <></>,
+            leadingIcon: theme === DarkTheme ? <Image source={require("@/assets/icons/icon_selected.png")} style={styles.icon} /> : <></>,
             disabled: false,
             onPress: () => {
                 setTheme(DarkTheme)

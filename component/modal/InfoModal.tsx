@@ -1,5 +1,5 @@
 import { FontStyles, Styles } from "@/constant/Style"
-import { infoModalVisibleAtom, themeAtom } from "@/store"
+import { infoModalVisibleAtom, sortAtom, themeAtom } from "@/store"
 import { Memo, MemoType } from "@/type"
 import { useQueryClient } from "@tanstack/react-query"
 import { useGlobalSearchParams } from "expo-router"
@@ -18,11 +18,12 @@ const formatUnixTime = (unixTime: number) => {
 
 export const InfoModal = () => {
     const theme = useAtomValue(themeAtom)
+    const sortType = useAtomValue(sortAtom)
     const queryClient = useQueryClient()
     const params = useGlobalSearchParams()
     const [infoModalVisible, setInfoModalVisible] = useAtom(infoModalVisibleAtom)
     const currentId = params.id ? Number(params?.id) : 0
-    const memo = queryClient.getQueryData<Memo>([MemoType.FILE, currentId])
+    const memo = queryClient.getQueryData<Memo>([MemoType.FILE, currentId, sortType])
 
     return (
         <Modal visible={infoModalVisible} onDismiss={() => setInfoModalVisible(false)} contentContainerStyle={styles.modalContainer} style={styles.center}>

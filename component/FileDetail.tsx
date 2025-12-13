@@ -1,22 +1,25 @@
 import { ContentInput } from "@/component/input/ContentInput"
 import { TitleInput } from "@/component/input/TitleInput"
 import { useEditMemo } from "@/hook/useEditMemo"
+import { sortAtom } from "@/store"
 import { FormValues, Memo, MemoType } from "@/type"
 import { useQueryClient } from "@tanstack/react-query"
 import { useLocalSearchParams } from "expo-router"
 import { useSQLiteContext } from "expo-sqlite"
+import { useAtomValue } from "jotai"
 import { useEffect } from "react"
 import { Controller, useForm } from "react-hook-form"
 import { ScrollView, StyleSheet } from "react-native"
 
 export const FileDetail = () => {
+    const sortType = useAtomValue(sortAtom)
     const db = useSQLiteContext()
     const params = useLocalSearchParams()
     const queryClient = useQueryClient()
     const { saveTitle, saveContent } = useEditMemo()
     const currentId = params?.id ? Number(params?.id) : 0
     const parentId = params.parentId ? Number(params.parentId) : null
-    const memo = queryClient.getQueryData<Memo>([MemoType.FILE, currentId])
+    const memo = queryClient.getQueryData<Memo>([MemoType.FILE, currentId, sortType])
 
     const { control, handleSubmit } = useForm<FormValues>({
         defaultValues: { title: memo?.title ?? "", content: memo?.content ?? "" },

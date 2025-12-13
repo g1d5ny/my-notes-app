@@ -19,7 +19,7 @@ export const FolderDetail = () => {
         <>
             <MainAppBar setResetModalVisible={setResetModalVisible} />
             <RoutingHeader />
-            {memo.length === 0 ? <EmptyMemo /> : <FolderList memos={memo} />}
+            {memo.length === 0 ? <EmptyMemo /> : <FolderList />}
             <MessageModal
                 message={"데이터를 초기화하시겠습니까?"}
                 visible={resetModalVisible}

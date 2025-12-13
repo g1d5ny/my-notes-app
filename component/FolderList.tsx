@@ -2,10 +2,11 @@
 import { EmptyFolder, File, FilledFolder } from "@/assets/icons/svg/icon"
 import { FontStyles } from "@/constant/Style"
 import { ThemeContext } from "@/context/ThemeContext"
+import { useCheckFilledMemo } from "@/hook/useCheckFilledMemo"
+import { useEditMemo } from "@/hook/useEditMemo"
 import { Memo, MemoType } from "@/type"
-import { useQuery, useQueryClient } from "@tanstack/react-query"
-import { RelativePathString, router, usePathname } from "expo-router"
-import { useSQLiteContext } from "expo-sqlite"
+import { useQueryClient } from "@tanstack/react-query"
+import { RelativePathString, router, useLocalSearchParams, usePathname } from "expo-router"
 import { useContext, useMemo, useRef } from "react"
 import { Controller, FieldPath, useForm } from "react-hook-form"
 import { Dimensions, Pressable, ScrollView, StyleSheet, TextInput, View } from "react-native"
@@ -16,17 +17,20 @@ type FormValues = {
 
 const ITEM_WIDTH = 76
 const PADDING = 16
-export const FolderList = ({ memos = [] }: { memos: Memo[] }) => {
-    const db = useSQLiteContext()
+export const FolderList = () => {
     const { theme } = useContext(ThemeContext)
     const queryClient = useQueryClient()
+    const params = useLocalSearchParams()
+    const { saveTitle } = useEditMemo()
     const titleRef = useRef<TextInput>(null)
+    const currentId = params.id ? Number(params?.id) : 0
+    const parentId = params.parentId ? Number(params?.parentId) : null
+    const memos = queryClient.getQueryData<Memo[]>([MemoType.FOLDER, currentId]) ?? []
+    const { data: filledFolder = [] } = useCheckFilledMemo(memos)
 
-    const { control, watch } = useForm<FormValues>({
+    const { control } = useForm<FormValues>({
         defaultValues: { title: "" }
     })
-
-    const title = watch("title")
 
     const getItemsPerRow = () => {
         const screenWidth = Dimensions.get("window").width
@@ -45,43 +49,6 @@ export const FolderList = ({ memos = [] }: { memos: Memo[] }) => {
         router.push({ pathname: path, params: { type, id, title } })
     }
 
-    const saveTitle = async (id: number, title: string, type: MemoType) => {
-        await db.runAsync(`UPDATE ${type} SET title = ? WHERE id = ?`, [title, id])
-        // 제목 수정 시에는 부모 폴더의 목록을 invalidate해야 함
-        // 현재 경로에서 parentId를 가져와야 하는데, 이건 params에서 가져와야 함
-        // 일단 현재는 해당 항목의 상세 쿼리만 invalidate
-        await queryClient.invalidateQueries({ queryKey: [type, id] })
-        // 부모 폴더 목록도 invalidate 필요 - 이건 상위 컴포넌트에서 처리하는 게 나을 수 있음
-    }
-
-    // 각 폴더 아이템마다 내용이 있는지 체크
-    const checkFolderHasContent = async (folderId: number) => {
-        const result = await db.getFirstAsync<{ totalCount: number }>(
-            `SELECT 
-                (SELECT COUNT(*) FROM folder WHERE parentId = ?) + 
-                (SELECT COUNT(*) FROM file WHERE parentId = ?) as totalCount`,
-            [folderId, folderId]
-        )
-        return (result?.totalCount ?? 0) > 0
-    }
-
-    // 각 폴더 아이템마다 내용이 있는지 체크
-    const folderIds = useMemo(() => memos?.filter(m => m.type === MemoType.FOLDER).map(m => m.id), [memos])
-
-    const { data: folderContentMap = {} } = useQuery({
-        queryKey: [folderIds],
-        queryFn: async () => {
-            const map: Record<number, boolean> = {}
-            await Promise.all(
-                folderIds.map(async id => {
-                    map[id] = await checkFolderHasContent(id)
-                })
-            )
-            return map
-        },
-        enabled: folderIds?.length > 0
-    })
-
     return (
         <View style={styles.container}>
             <ScrollView contentContainerStyle={styles.contentContainerStyle} showsVerticalScrollIndicator={false}>
@@ -89,7 +56,7 @@ export const FolderList = ({ memos = [] }: { memos: Memo[] }) => {
                     return (
                         <View key={index} style={styles.item}>
                             <Pressable style={{ borderWidth: 1, borderColor: "blue" }} onPress={() => open(id, type, title)}>
-                                {type === MemoType.FILE ? <File /> : folderContentMap[id] ? <FilledFolder /> : <EmptyFolder />}
+                                {type === MemoType.FILE ? <File /> : filledFolder[id] ? <FilledFolder /> : <EmptyFolder />}
                             </Pressable>
                             <Pressable style={styles.titleContainer} onPress={() => open(id, type, title)}>
                                 <Controller
@@ -101,9 +68,9 @@ export const FolderList = ({ memos = [] }: { memos: Memo[] }) => {
                                             ref={titleRef}
                                             onBlur={async () => {
                                                 onBlur()
-                                                const currentValue = value ?? title
+                                                const currentValue = value
                                                 if (currentValue && currentValue !== title) {
-                                                    await saveTitle(id, currentValue, type)
+                                                    saveTitle({ title: currentValue, memoId: id, parentId })
                                                 } else {
                                                     onChange(title)
                                                 }

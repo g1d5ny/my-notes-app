@@ -15,10 +15,10 @@ export default function FolderIndex() {
         return (
             <>
                 <RoutingHeader />
-                <FolderList memos={memos} />
+                <FolderList />
             </>
         )
-    }, [memos])
+    }, [])
 
     return (
         <>

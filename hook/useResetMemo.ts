@@ -9,13 +9,13 @@ export const useResetMemo = () => {
     const params = useLocalSearchParams()
     const currentType = (params.type as MemoType) ?? MemoType.FOLDER
     const currentId = params.id ? Number(params?.id) : 0
+    const parentId = params.parentId ? Number(params?.parentId) : null
 
     return useMutation({
         mutationFn: async () => {
             // TODO: db 아예 초기화하는 방법으로 교체
             await db.runAsync(`DELETE FROM ${MemoType.FOLDER}`)
             await db.runAsync(`DELETE FROM ${MemoType.FILE}`)
-            await queryClient.invalidateQueries({ queryKey: [currentType, currentId] })
         }
     })
 }

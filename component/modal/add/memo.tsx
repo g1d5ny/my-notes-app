@@ -2,6 +2,8 @@ import { FilePlus, FolderPlus } from "@/assets/icons/svg/icon"
 import { FontStyles, Styles } from "@/constant/Style"
 import { DarkTheme, LightTheme } from "@/constant/Theme"
 import { ThemeContext } from "@/context/ThemeContext"
+import { useCreateMemo } from "@/hook/useCreateMemo"
+import { useLocalSearchParams } from "expo-router"
 import React, { useContext, useState } from "react"
 import { Image, Pressable, StyleSheet, Text } from "react-native"
 import { Modal } from "react-native-paper"
@@ -12,13 +14,15 @@ const ICON_SIZE = 80
 
 interface AddMemoProps {
     onAddFile: () => void
-    onAddFolder: () => void
 }
 
-export const AddMemo = ({ onAddFile, onAddFolder }: AddMemoProps) => {
+export const AddMemo = ({ onAddFile }: AddMemoProps) => {
     const { theme } = useContext(ThemeContext)
     const { bottom } = useSafeAreaInsets()
+    const { createFolder } = useCreateMemo()
+    const params = useLocalSearchParams()
     const [modalVisible, setModalVisible] = useState(false)
+    const parentId = params.id ? Number(params.id) : null
 
     const closeModal = () => {
         setModalVisible(false)
@@ -35,7 +39,7 @@ export const AddMemo = ({ onAddFile, onAddFolder }: AddMemoProps) => {
 
     const handleAddFolder = () => {
         closeModal()
-        onAddFolder()
+        createFolder({ parentId })
     }
 
     return (

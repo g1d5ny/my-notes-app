@@ -1,13 +1,14 @@
 import { AndroidBack, IosBack } from "@/assets/icons/svg/icon"
 import { ThemeContext } from "@/context/ThemeContext"
 import { useGetMemo } from "@/hook/useGetMemo"
-import { Memo } from "@/type"
+import { FormValues, Memo } from "@/type"
 import { UseQueryResult } from "@tanstack/react-query"
 import * as FileSystem from "expo-file-system"
 import { router } from "expo-router"
 import * as Sharing from "expo-sharing"
 import { Dispatch, SetStateAction, useContext } from "react"
-import { Platform, Pressable, StyleSheet, TextInput, View } from "react-native"
+import { UseFormSetFocus } from "react-hook-form"
+import { Platform, Pressable, StyleSheet, View } from "react-native"
 import Toast from "react-native-toast-message"
 import { Styles } from "../../constant/Style"
 import { FileEditOption } from "../option/FileEditOption"
@@ -19,15 +20,15 @@ export interface ModalVisible {
 }
 
 interface FileDetailAppBarProps {
-    titleRef: React.RefObject<TextInput>
     setModalVisible: Dispatch<SetStateAction<ModalVisible>>
+    setFocus: UseFormSetFocus<FormValues>
 }
-export const FileDetailAppBar = ({ titleRef, setModalVisible }: FileDetailAppBarProps) => {
+export const FileDetailAppBar = ({ setModalVisible, setFocus }: FileDetailAppBarProps) => {
     const { theme } = useContext(ThemeContext)
     const { data: memo } = useGetMemo() as UseQueryResult<Memo, Error>
 
     const editFile = () => {
-        titleRef.current?.focus()
+        setFocus("title")
     }
 
     const showDeleteModal = () => {

@@ -1,10 +1,8 @@
 import { AndroidBack, Check, Close, IosBack } from "@/assets/icons/svg/icon"
 import { FontStyles, Styles } from "@/constant/Style"
 import { ThemeContext } from "@/context/ThemeContext"
-import { MemoType } from "@/type"
-import { useQueryClient } from "@tanstack/react-query"
+import { useCreateMemo } from "@/hook/useCreateMemo"
 import { useLocalSearchParams } from "expo-router"
-import { useSQLiteContext } from "expo-sqlite"
 import { useContext } from "react"
 import { UseFormHandleSubmit } from "react-hook-form"
 import { Platform, Pressable, StyleSheet, Text, View } from "react-native"
@@ -25,47 +23,21 @@ interface FileCreateAppBarProps {
 }
 export const FileCreateAppBar = ({ textLength, handleSubmit, close, back, inputBlur }: FileCreateAppBarProps) => {
     const { theme } = useContext(ThemeContext)
-    const db = useSQLiteContext()
     const params = useLocalSearchParams()
-    const queryClient = useQueryClient()
-    const currentType = params.type as MemoType
-    const parentId = params.id ? Number(params.id) : null
+    const { createFile } = useCreateMemo()
+    const parentId = params.parentId ? Number(params.parentId) : null
 
     const submitFile = () => {
         handleSubmit(
             async data => {
-                try {
-                    const now = Math.floor(Date.now() / 1000)
-                    await db.runAsync(
-                        `INSERT INTO ${MemoType.FILE} (type, title, content, parentId, createdAt, updatedAt, viewedAt)
-                        VALUES (?, ?, ?, ?, ?, ?, ?)`,
-                        [MemoType.FILE, data.title, data.content, parentId, now, now, now]
-                    )
-
-                    inputBlur()
-                    back()
-
-                    await queryClient.invalidateQueries({ queryKey: [currentType, parentId] })
-
-                    Toast.show({
-                        text1: "작성된 글이 저장되었습니다.",
-                        type: "customToast",
-                        position: "bottom",
-                        visibilityTime: 3000
-                    })
-                } catch (error) {
-                    console.error("메모 저장 실패:", error)
-                    Toast.show({
-                        text1: "메모 저장에 실패했습니다.",
-                        type: "customToast",
-                        position: "bottom",
-                        visibilityTime: 3000
-                    })
-                }
+                createFile({ title: data.title, content: data.content, parentId })
+                inputBlur()
+                back()
             },
             errors => {
                 const titleError = errors.title
                 const errorText = titleError ? "제목을 입력해주세요." : "내용을 입력해주세요."
+                console.error("메모 저장 실패:", errors)
                 Toast.show({
                     text1: errorText,
                     type: "customToast",
@@ -75,6 +47,7 @@ export const FileCreateAppBar = ({ textLength, handleSubmit, close, back, inputB
             }
         )()
     }
+
     return (
         <AppBarForm>
             <View style={[Styles.row, styles.container]}>

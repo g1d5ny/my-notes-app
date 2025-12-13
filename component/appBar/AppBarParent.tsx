@@ -15,12 +15,14 @@ export const AppBarParent = ({ children }: DefaultAppBarProps) => {
 const styles = StyleSheet.create({
     iosContainer: {
         width: "100%",
+        height: 44,
         paddingVertical: 8,
         paddingHorizontal: 16,
         borderBottomWidth: 1
     },
     androidContainer: {
         width: "100%",
+        height: 56,
         paddingVertical: 12,
         paddingHorizontal: 16,
         borderBottomWidth: 1

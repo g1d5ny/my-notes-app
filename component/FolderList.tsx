@@ -25,7 +25,6 @@ export const FolderList = () => {
     const { saveTitle } = useEditMemo()
     const titleRef = useRef<TextInput>(null)
     const currentId = params.id ? Number(params?.id) : 0
-    const parentId = params.parentId ? Number(params?.parentId) : null
     const memos = queryClient.getQueryData<Memo[]>([MemoType.FOLDER, currentId]) ?? []
     const { data: filledFolder = [] } = useCheckFilledMemo(memos)
 
@@ -45,21 +44,21 @@ export const FolderList = () => {
 
     const currentPath = usePathname()
 
-    const open = (id: number, type: MemoType, title: string) => {
+    const open = (id: number, type: MemoType, title: string, parentId: number | null) => {
         const path = (currentPath + `/${title}`) as RelativePathString
-        router.push({ pathname: path, params: { type, id, title } })
+        router.push({ pathname: path, params: { type, id, title, parentId } })
     }
 
     return (
         <View style={styles.container}>
             <ScrollView contentContainerStyle={styles.contentContainerStyle} showsVerticalScrollIndicator={false}>
-                {memos.map(({ id, title, type }, index) => {
+                {memos.map(({ id, title, type, parentId }, index) => {
                     return (
                         <View key={index} style={styles.item}>
-                            <Pressable style={{ borderWidth: 1, borderColor: "blue" }} onPress={() => open(id, type, title)}>
+                            <Pressable style={{ borderWidth: 1, borderColor: "blue" }} onPress={() => open(id, type, title, parentId)}>
                                 {type === MemoType.FILE ? <File /> : filledFolder[id] ? <FilledFolder /> : <EmptyFolder />}
                             </Pressable>
-                            <Pressable style={styles.titleContainer} onPress={() => open(id, type, title)}>
+                            <Pressable style={styles.titleContainer} onPress={() => open(id, type, title, parentId)}>
                                 <Controller
                                     name={`title-${index}` as FieldPath<FormValues>}
                                     control={control}

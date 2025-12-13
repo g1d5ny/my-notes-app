@@ -1,6 +1,7 @@
 import { CheckOption, ResetOption, SortOption, ThemeOption } from "@/assets/icons/svg/option/icon"
 import { FontStyles } from "@/constant/Style"
 import { DarkTheme, LightTheme } from "@/constant/Theme"
+import { useResetMemo } from "@/hook/useResetMemo"
 import { modalAtom, schemeAtom, themeAtom } from "@/store"
 import { useAtom, useSetAtom } from "jotai"
 import { useState } from "react"
@@ -11,6 +12,7 @@ export const SettingOption = () => {
     const [theme, setTheme] = useAtom(themeAtom)
     const [scheme, setScheme] = useAtom(schemeAtom)
     const setModalVisible = useSetAtom(modalAtom)
+    const { mutate: resetMemo } = useResetMemo()
     const [menuVisible, setMenuVisible] = useState(false)
 
     const mainOptionList: OptionMenuList[] = [
@@ -123,7 +125,12 @@ export const SettingOption = () => {
             trailingIcon: <ResetOption theme={theme} />,
             disabled: false,
             onPress: () => {
-                setModalVisible({ visible: true, message: "정말 초기화하시겠습니까?", onConfirm: () => {}, confirmText: "초기화" })
+                setModalVisible({
+                    visible: true,
+                    message: "정말 초기화하시겠습니까?",
+                    onConfirm: resetMemo,
+                    confirmText: "초기화"
+                })
                 setMenuVisible(false)
             },
             hasDivider: false

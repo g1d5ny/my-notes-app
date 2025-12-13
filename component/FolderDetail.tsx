@@ -6,13 +6,8 @@ import { UseQueryResult } from "@tanstack/react-query"
 import { EmptyMemo } from "./EmptyMemo"
 
 export const FolderDetail = () => {
-    const { data: memo = [] } = useGetMemo() as UseQueryResult<Memo[], Error>
+    const { data: memos = [] } = useGetMemo() as UseQueryResult<Memo[], Error>
+    console.log("memos: ", memos)
 
-    return (
-        <>
-            {/* <MainAppBar setResetModalVisible={setResetModalVisible} /> */}
-            {/* <RoutingHeader /> */}
-            {memo.length === 0 ? <EmptyMemo /> : <FolderList />}
-        </>
-    )
+    return memos.length === 0 ? <EmptyMemo /> : <FolderList />
 }

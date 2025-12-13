@@ -8,6 +8,20 @@ export const useEditMemo = () => {
     const db = useSQLiteContext()
     const queryClient = useQueryClient()
 
+    // parentId와 그 부모(parentId의 parentId)만 invalidate하는 함수
+    const invalidateParentAndGrandparent = async (parentId: number | null) => {
+        // parentId 자체 invalidate
+        await queryClient.invalidateQueries({ queryKey: [MemoType.FOLDER, parentId] })
+
+        // parentId가 null이 아니면 그 부모도 찾아서 invalidate
+        if (parentId !== null) {
+            const folder = await db.getFirstAsync<{ parentId: number | null }>(`SELECT parentId FROM ${MemoType.FOLDER} WHERE id = ?`, [parentId])
+            if (folder?.parentId !== null) {
+                await queryClient.invalidateQueries({ queryKey: [MemoType.FOLDER, folder?.parentId] })
+            }
+        }
+    }
+
     const { mutate: saveTitle } = useMutation({
         mutationFn: async ({ title, memoId, parentId }: { title: string; memoId: number; parentId: number | null }) => {
             await db.runAsync(`UPDATE ${MemoType.FILE} SET title = ? WHERE id = ?`, [title, memoId])
@@ -31,10 +45,8 @@ export const useEditMemo = () => {
     const { mutate: deleteMemo } = useMutation({
         mutationFn: async ({ memoId, parentId }: { memoId: number; parentId: number | null }) => {
             await db.runAsync(`DELETE FROM ${MemoType.FILE} WHERE id = ?`, [memoId])
-            // 부모 폴더 목록 invalidate
-            await queryClient.invalidateQueries({ queryKey: [MemoType.FOLDER, parentId] })
-            // 파일 상세 invalidate
-            await queryClient.invalidateQueries({ queryKey: [MemoType.FILE, memoId] })
+            // parentId와 그 부모 폴더 목록 invalidate
+            await invalidateParentAndGrandparent(parentId)
         },
         onSuccess: () => {
             Toast.show({

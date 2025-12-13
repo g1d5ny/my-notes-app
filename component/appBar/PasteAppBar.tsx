@@ -6,7 +6,6 @@ import { useAtomValue, useSetAtom } from "jotai"
 import { useEffect, useState } from "react"
 import { Platform, Pressable, StyleSheet, View } from "react-native"
 import Toast from "react-native-toast-message"
-import { AppBarParent } from "./AppBarParent"
 
 export const PasteAppBar = () => {
     const theme = useAtomValue(themeAtom)
@@ -33,7 +32,7 @@ export const PasteAppBar = () => {
     }, [pathname])
 
     return (
-        <AppBarParent>
+        <View>
             <View style={styles.left}>
                 {canBack && (
                     <Pressable style={styles.back} onPress={() => router.back()}>
@@ -49,7 +48,7 @@ export const PasteAppBar = () => {
                     <Paste theme={theme} />
                 </Pressable>
             </View>
-        </AppBarParent>
+        </View>
     )
 }
 

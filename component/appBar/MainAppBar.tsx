@@ -2,19 +2,16 @@ import { AndroidBack, Close, IosBack, Search } from "@/assets/icons/svg/icon"
 import { themeAtom } from "@/store"
 import { usePathname, useRouter } from "expo-router"
 import { useAtomValue } from "jotai"
-import { useEffect, useState } from "react"
 import { Platform, Pressable, StyleSheet, Text, TextInput, useWindowDimensions, View } from "react-native"
 import Animated, { useAnimatedStyle, useDerivedValue, useSharedValue, withTiming } from "react-native-reanimated"
 import { FontStyles, Styles } from "../../constant/Style"
 import { SettingOption } from "../option/SettingOption"
-import { AppBarParent } from "./AppBarParent"
 
 export const MainAppBar = () => {
     const theme = useAtomValue(themeAtom)
     const router = useRouter()
     const pathname = usePathname()
     const lastPathname = pathname.split("/").pop()
-    const [canBack, setCanBack] = useState(pathname.split("/").length > 2)
     const { width } = useWindowDimensions()
     const translateX = useSharedValue(-width) // 초기값을 화면 너비만큼 밖으로 설정
 
@@ -29,32 +26,26 @@ export const MainAppBar = () => {
         }
     }, [])
 
-    useEffect(() => {
-        setCanBack(pathname.split("/").length > 2)
-    }, [pathname])
-
     return (
         <>
-            <AppBarParent>
-                <View style={[Styles.row, styles.left]}>
-                    {canBack && (
-                        <>
-                            <Pressable style={styles.back} onPress={() => router.back()}>
-                                {Platform.OS === "ios" ? <IosBack theme={theme} /> : <AndroidBack theme={theme} />}
-                            </Pressable>
-                            <Text style={[styles.lastPathname, { color: theme.text }]} numberOfLines={1} ellipsizeMode='tail'>
-                                {lastPathname}
-                            </Text>
-                        </>
-                    )}
-                </View>
-                <View style={[Styles.row, styles.right]}>
-                    <Pressable onPress={() => (translateX.value = withTiming(0, { duration: 300 }))}>
-                        <Search theme={theme} />
-                    </Pressable>
-                    <SettingOption />
-                </View>
-            </AppBarParent>
+            <View style={[Styles.row, styles.left]}>
+                {pathname.split("/").length > 2 && (
+                    <>
+                        <Pressable style={styles.back} onPress={() => router.back()}>
+                            {Platform.OS === "ios" ? <IosBack theme={theme} /> : <AndroidBack theme={theme} />}
+                        </Pressable>
+                        <Text style={[styles.lastPathname, { color: theme.text }]} numberOfLines={1} ellipsizeMode='tail'>
+                            {lastPathname}
+                        </Text>
+                    </>
+                )}
+            </View>
+            <View style={[Styles.row, styles.right]}>
+                <Pressable onPress={() => (translateX.value = withTiming(0, { duration: 300 }))}>
+                    <Search theme={theme} />
+                </Pressable>
+                <SettingOption />
+            </View>
             {/* TODO: 나중에 페이지로 코드 분리 필요 */}
             <Animated.View style={[Styles.row, styles.container, animatedStyle]}>
                 <Pressable onPress={() => (translateX.value = withTiming(-width, { duration: 300 }))}>

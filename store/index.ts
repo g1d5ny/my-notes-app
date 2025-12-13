@@ -12,3 +12,5 @@ export const themeAtom = atom<ThemeColorPalette>(Appearance.getColorScheme() ===
 export const schemeAtom = atom<ColorSchemeName>(Appearance.getColorScheme())
 
 export const modalAtom = atom<Modal>({ visible: false, message: "", onConfirm: () => {}, confirmText: "" })
+// TODO: 추후 보정 필요
+export const infoModalVisibleAtom = atom<boolean>(false)

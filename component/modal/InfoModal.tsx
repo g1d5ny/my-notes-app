@@ -1,16 +1,11 @@
 import { FontStyles, Styles } from "@/constant/Style"
-import { themeAtom } from "@/store"
-import { useAtomValue } from "jotai"
+import { infoModalVisibleAtom, themeAtom } from "@/store"
+import { Memo, MemoType } from "@/type"
+import { useQueryClient } from "@tanstack/react-query"
+import { useGlobalSearchParams } from "expo-router"
+import { useAtom, useAtomValue } from "jotai"
 import { StyleSheet, Text, View } from "react-native"
 import { Modal } from "react-native-paper"
-
-interface InfoModalProps {
-    visible: boolean
-    onDismiss: () => void
-    createdAt: number
-    updatedAt: number
-    viewedAt: number
-}
 
 const formatUnixTime = (unixTime: number) => {
     if (!unixTime || Number.isNaN(unixTime)) return ""
@@ -21,23 +16,28 @@ const formatUnixTime = (unixTime: number) => {
     return `${year}/${month}/${day}`
 }
 
-export const InfoModal = ({ visible, onDismiss, createdAt, updatedAt, viewedAt }: InfoModalProps) => {
+export const InfoModal = () => {
     const theme = useAtomValue(themeAtom)
+    const queryClient = useQueryClient()
+    const params = useGlobalSearchParams()
+    const [infoModalVisible, setInfoModalVisible] = useAtom(infoModalVisibleAtom)
+    const currentId = params.id ? Number(params?.id) : 0
+    const memo = queryClient.getQueryData<Memo>([MemoType.FILE, currentId])
 
     return (
-        <Modal visible={visible} onDismiss={onDismiss} contentContainerStyle={styles.modalContainer} style={styles.center}>
+        <Modal visible={infoModalVisible} onDismiss={() => setInfoModalVisible(false)} contentContainerStyle={styles.modalContainer} style={styles.center}>
             <View style={[styles.modal, { backgroundColor: theme.background }]}>
                 <View style={[Styles.row, styles.dateContainer]}>
                     <Text style={[FontStyles.BodySmall, { color: theme.gray }]}>최근 생성 시간</Text>
-                    <Text style={[FontStyles.BodySmall, { color: theme.gray }]}>{formatUnixTime(createdAt)}</Text>
+                    <Text style={[FontStyles.BodySmall, { color: theme.gray }]}>{formatUnixTime(memo?.createdAt ?? 0)}</Text>
                 </View>
                 <View style={[Styles.row, styles.dateContainer]}>
                     <Text style={[FontStyles.BodySmall, { color: theme.gray }]}>최근 수정 시간</Text>
-                    <Text style={[FontStyles.BodySmall, { color: theme.gray }]}>{formatUnixTime(updatedAt)}</Text>
+                    <Text style={[FontStyles.BodySmall, { color: theme.gray }]}>{formatUnixTime(memo?.updatedAt ?? 0)}</Text>
                 </View>
                 <View style={[Styles.row, styles.dateContainer]}>
                     <Text style={[FontStyles.BodySmall, { color: theme.gray }]}>최근 조회 시간</Text>
-                    <Text style={[FontStyles.BodySmall, { color: theme.gray }]}>{formatUnixTime(viewedAt)}</Text>
+                    <Text style={[FontStyles.BodySmall, { color: theme.gray }]}>{formatUnixTime(memo?.viewedAt ?? 0)}</Text>
                 </View>
             </View>
         </Modal>

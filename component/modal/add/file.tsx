@@ -6,29 +6,21 @@ import { FormValues } from "@/type"
 import BottomSheet, { BottomSheetScrollView } from "@gorhom/bottom-sheet"
 import { BottomSheetMethods } from "@gorhom/bottom-sheet/lib/typescript/types"
 import { useAtomValue, useSetAtom } from "jotai"
-import { forwardRef, useRef } from "react"
+import { forwardRef } from "react"
 import { Controller, useForm } from "react-hook-form"
-import { Keyboard, SafeAreaView, StyleSheet, TextInput, View } from "react-native"
+import { Keyboard, StyleSheet, View } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 
 export const AddFile = forwardRef<BottomSheetMethods>((_, ref) => {
     const theme = useAtomValue(themeAtom)
-    const { bottom } = useSafeAreaInsets()
-
-    const titleRef = useRef<TextInput>(null)
-    const contentRef = useRef<TextInput>(null)
     const setModal = useSetAtom(modalAtom)
+    const { top, bottom } = useSafeAreaInsets()
 
-    const { control, handleSubmit, resetField, watch } = useForm<FormValues>({
+    const { control, handleSubmit, resetField, watch, setFocus } = useForm<FormValues>({
         defaultValues: { title: "", content: "" }
     })
 
     const contentText = watch("content")
-
-    const inputBlur = () => {
-        titleRef.current?.blur()
-        contentRef.current?.blur()
-    }
 
     const back = async () => {
         if (ref && typeof ref !== "function" && ref.current) {
@@ -48,26 +40,25 @@ export const AddFile = forwardRef<BottomSheetMethods>((_, ref) => {
         <BottomSheet
             ref={ref}
             index={-1}
-            handleComponent={() => <FileCreateAppBar textLength={contentText.length} handleSubmit={handleSubmit} close={close} back={back} inputBlur={inputBlur} />}
+            topInset={top}
+            handleComponent={() => <FileCreateAppBar textLength={contentText.length} handleSubmit={handleSubmit} close={close} back={back} />}
             snapPoints={["100%"]}
             backgroundStyle={{ backgroundColor: theme.background }}
             enablePanDownToClose={true}
             enableContentPanningGesture={false}
             enableHandlePanningGesture={false}
         >
-            <SafeAreaView style={{ flex: 1 }}>
-                <View style={[styles.container, { paddingBottom: bottom }]}>
-                    <Controller
-                        control={control}
-                        name='title'
-                        rules={{ required: true }}
-                        render={({ field: { onChange, onBlur, value } }) => <TitleInput ref={titleRef} value={value} onBlur={onBlur} onChangeText={onChange} onSubmitEditing={() => contentRef.current?.focus()} />}
-                    />
-                    <BottomSheetScrollView showsVerticalScrollIndicator>
-                        <Controller control={control} name='content' rules={{ required: true }} render={({ field: { onChange, onBlur, value } }) => <ContentInput ref={contentRef} onBlur={onBlur} onChangeText={onChange} value={value} />} />
-                    </BottomSheetScrollView>
-                </View>
-            </SafeAreaView>
+            <View style={[styles.container, { paddingBottom: bottom }]}>
+                <Controller
+                    control={control}
+                    name='title'
+                    rules={{ required: true }}
+                    render={({ field: { onChange, onBlur, value } }) => <TitleInput value={value} onBlur={onBlur} onChangeText={onChange} onSubmitEditing={() => setFocus("content")} />}
+                />
+                <BottomSheetScrollView showsVerticalScrollIndicator>
+                    <Controller control={control} name='content' rules={{ required: true }} render={({ field: { onChange, onBlur, value, ref } }) => <ContentInput ref={ref} onBlur={onBlur} onChangeText={onChange} value={value} />} />
+                </BottomSheetScrollView>
+            </View>
         </BottomSheet>
     )
 })

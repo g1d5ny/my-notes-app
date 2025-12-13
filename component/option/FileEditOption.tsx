@@ -1,37 +1,37 @@
-import { DeleteOption, EditOption, ExportOption, InfoOption } from "@/assets/icons/svg/option/icon"
-import { themeAtom } from "@/store"
-import { useAtomValue } from "jotai"
+import { DeleteOption, ExportOption, InfoOption } from "@/assets/icons/svg/option/icon"
+import { useEditMemo } from "@/hook/useEditMemo"
+import { infoModalVisibleAtom, modalAtom, themeAtom } from "@/store"
+import { useGlobalSearchParams } from "expo-router"
+import { useAtomValue, useSetAtom } from "jotai"
 import { useState } from "react"
 import { OptionMenu, OptionMenuList } from "../OptionMenu"
 
 interface FileEditOptionProps {
-    editFile: () => void
-    showDeleteModal: () => void
     exportFile: () => void
-    showInfoModal: () => void
 }
-export const FileEditOption = ({ editFile, showDeleteModal, exportFile, showInfoModal }: FileEditOptionProps) => {
+export const FileEditOption = ({ exportFile }: FileEditOptionProps) => {
     const theme = useAtomValue(themeAtom)
+    const setModal = useSetAtom(modalAtom)
+    const setInfoModalVisible = useSetAtom(infoModalVisibleAtom)
     const [menuVisible, setMenuVisible] = useState(false)
+    const params = useGlobalSearchParams()
+    const currentId = params.id ? Number(params?.id) : 0
+    const { deleteMemo } = useEditMemo()
 
     const fileEditOptionList: OptionMenuList[] = [
-        {
-            title: "편집하기",
-            trailingIcon: <EditOption theme={theme} />,
-            disabled: false,
-            onPress: () => {
-                editFile()
-                setMenuVisible(false)
-            },
-            dividerWidth: 1,
-            hasDivider: true
-        },
         {
             title: "삭제하기",
             trailingIcon: <DeleteOption theme={theme} />,
             disabled: false,
             onPress: () => {
-                showDeleteModal()
+                setModal({
+                    visible: true,
+                    message: "정말 삭제하시겠습니까?",
+                    onConfirm: () => {
+                        deleteMemo({ memoId: currentId, parentId: params.parentId ? Number(params.parentId) : null })
+                    },
+                    confirmText: "삭제"
+                })
                 setMenuVisible(false)
             },
             dividerWidth: 1,
@@ -53,7 +53,7 @@ export const FileEditOption = ({ editFile, showDeleteModal, exportFile, showInfo
             trailingIcon: <InfoOption theme={theme} />,
             disabled: false,
             onPress: () => {
-                showInfoModal()
+                setInfoModalVisible(true)
                 setMenuVisible(false)
             },
             hasDivider: false

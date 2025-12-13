@@ -1,8 +1,10 @@
-import { MainAppBar } from "@/component/appBar/MainAppBar"
-import { StatusBar } from "@/component/appBar/StatusBar"
+import { AppBar } from "@/component/appBar"
 import { CommonToast } from "@/component/CommonToast"
 import { AddMemoController } from "@/component/modal/add"
+import { InfoModal } from "@/component/modal/InfoModal"
+import { MessageModal } from "@/component/modal/MessageModal"
 import RoutingHeader from "@/component/RoutingHeader"
+import { StatusBar } from "@/component/StatusBar"
 import { customFontsToLoad } from "@/constant/Style"
 import { store, themeAtom } from "@/store"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
@@ -11,7 +13,7 @@ import { Slot } from "expo-router"
 import { SQLiteDatabase, SQLiteProvider } from "expo-sqlite"
 import { Provider, useAtomValue } from "jotai"
 import { Suspense } from "react"
-import { ActivityIndicator, StyleSheet } from "react-native"
+import { StyleSheet } from "react-native"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { PaperProvider } from "react-native-paper"
 import { SafeAreaView } from "react-native-safe-area-context"
@@ -24,15 +26,17 @@ function AppContent() {
     const theme = useAtomValue(themeAtom)
 
     return (
-        <Suspense fallback={<ActivityIndicator />}>
+        <Suspense fallback={<></>}>
             <SQLiteProvider databaseName={DATABASE_NAME} options={{ enableChangeListener: true }} useSuspense onInit={migrateDbIfNeeded}>
                 <PaperProvider>
                     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
                         <StatusBar />
-                        <MainAppBar />
+                        <AppBar />
                         <RoutingHeader />
                         <Slot />
                         <AddMemoController />
+                        <MessageModal />
+                        <InfoModal />
                         <CommonToast />
                     </SafeAreaView>
                 </PaperProvider>

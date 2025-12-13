@@ -3,7 +3,7 @@ import { FontStyles, Styles } from "@/constant/Style"
 import { DarkTheme, LightTheme } from "@/constant/Theme"
 import { useCreateMemo } from "@/hook/useCreateMemo"
 import { themeAtom } from "@/store"
-import { useLocalSearchParams } from "expo-router"
+import { useGlobalSearchParams } from "expo-router"
 import { useAtomValue } from "jotai"
 import { useState } from "react"
 import { Image, Pressable, StyleSheet, Text } from "react-native"
@@ -21,7 +21,7 @@ export const AddMemo = ({ onAddFile }: AddMemoProps) => {
     const { bottom } = useSafeAreaInsets()
     const theme = useAtomValue(themeAtom)
     const { createFolder } = useCreateMemo()
-    const params = useLocalSearchParams()
+    const params = useGlobalSearchParams()
     const [modalVisible, setModalVisible] = useState(false)
     const parentId = params.id ? Number(params.id) : null
 

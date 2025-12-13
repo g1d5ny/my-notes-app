@@ -2,7 +2,7 @@ import { AndroidBack, Check, Close, IosBack } from "@/assets/icons/svg/icon"
 import { FontStyles, Styles } from "@/constant/Style"
 import { useCreateMemo } from "@/hook/useCreateMemo"
 import { themeAtom } from "@/store"
-import { useLocalSearchParams } from "expo-router"
+import { useGlobalSearchParams } from "expo-router"
 import { useAtomValue } from "jotai"
 import { UseFormHandleSubmit } from "react-hook-form"
 import { Platform, Pressable, StyleSheet, Text, View } from "react-native"
@@ -19,19 +19,16 @@ interface FileCreateAppBarProps {
     handleSubmit: UseFormHandleSubmit<FormValues, FormValues>
     close: () => void
     back: () => void
-    inputBlur: () => void
 }
-export const FileCreateAppBar = ({ textLength, handleSubmit, close, back, inputBlur }: FileCreateAppBarProps) => {
+export const FileCreateAppBar = ({ textLength, handleSubmit, close, back }: FileCreateAppBarProps) => {
     const theme = useAtomValue(themeAtom)
-    const params = useLocalSearchParams()
+    const params = useGlobalSearchParams()
     const { createFile } = useCreateMemo()
-    const parentId = params.parentId ? Number(params.parentId) : null
 
     const submitFile = () => {
         handleSubmit(
             async data => {
-                createFile({ title: data.title, content: data.content, parentId })
-                inputBlur()
+                createFile({ title: data.title, content: data.content, parentId: params.id ? Number(params.id) : null })
                 back()
             },
             errors => {

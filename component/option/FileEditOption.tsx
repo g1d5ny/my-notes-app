@@ -1,5 +1,5 @@
 import { DeleteOption, ExportOption, InfoOption } from "@/assets/icons/svg/option/icon"
-import { useEditMemo } from "@/hook/useEditMemo"
+import { useEditMemo } from "@/hook/useUpdateMemo"
 import { infoModalVisibleAtom, modalAtom, themeAtom } from "@/store"
 import { useGlobalSearchParams } from "expo-router"
 import { useAtomValue, useSetAtom } from "jotai"

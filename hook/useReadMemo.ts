@@ -11,7 +11,19 @@ const ORDER_BY = {
     [SortType.TITLE]: `ORDER BY ${SortType.TITLE} ASC`
 }
 
-export const useGetMemo = () => {
+const sort = (memos: Memo[], sortType: SortType) => {
+    switch (sortType) {
+        case SortType.CREATED_AT:
+            return memos.sort((a, b) => b.createdAt - a.createdAt)
+        case SortType.UPDATED_AT:
+            return memos.sort((a, b) => b.updatedAt - a.updatedAt)
+        case SortType.TITLE:
+            return memos.sort((a, b) => a.title.localeCompare(b.title))
+    }
+    return memos
+}
+
+export const useReadMemo = () => {
     const db = useSQLiteContext()
     const params = useLocalSearchParams()
     const queryClient = useQueryClient()
@@ -29,7 +41,8 @@ export const useGetMemo = () => {
             if (currentId === 0) {
                 const folderResult = await db.getAllAsync(`SELECT * FROM ${MemoType.FOLDER} WHERE parentId IS NULL ${ORDER_BY[sortType]}`)
                 const fileResult = await db.getAllAsync(`SELECT * FROM ${MemoType.FILE} WHERE parentId IS NULL ${ORDER_BY[sortType]}`)
-                const result = [...folderResult, ...fileResult] as Memo[]
+                const allResult = [...folderResult, ...fileResult] as Memo[]
+                const result = sort(allResult, sortType) as Memo[]
                 await queryClient.setQueryData([currentType, currentId, sortType], result)
                 return result
             }
@@ -43,7 +56,8 @@ export const useGetMemo = () => {
             // 폴더 타입인 경우
             const folderResult = await db.getAllAsync(`SELECT * FROM ${MemoType.FOLDER} WHERE parentId = ? ${ORDER_BY[sortType]}`, [currentId])
             const fileResult = await db.getAllAsync(`SELECT * FROM ${MemoType.FILE} WHERE parentId = ? ${ORDER_BY[sortType]}`, [currentId])
-            const result = [...folderResult, ...fileResult] as Memo[]
+            const allResult = [...folderResult, ...fileResult] as Memo[]
+            const result = sort(allResult, sortType) as Memo[]
             await queryClient.setQueryData([currentType, currentId, sortType], result)
             return result
         },

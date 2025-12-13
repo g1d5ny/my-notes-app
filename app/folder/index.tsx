@@ -1,6 +1,6 @@
 // app/folder/index.tsx
-import { FolderDetail } from "@/component/FolderDetail"
+import FolderScreen from "./[...path]"
 
 export default function FolderIndex() {
-    return <FolderDetail />
+    return <FolderScreen />
 }

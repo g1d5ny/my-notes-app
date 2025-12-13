@@ -1,5 +1,5 @@
 import { AndroidBack, IosBack } from "@/assets/icons/svg/icon"
-import { useGetMemo } from "@/hook/useGetMemo"
+import { useReadMemo } from "@/hook/useReadMemo"
 import { themeAtom } from "@/store"
 import { Memo } from "@/type"
 import { UseQueryResult } from "@tanstack/react-query"
@@ -14,7 +14,7 @@ import { FileEditOption } from "../option/FileEditOption"
 
 export const FileDetailAppBar = () => {
     const theme = useAtomValue(themeAtom)
-    const { data: memo } = useGetMemo() as UseQueryResult<Memo, Error>
+    const { data: memo } = useReadMemo() as UseQueryResult<Memo, Error>
 
     const exportFile = async () => {
         try {

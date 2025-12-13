@@ -1,6 +1,6 @@
 import { ContentInput } from "@/component/input/ContentInput"
 import { TitleInput } from "@/component/input/TitleInput"
-import { useEditMemo } from "@/hook/useEditMemo"
+import { useUpdateMemo } from "@/hook/useUpdateMemo"
 import { sortAtom } from "@/store"
 import { FormValues, Memo, MemoType } from "@/type"
 import { useQueryClient } from "@tanstack/react-query"
@@ -16,7 +16,7 @@ export const FileDetail = () => {
     const db = useSQLiteContext()
     const params = useLocalSearchParams()
     const queryClient = useQueryClient()
-    const { saveTitle, saveContent } = useEditMemo()
+    const { updateFileTitle, updateFileContent } = useUpdateMemo()
     const currentId = params?.id ? Number(params?.id) : 0
     const parentId = params.parentId ? Number(params.parentId) : null
     const memo = queryClient.getQueryData<Memo>([MemoType.FILE, currentId, sortType])
@@ -41,13 +41,13 @@ export const FileDetail = () => {
                 control={control}
                 name='title'
                 rules={{ required: true }}
-                render={({ field: { onChange, value, ref } }) => <TitleInput ref={ref} value={value} onChangeText={onChange} onBlur={() => handleSubmit(data => saveTitle({ title: data.title, memoId: memo?.id ?? 0, parentId }))} />}
+                render={({ field: { onChange, value, ref } }) => <TitleInput ref={ref} value={value} onChangeText={onChange} onBlur={() => handleSubmit(data => updateFileTitle({ title: data.title, memoId: memo?.id ?? 0, parentId }))} />}
             />
             <Controller
                 control={control}
                 name='content'
                 rules={{ required: true }}
-                render={({ field: { onChange, value } }) => <ContentInput value={value} onChangeText={onChange} onBlur={() => handleSubmit(data => saveContent({ content: data.content, memoId: memo?.id ?? 0, parentId }))} />}
+                render={({ field: { onChange, value } }) => <ContentInput value={value} onChangeText={onChange} onBlur={() => handleSubmit(data => updateFileContent({ content: data.content, memoId: memo?.id ?? 0, parentId }))} />}
             />
         </ScrollView>
     )

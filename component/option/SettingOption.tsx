@@ -1,7 +1,7 @@
 import { CheckOption, ResetOption, SortOption, ThemeOption } from "@/assets/icons/svg/option/icon"
 import { FontStyles } from "@/constant/Style"
 import { DarkTheme, LightTheme } from "@/constant/Theme"
-import { useResetMemo } from "@/hook/useResetMemo"
+import { useDeleteMemo } from "@/hook/useDeleteMemo"
 import { useSort } from "@/hook/useSort"
 import { modalAtom, schemeAtom, sortAtom, themeAtom } from "@/store"
 import { SortType } from "@/type"
@@ -15,7 +15,7 @@ export const SettingOption = () => {
     const setScheme = useSetAtom(schemeAtom)
     const setModalVisible = useSetAtom(modalAtom)
     const sort = useAtomValue(sortAtom)
-    const { mutate: resetMemo } = useResetMemo()
+    const { resetMemo } = useDeleteMemo()
     const { sortCreatedAt, sortUpdatedAt, sortTitle } = useSort()
     const [menuVisible, setMenuVisible] = useState(false)
 

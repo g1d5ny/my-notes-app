@@ -2,7 +2,7 @@
 import { EmptyFolder, File, FilledFolder } from "@/assets/icons/svg/icon"
 import { FontStyles } from "@/constant/Style"
 import { useCheckFilledMemo } from "@/hook/useCheckFilledMemo"
-import { useEditMemo } from "@/hook/useEditMemo"
+import { useUpdateMemo } from "@/hook/useUpdateMemo"
 import { sortAtom, themeAtom } from "@/store"
 import { Memo, MemoType } from "@/type"
 import { useQueryClient } from "@tanstack/react-query"
@@ -32,7 +32,8 @@ export const FolderList = () => {
     const sortType = useAtomValue(sortAtom)
     const queryClient = useQueryClient()
     const params = useLocalSearchParams()
-    const { saveTitle } = useEditMemo()
+    const currentPath = usePathname()
+    const { updateFolderTitle, updateFileTitle } = useUpdateMemo()
     const titleRef = useRef<TextInput>(null)
     const currentId = params.id ? Number(params?.id) : 0
     const memos = queryClient.getQueryData<Memo[]>([MemoType.FOLDER, currentId, sortType]) ?? []
@@ -43,8 +44,6 @@ export const FolderList = () => {
     })
 
     const itemsPerRow = useMemo(() => getItemsPerRow(), [])
-
-    const currentPath = usePathname()
 
     const open = (id: number, type: MemoType, title: string, parentId: number | null) => {
         const path = (currentPath + `/${title}`) as RelativePathString
@@ -57,12 +56,10 @@ export const FolderList = () => {
                 {memos.map(({ id, title, type, parentId }, index) => {
                     return (
                         <View key={index} style={styles.item}>
-                            <Pressable style={{ borderWidth: 1, borderColor: "blue" }} onPress={() => open(id, type, title, parentId)}>
-                                {type === MemoType.FILE ? <File /> : filledFolder[id] ? <FilledFolder /> : <EmptyFolder />}
-                            </Pressable>
+                            <Pressable onPress={() => open(id, type, title, parentId)}>{type === MemoType.FILE ? <File /> : filledFolder[id] ? <FilledFolder /> : <EmptyFolder />}</Pressable>
                             <Pressable style={styles.titleContainer} onPress={() => open(id, type, title, parentId)}>
                                 <Controller
-                                    name={`title-${index}` as FieldPath<FormValues>}
+                                    name={`${id}-${type}` as FieldPath<FormValues>}
                                     control={control}
                                     rules={{ required: true }}
                                     render={({ field: { onChange, onBlur, value } }) => (
@@ -72,7 +69,11 @@ export const FolderList = () => {
                                                 onBlur()
                                                 const currentValue = value
                                                 if (currentValue && currentValue !== title) {
-                                                    saveTitle({ title: currentValue, memoId: id, parentId })
+                                                    if (type === MemoType.FILE) {
+                                                        updateFileTitle({ title: currentValue, memoId: id, parentId })
+                                                    } else {
+                                                        updateFolderTitle({ title: currentValue, memoId: id, parentId })
+                                                    }
                                                 } else {
                                                     onChange(title)
                                                 }
@@ -102,22 +103,20 @@ const styles = StyleSheet.create({
     titleContainer: {
         width: "100%",
         maxHeight: 40,
-        marginTop: 8,
-        borderWidth: 1,
-        borderColor: "red"
+        marginTop: 8
     },
     title: {
-        ...FontStyles.BodySmall,
+        width: "100%",
+        borderRadius: 4,
+        backgroundColor: "rgba(221, 221, 221, 0.2)",
         textAlign: "center",
-        includeFontPadding: false,
-        padding: 0
+        textAlignVertical: "center",
+        ...FontStyles.BodySmall
     },
     container: {
         flex: 1,
         padding: 16,
-        gap: 12,
-        borderWidth: 1,
-        borderColor: "green"
+        gap: 12
     },
     contentContainerStyle: {
         flexDirection: "row",

@@ -1,10 +1,11 @@
 import { FontStyles } from "@/constant/Style"
-import { ThemeContext } from "@/context/ThemeContext"
-import { forwardRef, useContext } from "react"
+import { themeAtom } from "@/store"
+import { useAtomValue } from "jotai"
+import { forwardRef } from "react"
 import { StyleSheet, TextInput, TextInputProps } from "react-native"
 
 export const TitleInput = forwardRef<TextInput, TextInputProps>((props, ref) => {
-    const { theme } = useContext(ThemeContext)
+    const theme = useAtomValue(themeAtom)
 
     return (
         <TextInput ref={ref} style={[FontStyles.Title, styles.title, { color: theme.text }]} placeholder='제목을 입력해주세요.' placeholderTextColor={theme.gray} returnKeyType='next' multiline numberOfLines={2} maxLength={30} {...props} />

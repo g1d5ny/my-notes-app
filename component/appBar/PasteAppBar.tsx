@@ -1,18 +1,18 @@
 import { AndroidBack, Close, IosBack, Paste } from "@/assets/icons/svg/icon"
 import { Styles } from "@/constant/Style"
-import { ThemeContext } from "@/context/ThemeContext"
+import { modalAtom, themeAtom } from "@/store"
 import { usePathname, useRouter } from "expo-router"
-import { useContext, useEffect, useState } from "react"
+import { useAtomValue, useSetAtom } from "jotai"
+import { useEffect, useState } from "react"
 import { Platform, Pressable, StyleSheet, View } from "react-native"
 import Toast from "react-native-toast-message"
-import { MessageModal } from "../modal/MessageModal"
-import { AppBarForm } from "./AppBarForm"
+import { AppBarParent } from "./AppBarParent"
 
 export const PasteAppBar = () => {
-    const { theme } = useContext(ThemeContext)
+    const theme = useAtomValue(themeAtom)
     const router = useRouter()
     const pathname = usePathname()
-    const [cancelModalVisible, setCancelModalVisible] = useState(false)
+    const setModal = useSetAtom(modalAtom)
     const [canBack, setCanBack] = useState(pathname.split("/").length > 2)
 
     const paste = () => {
@@ -25,7 +25,7 @@ export const PasteAppBar = () => {
     }
 
     const cancel = () => {
-        setCancelModalVisible(true)
+        setModal(prev => ({ ...prev, visible: true, message: "붙여넣기를 취소하시겠습니까?", onConfirm: () => {}, confirmText: "취소" }))
     }
 
     useEffect(() => {
@@ -33,26 +33,23 @@ export const PasteAppBar = () => {
     }, [pathname])
 
     return (
-        <>
-            <AppBarForm>
-                <View style={styles.left}>
-                    {canBack && (
-                        <Pressable style={styles.back} onPress={() => router.back()}>
-                            {Platform.OS === "ios" ? <IosBack theme={theme} /> : <AndroidBack theme={theme} />}
-                        </Pressable>
-                    )}
-                </View>
-                <View style={[Styles.row, styles.right]}>
-                    <Pressable onPress={cancel}>
-                        <Close theme={theme} />
+        <AppBarParent>
+            <View style={styles.left}>
+                {canBack && (
+                    <Pressable style={styles.back} onPress={() => router.back()}>
+                        {Platform.OS === "ios" ? <IosBack theme={theme} /> : <AndroidBack theme={theme} />}
                     </Pressable>
-                    <Pressable onPress={paste}>
-                        <Paste theme={theme} />
-                    </Pressable>
-                </View>
-            </AppBarForm>
-            <MessageModal message={"붙여넣기를 취소하시겠습니까?"} visible={cancelModalVisible} onDismiss={() => setCancelModalVisible(false)} onConfirm={() => setCancelModalVisible(false)} confirmText={"취소"} />
-        </>
+                )}
+            </View>
+            <View style={[Styles.row, styles.right]}>
+                <Pressable onPress={cancel}>
+                    <Close theme={theme} />
+                </Pressable>
+                <Pressable onPress={paste}>
+                    <Paste theme={theme} />
+                </Pressable>
+            </View>
+        </AppBarParent>
     )
 }
 

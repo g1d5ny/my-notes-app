@@ -6,10 +6,6 @@ export interface ThemeColorPalette {
     background: string
     border: string
     text: string
-    // gray: {
-    //     1: string
-    //     2: string
-    // }
     gray: string
     icon: string
 }
@@ -34,4 +30,17 @@ export interface Memo {
 export type FormValues = {
     title: string
     content: string
+}
+
+export enum SortType {
+    CREATED_AT = "createdAt",
+    UPDATED_AT = "updatedAt",
+    TITLE = "title"
+}
+
+export interface Modal {
+    visible: boolean
+    message: string
+    onConfirm: () => Promise<void> | void
+    confirmText: string
 }

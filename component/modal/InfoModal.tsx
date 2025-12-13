@@ -1,6 +1,6 @@
 import { FontStyles, Styles } from "@/constant/Style"
-import { ThemeContext } from "@/context/ThemeContext"
-import { useContext } from "react"
+import { themeAtom } from "@/store"
+import { useAtomValue } from "jotai"
 import { StyleSheet, Text, View } from "react-native"
 import { Modal } from "react-native-paper"
 
@@ -12,17 +12,17 @@ interface InfoModalProps {
     viewedAt: number
 }
 
-export const InfoModal = ({ visible, onDismiss, createdAt, updatedAt, viewedAt }: InfoModalProps) => {
-    const { theme } = useContext(ThemeContext)
+const formatUnixTime = (unixTime: number) => {
+    if (!unixTime || Number.isNaN(unixTime)) return ""
+    const date = new Date(unixTime * 1000) // Unix timestamp는 초 단위이므로 1000을 곱해 밀리초로 변환
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, "0")
+    const day = String(date.getDate()).padStart(2, "0")
+    return `${year}/${month}/${day}`
+}
 
-    const formatUnixTime = (unixTime: number) => {
-        if (!unixTime || Number.isNaN(unixTime)) return ""
-        const date = new Date(unixTime * 1000) // Unix timestamp는 초 단위이므로 1000을 곱해 밀리초로 변환
-        const year = date.getFullYear()
-        const month = String(date.getMonth() + 1).padStart(2, "0")
-        const day = String(date.getDate()).padStart(2, "0")
-        return `${year}/${month}/${day}`
-    }
+export const InfoModal = ({ visible, onDismiss, createdAt, updatedAt, viewedAt }: InfoModalProps) => {
+    const theme = useAtomValue(themeAtom)
 
     return (
         <Modal visible={visible} onDismiss={onDismiss} contentContainerStyle={styles.modalContainer} style={styles.center}>

@@ -1,13 +1,14 @@
 // component/MemoList.tsx
 import { EmptyFolder, File, FilledFolder } from "@/assets/icons/svg/icon"
 import { FontStyles } from "@/constant/Style"
-import { ThemeContext } from "@/context/ThemeContext"
 import { useCheckFilledMemo } from "@/hook/useCheckFilledMemo"
 import { useEditMemo } from "@/hook/useEditMemo"
+import { themeAtom } from "@/store"
 import { Memo, MemoType } from "@/type"
 import { useQueryClient } from "@tanstack/react-query"
 import { RelativePathString, router, useLocalSearchParams, usePathname } from "expo-router"
-import { useContext, useMemo, useRef } from "react"
+import { useAtomValue } from "jotai"
+import { useMemo, useRef } from "react"
 import { Controller, FieldPath, useForm } from "react-hook-form"
 import { Dimensions, Pressable, ScrollView, StyleSheet, TextInput, View } from "react-native"
 
@@ -18,7 +19,7 @@ type FormValues = {
 const ITEM_WIDTH = 76
 const PADDING = 16
 export const FolderList = () => {
-    const { theme } = useContext(ThemeContext)
+    const theme = useAtomValue(themeAtom)
     const queryClient = useQueryClient()
     const params = useLocalSearchParams()
     const { saveTitle } = useEditMemo()
@@ -77,8 +78,6 @@ export const FolderList = () => {
                                             }}
                                             onChangeText={onChange}
                                             value={value ?? title}
-                                            // numberOfLines={2}
-                                            // multiline
                                             onSubmitEditing={() => titleRef.current?.blur()}
                                             style={[styles.title, { color: theme.text }]}
                                             scrollEnabled={false}

@@ -1,18 +1,16 @@
 import { AndroidBack, Close, IosBack, Search } from "@/assets/icons/svg/icon"
-import { ThemeContext } from "@/context/ThemeContext"
+import { themeAtom } from "@/store"
 import { usePathname, useRouter } from "expo-router"
-import { Dispatch, SetStateAction, useContext, useEffect, useState } from "react"
+import { useAtomValue } from "jotai"
+import { useEffect, useState } from "react"
 import { Platform, Pressable, StyleSheet, Text, TextInput, useWindowDimensions, View } from "react-native"
 import Animated, { useAnimatedStyle, useDerivedValue, useSharedValue, withTiming } from "react-native-reanimated"
 import { FontStyles, Styles } from "../../constant/Style"
 import { SettingOption } from "../option/SettingOption"
-import { AppBarForm } from "./AppBarForm"
+import { AppBarParent } from "./AppBarParent"
 
-interface MainAppBarProps {
-    setResetModalVisible: Dispatch<SetStateAction<boolean>>
-}
-export const MainAppBar = ({ setResetModalVisible }: MainAppBarProps) => {
-    const { theme } = useContext(ThemeContext)
+export const MainAppBar = () => {
+    const theme = useAtomValue(themeAtom)
     const router = useRouter()
     const pathname = usePathname()
     const lastPathname = pathname.split("/").pop()
@@ -37,7 +35,7 @@ export const MainAppBar = ({ setResetModalVisible }: MainAppBarProps) => {
 
     return (
         <>
-            <AppBarForm>
+            <AppBarParent>
                 <View style={[Styles.row, styles.left]}>
                     {canBack && (
                         <>
@@ -54,9 +52,9 @@ export const MainAppBar = ({ setResetModalVisible }: MainAppBarProps) => {
                     <Pressable onPress={() => (translateX.value = withTiming(0, { duration: 300 }))}>
                         <Search theme={theme} />
                     </Pressable>
-                    <SettingOption setResetModalVisible={setResetModalVisible} />
+                    <SettingOption />
                 </View>
-            </AppBarForm>
+            </AppBarParent>
             {/* TODO: 나중에 페이지로 코드 분리 필요 */}
             <Animated.View style={[Styles.row, styles.container, animatedStyle]}>
                 <Pressable onPress={() => (translateX.value = withTiming(-width, { duration: 300 }))}>

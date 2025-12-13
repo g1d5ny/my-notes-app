@@ -1,6 +1,7 @@
 import { DeleteOption, EditOption, ExportOption, InfoOption } from "@/assets/icons/svg/option/icon"
-import { ThemeContext } from "@/context/ThemeContext"
-import { useContext, useState } from "react"
+import { themeAtom } from "@/store"
+import { useAtomValue } from "jotai"
+import { useState } from "react"
 import { OptionMenu, OptionMenuList } from "../OptionMenu"
 
 interface FileEditOptionProps {
@@ -10,7 +11,7 @@ interface FileEditOptionProps {
     showInfoModal: () => void
 }
 export const FileEditOption = ({ editFile, showDeleteModal, exportFile, showInfoModal }: FileEditOptionProps) => {
-    const { theme } = useContext(ThemeContext)
+    const theme = useAtomValue(themeAtom)
     const [menuVisible, setMenuVisible] = useState(false)
 
     const fileEditOptionList: OptionMenuList[] = [

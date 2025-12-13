@@ -1,9 +1,9 @@
-import { ThemeContext } from "@/context/ThemeContext"
+import { themeAtom } from "@/store"
 import { Stack } from "expo-router"
-import { useContext } from "react"
+import { useAtomValue } from "jotai"
 
 export default function FolderLayout() {
-    const { theme } = useContext(ThemeContext)
+    const theme = useAtomValue(themeAtom)
 
     return (
         <Stack

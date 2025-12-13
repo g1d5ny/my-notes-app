@@ -1,10 +1,11 @@
 import { FontStyles } from "@/constant/Style"
-import { ThemeContext } from "@/context/ThemeContext"
-import { forwardRef, useContext } from "react"
+import { themeAtom } from "@/store"
+import { useAtomValue } from "jotai"
+import { forwardRef } from "react"
 import { StyleSheet, TextInput, TextInputProps } from "react-native"
 
 export const ContentInput = forwardRef<TextInput, TextInputProps>((props, ref) => {
-    const { theme } = useContext(ThemeContext)
+    const theme = useAtomValue(themeAtom)
 
     return (
         <TextInput

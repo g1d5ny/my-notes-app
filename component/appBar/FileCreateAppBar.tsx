@@ -1,13 +1,13 @@
 import { AndroidBack, Check, Close, IosBack } from "@/assets/icons/svg/icon"
 import { FontStyles, Styles } from "@/constant/Style"
-import { ThemeContext } from "@/context/ThemeContext"
 import { useCreateMemo } from "@/hook/useCreateMemo"
+import { themeAtom } from "@/store"
 import { useLocalSearchParams } from "expo-router"
-import { useContext } from "react"
+import { useAtomValue } from "jotai"
 import { UseFormHandleSubmit } from "react-hook-form"
 import { Platform, Pressable, StyleSheet, Text, View } from "react-native"
 import Toast from "react-native-toast-message"
-import { AppBarForm } from "./AppBarForm"
+import { AppBarParent } from "./AppBarParent"
 
 type FormValues = {
     title: string
@@ -22,7 +22,7 @@ interface FileCreateAppBarProps {
     inputBlur: () => void
 }
 export const FileCreateAppBar = ({ textLength, handleSubmit, close, back, inputBlur }: FileCreateAppBarProps) => {
-    const { theme } = useContext(ThemeContext)
+    const theme = useAtomValue(themeAtom)
     const params = useLocalSearchParams()
     const { createFile } = useCreateMemo()
     const parentId = params.parentId ? Number(params.parentId) : null
@@ -49,7 +49,7 @@ export const FileCreateAppBar = ({ textLength, handleSubmit, close, back, inputB
     }
 
     return (
-        <AppBarForm>
+        <AppBarParent>
             <View style={[Styles.row, styles.container]}>
                 <View style={[Styles.row, styles.back]}>
                     {textLength > 0 ? (
@@ -65,7 +65,7 @@ export const FileCreateAppBar = ({ textLength, handleSubmit, close, back, inputB
                     <Check />
                 </Pressable>
             </View>
-        </AppBarForm>
+        </AppBarParent>
     )
 }
 

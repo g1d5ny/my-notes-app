@@ -1,7 +1,8 @@
 import { AndroidDots, IosDots } from "@/assets/icons/svg/icon"
 import { FontStyles } from "@/constant/Style"
-import { ThemeContext } from "@/context/ThemeContext"
-import { Dispatch, SetStateAction, useContext } from "react"
+import { themeAtom } from "@/store"
+import { useAtomValue } from "jotai"
+import { Dispatch, SetStateAction } from "react"
 import { Platform, Pressable, StyleSheet, View } from "react-native"
 import { Divider, Menu } from "react-native-paper"
 
@@ -21,7 +22,7 @@ interface OptionMenuProps {
     setMenuVisible: Dispatch<SetStateAction<boolean>>
 }
 export const OptionMenu = ({ list, menuVisible, setMenuVisible }: OptionMenuProps) => {
-    const { theme } = useContext(ThemeContext)
+    const theme = useAtomValue(themeAtom)
     const openMenu = () => setMenuVisible(true)
     const closeMenu = () => setMenuVisible(false)
 

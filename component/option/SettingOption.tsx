@@ -1,16 +1,16 @@
 import { CheckOption, ResetOption, SortOption, ThemeOption } from "@/assets/icons/svg/option/icon"
 import { FontStyles } from "@/constant/Style"
 import { DarkTheme, LightTheme } from "@/constant/Theme"
-import { ThemeContext } from "@/context/ThemeContext"
-import { Dispatch, SetStateAction, useContext, useState } from "react"
+import { modalAtom, schemeAtom, themeAtom } from "@/store"
+import { useAtom, useSetAtom } from "jotai"
+import { useState } from "react"
 import { Image, StyleSheet, Text } from "react-native"
 import { OptionMenu, OptionMenuList } from "../OptionMenu"
 
-interface SettingOptionProps {
-    setResetModalVisible: Dispatch<SetStateAction<boolean>>
-}
-export const SettingOption = ({ setResetModalVisible }: SettingOptionProps) => {
-    const { theme, currentScheme, setTheme, setCurrentScheme } = useContext(ThemeContext)
+export const SettingOption = () => {
+    const [theme, setTheme] = useAtom(themeAtom)
+    const [scheme, setScheme] = useAtom(schemeAtom)
+    const setModalVisible = useSetAtom(modalAtom)
     const [menuVisible, setMenuVisible] = useState(false)
 
     const mainOptionList: OptionMenuList[] = [
@@ -86,11 +86,11 @@ export const SettingOption = ({ setResetModalVisible }: SettingOptionProps) => {
         },
         {
             title: "라이트 모드",
-            leadingIcon: currentScheme === "light" ? <Image source={require("@/assets/icons/icon_selected.png")} style={styles.icon} /> : <></>,
+            leadingIcon: scheme === "light" ? <Image source={require("@/assets/icons/icon_selected.png")} style={styles.icon} /> : <></>,
             disabled: false,
             onPress: () => {
-                setCurrentScheme("light")
                 setTheme(LightTheme)
+                setScheme("light")
                 setMenuVisible(false)
             },
             dividerWidth: 1,
@@ -98,11 +98,11 @@ export const SettingOption = ({ setResetModalVisible }: SettingOptionProps) => {
         },
         {
             title: "다크 모드",
-            leadingIcon: currentScheme === "dark" ? <Image source={require("@/assets/icons/icon_selected.png")} style={styles.icon} /> : <></>,
+            leadingIcon: scheme === "dark" ? <Image source={require("@/assets/icons/icon_selected.png")} style={styles.icon} /> : <></>,
             disabled: false,
             onPress: () => {
-                setCurrentScheme("dark")
                 setTheme(DarkTheme)
+                setScheme("dark")
                 setMenuVisible(false)
             },
             dividerWidth: 2,
@@ -123,7 +123,7 @@ export const SettingOption = ({ setResetModalVisible }: SettingOptionProps) => {
             trailingIcon: <ResetOption theme={theme} />,
             disabled: false,
             onPress: () => {
-                setResetModalVisible(true)
+                setModalVisible({ visible: true, message: "정말 초기화하시겠습니까?", onConfirm: () => {}, confirmText: "초기화" })
                 setMenuVisible(false)
             },
             hasDivider: false

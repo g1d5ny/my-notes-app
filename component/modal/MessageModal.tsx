@@ -1,19 +1,16 @@
 import { Color, FontStyles } from "@/constant/Style"
-import { ThemeContext } from "@/context/ThemeContext"
-import { useContext } from "react"
+import { modalAtom, themeAtom } from "@/store"
+import { useAtom, useAtomValue } from "jotai"
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native"
 import { Modal } from "react-native-paper"
 
-interface MessageModalProps {
-    message: string
-    visible: boolean
-    onDismiss: () => void
-    onConfirm: () => Promise<void> | void
-    confirmText: string
-}
+export const MessageModal = () => {
+    const theme = useAtomValue(themeAtom)
+    const [{ visible, message, onConfirm, confirmText }, setModal] = useAtom(modalAtom)
 
-export const MessageModal = ({ message, visible, onDismiss, onConfirm, confirmText }: MessageModalProps) => {
-    const { theme } = useContext(ThemeContext)
+    const onDismiss = () => {
+        setModal(prev => ({ ...prev, visible: false }))
+    }
 
     return (
         <Modal visible={visible} onDismiss={onDismiss} contentContainerStyle={styles.modalContainer} style={styles.center}>

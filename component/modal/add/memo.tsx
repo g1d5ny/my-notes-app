@@ -1,10 +1,11 @@
 import { FilePlus, FolderPlus } from "@/assets/icons/svg/icon"
 import { FontStyles, Styles } from "@/constant/Style"
 import { DarkTheme, LightTheme } from "@/constant/Theme"
-import { ThemeContext } from "@/context/ThemeContext"
 import { useCreateMemo } from "@/hook/useCreateMemo"
+import { themeAtom } from "@/store"
 import { useLocalSearchParams } from "expo-router"
-import React, { useContext, useState } from "react"
+import { useAtomValue } from "jotai"
+import { useState } from "react"
 import { Image, Pressable, StyleSheet, Text } from "react-native"
 import { Modal } from "react-native-paper"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
@@ -17,8 +18,8 @@ interface AddMemoProps {
 }
 
 export const AddMemo = ({ onAddFile }: AddMemoProps) => {
-    const { theme } = useContext(ThemeContext)
     const { bottom } = useSafeAreaInsets()
+    const theme = useAtomValue(themeAtom)
     const { createFolder } = useCreateMemo()
     const params = useLocalSearchParams()
     const [modalVisible, setModalVisible] = useState(false)

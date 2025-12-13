@@ -1,13 +1,13 @@
 import { Styles } from "@/constant/Style"
-import { ThemeContext } from "@/context/ThemeContext"
-import { useContext } from "react"
+import { themeAtom } from "@/store"
+import { useAtomValue } from "jotai"
 import { Platform, StyleSheet, View } from "react-native"
 
 interface DefaultAppBarProps {
     children: React.ReactNode
 }
-export const AppBarForm = ({ children }: DefaultAppBarProps) => {
-    const { theme } = useContext(ThemeContext)
+export const AppBarParent = ({ children }: DefaultAppBarProps) => {
+    const theme = useAtomValue(themeAtom)
 
     return <View style={[Styles.row, Platform.OS === "ios" ? styles.iosContainer : styles.androidContainer, { backgroundColor: theme.background, borderColor: theme.border }]}>{children}</View>
 }

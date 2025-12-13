@@ -1,23 +1,23 @@
 import { FileCreateAppBar } from "@/component/appBar/FileCreateAppBar"
 import { ContentInput } from "@/component/input/ContentInput"
 import { TitleInput } from "@/component/input/TitleInput"
-import { ThemeContext } from "@/context/ThemeContext"
+import { modalAtom, themeAtom } from "@/store"
 import { FormValues } from "@/type"
 import BottomSheet, { BottomSheetScrollView } from "@gorhom/bottom-sheet"
 import { BottomSheetMethods } from "@gorhom/bottom-sheet/lib/typescript/types"
-import { forwardRef, useContext, useRef, useState } from "react"
+import { useAtomValue, useSetAtom } from "jotai"
+import { forwardRef, useRef } from "react"
 import { Controller, useForm } from "react-hook-form"
-import { Keyboard, StyleSheet, TextInput, View } from "react-native"
+import { Keyboard, SafeAreaView, StyleSheet, TextInput, View } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
-import { MessageModal } from "../MessageModal"
 
 export const AddFile = forwardRef<BottomSheetMethods>((_, ref) => {
-    const { theme } = useContext(ThemeContext)
+    const theme = useAtomValue(themeAtom)
     const { bottom } = useSafeAreaInsets()
 
     const titleRef = useRef<TextInput>(null)
     const contentRef = useRef<TextInput>(null)
-    const [showDeleteModal, setShowDeleteModal] = useState(false)
+    const setModal = useSetAtom(modalAtom)
 
     const { control, handleSubmit, resetField, watch } = useForm<FormValues>({
         defaultValues: { title: "", content: "" }
@@ -40,22 +40,22 @@ export const AddFile = forwardRef<BottomSheetMethods>((_, ref) => {
     }
 
     const close = () => {
-        setShowDeleteModal(true)
+        setModal({ visible: true, message: "뒤로 가시면 작성된 글이 삭제됩니다.\n뒤로 가시겠습니까?", onConfirm: back, confirmText: "뒤로 가기" })
         Keyboard.dismiss()
     }
 
     return (
-        <>
-            <BottomSheet
-                ref={ref}
-                index={-1}
-                handleComponent={() => <FileCreateAppBar textLength={contentText.length} handleSubmit={handleSubmit} close={close} back={back} inputBlur={inputBlur} />}
-                snapPoints={["100%"]}
-                backgroundStyle={{ backgroundColor: theme.background }}
-                enablePanDownToClose={true}
-                enableContentPanningGesture={false}
-                enableHandlePanningGesture={false}
-            >
+        <BottomSheet
+            ref={ref}
+            index={-1}
+            handleComponent={() => <FileCreateAppBar textLength={contentText.length} handleSubmit={handleSubmit} close={close} back={back} inputBlur={inputBlur} />}
+            snapPoints={["100%"]}
+            backgroundStyle={{ backgroundColor: theme.background }}
+            enablePanDownToClose={true}
+            enableContentPanningGesture={false}
+            enableHandlePanningGesture={false}
+        >
+            <SafeAreaView style={{ flex: 1 }}>
                 <View style={[styles.container, { paddingBottom: bottom }]}>
                     <Controller
                         control={control}
@@ -67,18 +67,8 @@ export const AddFile = forwardRef<BottomSheetMethods>((_, ref) => {
                         <Controller control={control} name='content' rules={{ required: true }} render={({ field: { onChange, onBlur, value } }) => <ContentInput ref={contentRef} onBlur={onBlur} onChangeText={onChange} value={value} />} />
                     </BottomSheetScrollView>
                 </View>
-            </BottomSheet>
-            <MessageModal
-                message={"뒤로 가시면 작성된 글이 삭제됩니다.\n뒤로 가시겠습니까?"}
-                visible={showDeleteModal}
-                onDismiss={() => setShowDeleteModal(false)}
-                onConfirm={() => {
-                    setShowDeleteModal(false)
-                    back()
-                }}
-                confirmText={"뒤로 가기"}
-            />
-        </>
+            </SafeAreaView>
+        </BottomSheet>
     )
 })
 

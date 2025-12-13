@@ -1,56 +1,53 @@
+import { MainAppBar } from "@/component/appBar/MainAppBar"
+import { StatusBar } from "@/component/appBar/StatusBar"
 import { CommonToast } from "@/component/CommonToast"
 import { AddMemoController } from "@/component/modal/add"
+import RoutingHeader from "@/component/RoutingHeader"
 import { customFontsToLoad } from "@/constant/Style"
-import { DarkTheme, LightTheme } from "@/constant/Theme"
-import { ThemeContext } from "@/context/ThemeContext"
-import { ToastContext } from "@/context/ToastContext"
+import { store, themeAtom } from "@/store"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import * as Font from "expo-font"
 import { Slot } from "expo-router"
 import { SQLiteDatabase, SQLiteProvider } from "expo-sqlite"
-import { Suspense, useState } from "react"
-import { ColorSchemeName, Platform, StatusBar, StyleSheet, useColorScheme } from "react-native"
+import { Provider, useAtomValue } from "jotai"
+import { Suspense } from "react"
+import { ActivityIndicator, StyleSheet } from "react-native"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { PaperProvider } from "react-native-paper"
 import { SafeAreaView } from "react-native-safe-area-context"
-import { DATABASE_NAME, MemoType, ThemeColorPalette } from "../type"
+import { DATABASE_NAME, MemoType } from "../type"
 
 Font.loadAsync(customFontsToLoad)
 const queryClient = new QueryClient()
 
+function AppContent() {
+    const theme = useAtomValue(themeAtom)
+
+    return (
+        <Suspense fallback={<ActivityIndicator />}>
+            <SQLiteProvider databaseName={DATABASE_NAME} options={{ enableChangeListener: true }} useSuspense onInit={migrateDbIfNeeded}>
+                <PaperProvider>
+                    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
+                        <StatusBar />
+                        <MainAppBar />
+                        <RoutingHeader />
+                        <Slot />
+                        <AddMemoController />
+                        <CommonToast />
+                    </SafeAreaView>
+                </PaperProvider>
+            </SQLiteProvider>
+        </Suspense>
+    )
+}
+
 export default function RootLayout() {
-    const scheme = useColorScheme()
-    const currentTheme = scheme === "dark" ? DarkTheme : LightTheme
-    const [currentScheme, setCurrentScheme] = useState<ColorSchemeName>(scheme)
-    const [theme, setTheme] = useState<ThemeColorPalette>(currentTheme)
-    const [message, setMessage] = useState<string>("")
-
-    const barStyle = () => {
-        if (Platform.OS === "android") {
-            return "dark-content"
-        }
-        return currentScheme === "dark" ? "light-content" : "dark-content"
-    }
-
     return (
         <QueryClientProvider client={queryClient}>
             <GestureHandlerRootView style={{ flex: 1 }}>
-                <Suspense fallback={<></>}>
-                    <SQLiteProvider databaseName={DATABASE_NAME} options={{ enableChangeListener: true }} useSuspense onInit={migrateDbIfNeeded}>
-                        <ThemeContext.Provider value={{ theme, setTheme, currentScheme, setCurrentScheme }}>
-                            <StatusBar barStyle={barStyle()} />
-                            <ToastContext.Provider value={{ message, setMessage }}>
-                                <PaperProvider>
-                                    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
-                                        <Slot />
-                                        <AddMemoController />
-                                        <CommonToast />
-                                    </SafeAreaView>
-                                </PaperProvider>
-                            </ToastContext.Provider>
-                        </ThemeContext.Provider>
-                    </SQLiteProvider>
-                </Suspense>
+                <Provider store={store}>
+                    <AppContent />
+                </Provider>
             </GestureHandlerRootView>
         </QueryClientProvider>
     )

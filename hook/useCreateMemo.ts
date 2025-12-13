@@ -18,7 +18,7 @@ export const useCreateMemo = () => {
     // parentId와 그 부모(parentId의 parentId)만 invalidate하는 함수
     const invalidateParentAndGrandparent = async (parentId: number | null) => {
         // parentId 자체 invalidate
-        await queryClient.invalidateQueries({ queryKey: [MemoType.FOLDER, parentId ?? 0] })
+        await queryClient.invalidateQueries({ queryKey: [MemoType.FOLDER, parentId] })
 
         // parentId가 null이 아니면 그 부모도 찾아서 invalidate
         if (parentId !== null) {
@@ -32,6 +32,7 @@ export const useCreateMemo = () => {
     const { mutate: createFile } = useMutation({
         mutationFn: async ({ title, content, parentId }: CreateFileProps) => {
             const now = Math.floor(Date.now() / 1000)
+
             await db.runAsync(
                 `INSERT INTO ${MemoType.FILE} (type, title, content, parentId, createdAt, updatedAt, viewedAt)
                 VALUES (?, ?, ?, ?, ?, ?, ?)`,
@@ -59,13 +60,14 @@ export const useCreateMemo = () => {
 
     const { mutate: createFolder } = useMutation({
         mutationFn: async ({ parentId }: CreateFolderProps) => {
+            const now = Math.floor(Date.now() / 1000)
+
             await db.runAsync(
-                `INSERT INTO ${MemoType.FOLDER} (type, title, parentId)
-                VALUES (?, ?, ?)`,
-                [MemoType.FOLDER, "새 폴더", parentId]
+                `INSERT INTO ${MemoType.FOLDER} (type, title, parentId, createdAt, updatedAt)
+                VALUES (?, ?, ?, ?, ?)`,
+                [MemoType.FOLDER, "새 폴더", parentId, now, now]
             )
 
-            console.log("parentId: ", parentId)
             await invalidateParentAndGrandparent(parentId)
         }
     })

@@ -7,7 +7,6 @@ import { EmptyMemo } from "./EmptyMemo"
 
 export const FolderDetail = () => {
     const { data: memos = [] } = useGetMemo() as UseQueryResult<Memo[], Error>
-    console.log("memos: ", memos)
 
     return memos.length === 0 ? <EmptyMemo /> : <FolderList />
 }

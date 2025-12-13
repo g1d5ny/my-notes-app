@@ -24,7 +24,8 @@ export const useEditMemo = () => {
 
     const { mutate: saveTitle } = useMutation({
         mutationFn: async ({ title, memoId, parentId }: { title: string; memoId: number; parentId: number | null }) => {
-            await db.runAsync(`UPDATE ${MemoType.FILE} SET title = ? WHERE id = ?`, [title, memoId])
+            const now = Math.floor(Date.now() / 1000)
+            await db.runAsync(`UPDATE ${MemoType.FILE} SET title = ?, updatedAt = ? WHERE id = ?`, [title, now, memoId])
             // 부모 폴더 목록 invalidate
             await queryClient.invalidateQueries({ queryKey: [MemoType.FOLDER, parentId] })
             // 파일 상세 invalidate
@@ -34,7 +35,8 @@ export const useEditMemo = () => {
 
     const { mutate: saveContent } = useMutation({
         mutationFn: async ({ content, memoId, parentId }: { content: string; memoId: number; parentId: number | null }) => {
-            await db.runAsync(`UPDATE ${MemoType.FILE} SET content = ? WHERE id = ?`, [content, memoId])
+            const now = Math.floor(Date.now() / 1000)
+            await db.runAsync(`UPDATE ${MemoType.FILE} SET content = ?, updatedAt = ? WHERE id = ?`, [content, now, memoId])
             // 부모 폴더 목록 invalidate
             await queryClient.invalidateQueries({ queryKey: [MemoType.FOLDER, parentId] })
             // 파일 상세 invalidate

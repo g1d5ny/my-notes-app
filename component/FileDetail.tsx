@@ -1,9 +1,8 @@
 import { ContentInput } from "@/component/input/ContentInput"
 import { TitleInput } from "@/component/input/TitleInput"
 import { useEditMemo } from "@/hook/useEditMemo"
-import { useGetMemo } from "@/hook/useGetMemo"
 import { FormValues, Memo, MemoType } from "@/type"
-import { UseQueryResult } from "@tanstack/react-query"
+import { useQueryClient } from "@tanstack/react-query"
 import { useLocalSearchParams } from "expo-router"
 import { useSQLiteContext } from "expo-sqlite"
 import { useEffect } from "react"
@@ -11,11 +10,13 @@ import { Controller, useForm } from "react-hook-form"
 import { ScrollView, StyleSheet } from "react-native"
 
 export const FileDetail = () => {
-    const { data: memo } = useGetMemo() as UseQueryResult<Memo, Error>
     const db = useSQLiteContext()
     const params = useLocalSearchParams()
+    const queryClient = useQueryClient()
     const { saveTitle, saveContent } = useEditMemo()
+    const currentId = params?.id ? Number(params?.id) : 0
     const parentId = params.parentId ? Number(params.parentId) : null
+    const memo = queryClient.getQueryData<Memo>([MemoType.FILE, currentId])
 
     const { control, handleSubmit } = useForm<FormValues>({
         defaultValues: { title: memo?.title ?? "", content: memo?.content ?? "" },
@@ -23,7 +24,8 @@ export const FileDetail = () => {
     })
 
     const updateViewedAt = async () => {
-        await db.runAsync(`UPDATE ${MemoType.FILE} SET viewedAt = ? WHERE id = ?`, [Math.floor(Date.now() / 1000), memo?.id ?? 0])
+        const now = Math.floor(Date.now() / 1000)
+        await db.runAsync(`UPDATE ${MemoType.FILE} SET viewedAt = ? WHERE id = ?`, [now, currentId])
     }
 
     useEffect(() => {

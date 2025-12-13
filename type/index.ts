@@ -22,8 +22,8 @@ export interface Memo {
     content?: string
     parentId: number | null
     path: RelativePathString
-    createdAt?: number
-    updatedAt?: number
+    createdAt: number
+    updatedAt: number
     viewedAt?: number
 }
 

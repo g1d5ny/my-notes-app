@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "3036359d-755e-4d0f-b4c9-a2bcae1bf8e9",
+  "id": "39445dab-bd3d-479d-8c6f-790f82bc5923",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "file": {
@@ -66,8 +66,8 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "file_parentId_fk": {
-          "name": "file_parentId_fk",
+        "file_parentId_folder_id_fk": {
+          "name": "file_parentId_folder_id_fk",
           "tableFrom": "file",
           "tableTo": "folder",
           "columnsFrom": [
@@ -114,12 +114,26 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
         }
       },
       "indexes": {},
       "foreignKeys": {
-        "folder_parentId_fk": {
-          "name": "folder_parentId_fk",
+        "folder_parentId_folder_id_fk": {
+          "name": "folder_parentId_folder_id_fk",
           "tableFrom": "folder",
           "tableTo": "folder",
           "columnsFrom": [

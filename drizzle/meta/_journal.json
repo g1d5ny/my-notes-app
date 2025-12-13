@@ -1,12 +1,12 @@
 {
-  "version": "7",
+  "version": "1",
   "dialect": "sqlite",
   "entries": [
     {
       "idx": 0,
       "version": "6",
-      "when": 1762070154611,
-      "tag": "0000_glamorous_master_chief",
+      "when": 1765642285533,
+      "tag": "0000_same_psynapse",
       "breakpoints": true
     }
   ]

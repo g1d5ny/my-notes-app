@@ -15,5 +15,7 @@ CREATE TABLE `folder` (
 	`type` text NOT NULL,
 	`title` text NOT NULL,
 	`parentId` integer,
+	`createdAt` integer NOT NULL,
+	`updatedAt` integer NOT NULL,
 	FOREIGN KEY (`parentId`) REFERENCES `folder`(`id`) ON UPDATE no action ON DELETE cascade
 );

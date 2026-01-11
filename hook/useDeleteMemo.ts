@@ -4,6 +4,11 @@ import { router } from "expo-router"
 import { useSQLiteContext } from "expo-sqlite"
 import Toast from "react-native-toast-message"
 
+interface DeleteProps {
+    id: number
+    parentId: number | null
+}
+
 export const useDeleteMemo = () => {
     const db = useSQLiteContext()
     const queryClient = useQueryClient()
@@ -33,9 +38,32 @@ export const useDeleteMemo = () => {
         }
     })
 
+    const { mutate: deleteFolder } = useMutation({
+        mutationFn: async ({ id, parentId }: DeleteProps) => {
+            await db.runAsync(`DELETE FROM ${MemoType.FOLDER} WHERE id = ?`, [id])
+            await invalidateParentAndGrandparent(parentId)
+        },
+        onSuccess: () => {
+            Toast.show({
+                text1: "폴더가 삭제되었습니다.",
+                type: "customToast",
+                position: "bottom",
+                visibilityTime: 3000
+            })
+        },
+        onError: () => {
+            Toast.show({
+                text1: "폴더 삭제에 실패했습니다.",
+                type: "customToast",
+                position: "bottom",
+                visibilityTime: 3000
+            })
+        }
+    })
+
     const { mutate: deleteFile } = useMutation({
-        mutationFn: async ({ memoId, parentId }: { memoId: number; parentId: number | null }) => {
-            await db.runAsync(`DELETE FROM ${MemoType.FILE} WHERE id = ?`, [memoId])
+        mutationFn: async ({ id, parentId }: DeleteProps) => {
+            await db.runAsync(`DELETE FROM ${MemoType.FILE} WHERE id = ?`, [id])
             // parentId와 그 부모 폴더 목록 invalidate
             await invalidateParentAndGrandparent(parentId)
         },
@@ -46,7 +74,9 @@ export const useDeleteMemo = () => {
                 position: "bottom",
                 visibilityTime: 3000
             })
-            router.back()
+            if (router.canGoBack()) {
+                router.back()
+            }
         },
         onError: () => {
             Toast.show({
@@ -58,5 +88,5 @@ export const useDeleteMemo = () => {
         }
     })
 
-    return { resetMemo, deleteFile }
+    return { resetMemo, deleteFile, deleteFolder }
 }

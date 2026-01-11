@@ -8,7 +8,7 @@ import { AppBar, Memo, MemoType, SelectedMemoType } from "@/type"
 import { useQueryClient } from "@tanstack/react-query"
 import { RelativePathString, router, useLocalSearchParams, usePathname } from "expo-router"
 import { useAtom, useAtomValue, useSetAtom } from "jotai"
-import { useMemo, useRef } from "react"
+import { useMemo } from "react"
 import { Controller, FieldPath, useForm } from "react-hook-form"
 import { Dimensions, Pressable, ScrollView, StyleSheet, TextInput, View } from "react-native"
 
@@ -36,12 +36,11 @@ export const FolderList = () => {
     const setAppBar = useSetAtom(appBarAtom)
     const [selectedMemo, setSelectedMemo] = useAtom(selectedMemoAtom)
     const { updateFolderTitle, updateFileTitle } = useUpdateMemo()
-    const titleRef = useRef<TextInput>(null)
     const currentId = params.id ? Number(params?.id) : 0
     const memos = queryClient.getQueryData<Memo[]>([MemoType.FOLDER, currentId, sortType]) ?? []
     const { data: filledFolder = [] } = useCheckFilledMemo(memos)
 
-    const { control } = useForm<FormValues>({
+    const { control, getFieldState } = useForm<FormValues>({
         defaultValues: { title: "" }
     })
 
@@ -79,9 +78,9 @@ export const FolderList = () => {
                                         name={`${id}-${type}` as FieldPath<FormValues>}
                                         control={control}
                                         rules={{ required: true }}
-                                        render={({ field: { onChange, onBlur, value } }) => (
+                                        render={({ field: { onChange, onBlur, value, ref } }) => (
                                             <TextInput
-                                                ref={titleRef}
+                                                ref={ref}
                                                 onBlur={async () => {
                                                     onBlur()
                                                     const currentValue = value
@@ -97,7 +96,6 @@ export const FolderList = () => {
                                                 }}
                                                 onChangeText={onChange}
                                                 value={value ?? title}
-                                                onSubmitEditing={() => titleRef.current?.blur()}
                                                 style={[styles.title, { color: theme.text }]}
                                                 scrollEnabled={false}
                                                 returnKeyType='done'
@@ -120,15 +118,16 @@ export const FolderList = () => {
 const styles = StyleSheet.create({
     titleContainer: {
         width: "100%",
-        maxHeight: 40,
         marginTop: 8
     },
     title: {
         width: "100%",
+        maxHeight: 40,
+        padding: 4,
         borderRadius: 4,
-        backgroundColor: "rgba(221, 221, 221, 0.2)",
         textAlign: "center",
         textAlignVertical: "center",
+        backgroundColor: "rgba(221, 221, 221, 0.2)",
         ...FontStyles.BodySmall
     },
     container: {

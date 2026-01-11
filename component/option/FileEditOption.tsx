@@ -28,7 +28,7 @@ export const FileEditOption = ({ exportFile }: FileEditOptionProps) => {
                     visible: true,
                     message: "정말 삭제하시겠습니까?",
                     onConfirm: () => {
-                        deleteFile({ memoId: currentId, parentId: params.parentId ? Number(params.parentId) : null })
+                        deleteFile({ id: currentId, parentId: params.parentId ? Number(params.parentId) : null })
                     },
                     confirmText: "삭제"
                 })

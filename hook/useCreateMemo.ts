@@ -34,16 +34,20 @@ export const useCreateMemo = () => {
         }
     }
 
+    const createFileFn = async ({ title, content, parentId }: CreateFileProps) => {
+        const now = Math.floor(Date.now() / 1000)
+
+        await db.runAsync(
+            `INSERT INTO ${MemoType.FILE} (type, title, content, parentId, createdAt, updatedAt, viewedAt)
+                VALUES (?, ?, ?, ?, ?, ?, ?)`,
+            [MemoType.FILE, title, content, parentId, now, now, now]
+        )
+        await invalidateParentAndGrandparent(parentId)
+    }
+
     const { mutate: createFile } = useMutation({
         mutationFn: async ({ title, content, parentId }: CreateFileProps) => {
-            const now = Math.floor(Date.now() / 1000)
-
-            await db.runAsync(
-                `INSERT INTO ${MemoType.FILE} (type, title, content, parentId, createdAt, updatedAt, viewedAt)
-                VALUES (?, ?, ?, ?, ?, ?, ?)`,
-                [MemoType.FILE, title, content, parentId, now, now, now]
-            )
-            await invalidateParentAndGrandparent(parentId)
+            createFileFn({ title, content, parentId })
         },
         onSuccess: () => {
             Toast.show({
@@ -163,5 +167,5 @@ export const useCreateMemo = () => {
         }
     })
 
-    return { createFile, createFolder, duplicateFolder }
+    return { createFile, createFolder, duplicateFolder, createFileFn }
 }

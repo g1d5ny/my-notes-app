@@ -3,9 +3,8 @@ import { Styles } from "@/constant/Style"
 import { useCreateMemo } from "@/hook/useCreateMemo"
 import { useDeleteMemo } from "@/hook/useDeleteMemo"
 import { appBarAtom, modalAtom, selectedMemoAtom, themeAtom } from "@/store"
-import { AppBar, MemoType } from "@/type"
+import { AppBar, MemoType, SelectedMemoType } from "@/type"
 import { useAtom, useAtomValue, useSetAtom } from "jotai"
-import { useEffect } from "react"
 import { Pressable, StyleSheet, View } from "react-native"
 import Toast from "react-native-toast-message"
 
@@ -43,13 +42,13 @@ export const FolderActionAppBar = () => {
         {
             icon: <Cut theme={theme} />,
             onPress: () => {
-                setAppBar(AppBar.MAIN)
-                Toast.show({
-                    text1: "메모가 잘라내기 되었습니다. 원하시는 곳에 붙여넣어주세요!",
-                    type: "customToast",
-                    position: "bottom",
-                    visibilityTime: 3000
+                setSelectedMemo(prev => {
+                    if (prev) {
+                        return { ...prev, type: SelectedMemoType.CUT }
+                    }
+                    return null
                 })
+                setAppBar(AppBar.PASTE)
             }
         },
         {
@@ -72,12 +71,6 @@ export const FolderActionAppBar = () => {
                 }))
         }
     ]
-
-    useEffect(() => {
-        return () => {
-            setSelectedMemo(null)
-        }
-    }, [])
 
     return (
         <View style={styles.row}>

@@ -12,7 +12,7 @@ export default function FolderScreen() {
     const setAppBar = useSetAtom(appBarAtom)
 
     useEffect(() => {
-        setAppBar(currentType === MemoType.FILE ? AppBar.FILE : AppBar.MAIN)
+        setAppBar(prev => (prev === AppBar.PASTE ? prev : currentType === MemoType.FILE ? AppBar.FILE : AppBar.MAIN))
     }, [currentType])
 
     return currentType === MemoType.FILE ? <FileDetail id={Number(params.id)} title={String(params.title)} content={String(params.content)} parentId={Number(params.parentId ?? 0)} /> : <FolderDetail />

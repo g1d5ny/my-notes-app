@@ -7,7 +7,7 @@ import { appBarAtom, selectedMemoAtom, sortAtom, themeAtom } from "@/store"
 import { AppBar, Memo, MemoType, SelectedMemoType } from "@/type"
 import { useQueryClient } from "@tanstack/react-query"
 import { RelativePathString, router, useLocalSearchParams, usePathname } from "expo-router"
-import { useAtom, useAtomValue, useSetAtom } from "jotai"
+import { useAtom, useAtomValue } from "jotai"
 import { useMemo } from "react"
 import { Controller, FieldPath, useForm } from "react-hook-form"
 import { Dimensions, Pressable, ScrollView, StyleSheet, TextInput, View } from "react-native"
@@ -33,14 +33,14 @@ export const FolderList = () => {
     const queryClient = useQueryClient()
     const params = useLocalSearchParams()
     const currentPath = usePathname()
-    const setAppBar = useSetAtom(appBarAtom)
+    const [appBar, setAppBar] = useAtom(appBarAtom)
     const [selectedMemo, setSelectedMemo] = useAtom(selectedMemoAtom)
     const { updateFolderTitle, updateFileTitle } = useUpdateMemo()
     const currentId = params.id ? Number(params?.id) : 0
     const memos = queryClient.getQueryData<Memo[]>([MemoType.FOLDER, currentId, sortType]) ?? []
     const { data: filledFolder = [] } = useCheckFilledMemo(memos)
 
-    const { control, getFieldState } = useForm<FormValues>({
+    const { control } = useForm<FormValues>({
         defaultValues: { title: "" }
     })
 
@@ -58,9 +58,9 @@ export const FolderList = () => {
 
     return (
         <View style={styles.container}>
-            <ScrollView showsVerticalScrollIndicator={false}>
+            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.contentContainerStyle}>
                 <Pressable
-                    style={styles.contentContainerStyle}
+                    style={styles.pressContainer}
                     onPress={() => {
                         setSelectedMemo(null)
                         setAppBar(AppBar.MAIN)
@@ -68,19 +68,19 @@ export const FolderList = () => {
                 >
                     {memos.map((memo, index) => {
                         const { id, title, type, content, parentId } = memo
+                        const selected = selectedMemo?.memo.id === id && selectedMemo.memo?.type === type
                         return (
-                            <View key={index} style={[styles.item, { opacity: selectedMemo?.memo.id === id && selectedMemo.memo?.type === type ? 0.5 : 1 }]}>
-                                <Pressable onLongPress={() => selectMemo(memo)} onPress={() => open(id, type, title, content, parentId)}>
+                            <View key={index} style={[styles.item, { opacity: selected ? 0.5 : 1 }]}>
+                                <Pressable disabled={selected} onLongPress={() => selectMemo(memo)} onPress={() => open(id, type, title, content, parentId)}>
                                     {type === MemoType.FILE ? <File /> : filledFolder[id] ? <FilledFolder /> : <EmptyFolder />}
                                 </Pressable>
-                                <Pressable style={styles.titleContainer} onPress={() => open(id, type, title, content, parentId)}>
+                                <Pressable disabled={selected} style={styles.titleContainer} onPress={() => open(id, type, title, content, parentId)}>
                                     <Controller
                                         name={`${id}-${type}` as FieldPath<FormValues>}
                                         control={control}
                                         rules={{ required: true }}
-                                        render={({ field: { onChange, onBlur, value, ref } }) => (
+                                        render={({ field: { onChange, onBlur, value } }) => (
                                             <TextInput
-                                                ref={ref}
                                                 onBlur={async () => {
                                                     onBlur()
                                                     const currentValue = value
@@ -135,12 +135,16 @@ const styles = StyleSheet.create({
         padding: 16,
         gap: 12
     },
-    contentContainerStyle: {
+    pressContainer: {
         flexDirection: "row",
         alignItems: "flex-start",
         justifyContent: "space-between",
         flexWrap: "wrap",
-        rowGap: 16
+        rowGap: 16,
+        flexGrow: 1
+    },
+    contentContainerStyle: {
+        flex: 1
     },
     item: {
         width: 76,

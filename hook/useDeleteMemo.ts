@@ -38,10 +38,14 @@ export const useDeleteMemo = () => {
         }
     })
 
+    const deleteFolderFn = async ({ id, parentId }: DeleteProps) => {
+        await db.runAsync(`DELETE FROM ${MemoType.FOLDER} WHERE id = ?`, [id])
+        await invalidateParentAndGrandparent(parentId)
+    }
+
     const { mutate: deleteFolder } = useMutation({
         mutationFn: async ({ id, parentId }: DeleteProps) => {
-            await db.runAsync(`DELETE FROM ${MemoType.FOLDER} WHERE id = ?`, [id])
-            await invalidateParentAndGrandparent(parentId)
+            deleteFolderFn({ id, parentId })
         },
         onSuccess: () => {
             Toast.show({
@@ -61,11 +65,15 @@ export const useDeleteMemo = () => {
         }
     })
 
+    const deleteFileFn = async ({ id, parentId }: DeleteProps) => {
+        await db.runAsync(`DELETE FROM ${MemoType.FILE} WHERE id = ?`, [id])
+        // parentId와 그 부모 폴더 목록 invalidate
+        await invalidateParentAndGrandparent(parentId)
+    }
+
     const { mutate: deleteFile } = useMutation({
         mutationFn: async ({ id, parentId }: DeleteProps) => {
-            await db.runAsync(`DELETE FROM ${MemoType.FILE} WHERE id = ?`, [id])
-            // parentId와 그 부모 폴더 목록 invalidate
-            await invalidateParentAndGrandparent(parentId)
+            deleteFileFn({ id, parentId })
         },
         onSuccess: () => {
             Toast.show({
@@ -88,5 +96,5 @@ export const useDeleteMemo = () => {
         }
     })
 
-    return { resetMemo, deleteFile, deleteFolder }
+    return { resetMemo, deleteFile, deleteFolder, deleteFileFn, deleteFolderFn }
 }

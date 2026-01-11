@@ -32,7 +32,7 @@ export const PasteAppBar = () => {
     }, [pathname])
 
     return (
-        <View>
+        <View style={styles.row}>
             <View style={styles.left}>
                 {canBack && (
                     <Pressable style={styles.back} onPress={() => router.back()}>
@@ -53,6 +53,12 @@ export const PasteAppBar = () => {
 }
 
 const styles = StyleSheet.create({
+    row: {
+        flex: 1,
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between"
+    },
     back: {
         alignSelf: "flex-start"
     },

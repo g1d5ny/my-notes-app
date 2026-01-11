@@ -48,7 +48,8 @@ export const useCreateMemo = () => {
                 visibilityTime: 3000
             })
         },
-        onError: () => {
+        onError: e => {
+            console.error(e)
             Toast.show({
                 text1: "메모 작성에 실패했습니다.",
                 type: "customToast",

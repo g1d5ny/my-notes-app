@@ -3,11 +3,11 @@ import { EmptyFolder, File, FilledFolder } from "@/assets/icons/svg/icon"
 import { FontStyles } from "@/constant/Style"
 import { useCheckFilledMemo } from "@/hook/useCheckFilledMemo"
 import { useUpdateMemo } from "@/hook/useUpdateMemo"
-import { sortAtom, themeAtom } from "@/store"
-import { Memo, MemoType } from "@/type"
+import { appBarAtom, selectedMemoAtom, sortAtom, themeAtom } from "@/store"
+import { AppBar, Memo, MemoType, SelectedMemoType } from "@/type"
 import { useQueryClient } from "@tanstack/react-query"
 import { RelativePathString, router, useLocalSearchParams, usePathname } from "expo-router"
-import { useAtomValue } from "jotai"
+import { useAtom, useAtomValue, useSetAtom } from "jotai"
 import { useMemo, useRef } from "react"
 import { Controller, FieldPath, useForm } from "react-hook-form"
 import { Dimensions, Pressable, ScrollView, StyleSheet, TextInput, View } from "react-native"
@@ -33,6 +33,8 @@ export const FolderList = () => {
     const queryClient = useQueryClient()
     const params = useLocalSearchParams()
     const currentPath = usePathname()
+    const setAppBar = useSetAtom(appBarAtom)
+    const [selectedMemo, setSelectedMemo] = useAtom(selectedMemoAtom)
     const { updateFolderTitle, updateFileTitle } = useUpdateMemo()
     const titleRef = useRef<TextInput>(null)
     const currentId = params.id ? Number(params?.id) : 0
@@ -50,50 +52,66 @@ export const FolderList = () => {
         router.push({ pathname: path, params: { type, id, title, content, parentId } })
     }
 
+    const selectMemo = (memo: Memo) => {
+        setSelectedMemo({ memo, type: SelectedMemoType.COPY })
+        setAppBar(AppBar.FOLDER_ACTION)
+    }
+
     return (
         <View style={styles.container}>
-            <ScrollView contentContainerStyle={styles.contentContainerStyle} showsVerticalScrollIndicator={false}>
-                {memos.map(({ id, title, type, content, parentId }, index) => {
-                    return (
-                        <View key={index} style={styles.item}>
-                            <Pressable onPress={() => open(id, type, title, content, parentId)}>{type === MemoType.FILE ? <File /> : filledFolder[id] ? <FilledFolder /> : <EmptyFolder />}</Pressable>
-                            <Pressable style={styles.titleContainer} onPress={() => open(id, type, title, content, parentId)}>
-                                <Controller
-                                    name={`${id}-${type}` as FieldPath<FormValues>}
-                                    control={control}
-                                    rules={{ required: true }}
-                                    render={({ field: { onChange, onBlur, value } }) => (
-                                        <TextInput
-                                            ref={titleRef}
-                                            onBlur={async () => {
-                                                onBlur()
-                                                const currentValue = value
-                                                if (currentValue && currentValue !== title) {
-                                                    if (type === MemoType.FILE) {
-                                                        updateFileTitle({ title: currentValue, memoId: id, parentId: parentId ?? 0 })
+            <ScrollView showsVerticalScrollIndicator={false}>
+                <Pressable
+                    style={styles.contentContainerStyle}
+                    onPress={() => {
+                        setSelectedMemo(null)
+                        setAppBar(AppBar.MAIN)
+                    }}
+                >
+                    {memos.map((memo, index) => {
+                        const { id, title, type, content, parentId } = memo
+                        return (
+                            <View key={index} style={[styles.item, { opacity: selectedMemo?.memo.id === id && selectedMemo.memo?.type === type ? 0.5 : 1 }]}>
+                                <Pressable onLongPress={() => selectMemo(memo)} onPress={() => open(id, type, title, content, parentId)}>
+                                    {type === MemoType.FILE ? <File /> : filledFolder[id] ? <FilledFolder /> : <EmptyFolder />}
+                                </Pressable>
+                                <Pressable style={styles.titleContainer} onPress={() => open(id, type, title, content, parentId)}>
+                                    <Controller
+                                        name={`${id}-${type}` as FieldPath<FormValues>}
+                                        control={control}
+                                        rules={{ required: true }}
+                                        render={({ field: { onChange, onBlur, value } }) => (
+                                            <TextInput
+                                                ref={titleRef}
+                                                onBlur={async () => {
+                                                    onBlur()
+                                                    const currentValue = value
+                                                    if (currentValue && currentValue !== title) {
+                                                        if (type === MemoType.FILE) {
+                                                            updateFileTitle({ title: currentValue, memoId: id, parentId: parentId ?? 0 })
+                                                        } else {
+                                                            updateFolderTitle({ title: currentValue, memoId: id, parentId: parentId ?? 0 })
+                                                        }
                                                     } else {
-                                                        updateFolderTitle({ title: currentValue, memoId: id, parentId: parentId ?? 0 })
+                                                        onChange(title)
                                                     }
-                                                } else {
-                                                    onChange(title)
-                                                }
-                                            }}
-                                            onChangeText={onChange}
-                                            value={value ?? title}
-                                            onSubmitEditing={() => titleRef.current?.blur()}
-                                            style={[styles.title, { color: theme.text }]}
-                                            scrollEnabled={false}
-                                            returnKeyType='done'
-                                        />
-                                    )}
-                                />
-                            </Pressable>
-                        </View>
-                    )
-                })}
-                {Array.from({ length: Math.max(0, itemsPerRow - (memos.length % itemsPerRow)) }).map((_, index) => {
-                    return <View key={index} style={styles.item} />
-                })}
+                                                }}
+                                                onChangeText={onChange}
+                                                value={value ?? title}
+                                                onSubmitEditing={() => titleRef.current?.blur()}
+                                                style={[styles.title, { color: theme.text }]}
+                                                scrollEnabled={false}
+                                                returnKeyType='done'
+                                            />
+                                        )}
+                                    />
+                                </Pressable>
+                            </View>
+                        )
+                    })}
+                    {Array.from({ length: Math.max(0, itemsPerRow - (memos.length % itemsPerRow)) }).map((_, index) => {
+                        return <View key={index} style={styles.item} />
+                    })}
+                </Pressable>
             </ScrollView>
         </View>
     )

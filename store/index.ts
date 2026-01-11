@@ -1,5 +1,5 @@
 import { DarkTheme, LightTheme } from "@/constant/Theme"
-import { Modal, SortType, ThemeColorPalette } from "@/type"
+import { AppBar, Modal, SelectedMemo, SortType, ThemeColorPalette } from "@/type"
 import { atom, createStore } from "jotai"
 import { atomWithStorage, createJSONStorage } from "jotai/utils"
 import { Appearance, ColorSchemeName } from "react-native"
@@ -43,3 +43,7 @@ export const schemeAtom = atom<ColorSchemeName>(Appearance.getColorScheme())
 export const modalAtom = atom<Modal>({ visible: false, message: "", onConfirm: () => {}, confirmText: "" })
 // TODO: 추후 보정 필요
 export const infoModalVisibleAtom = atom<boolean>(false)
+
+export const appBarAtom = atom<AppBar>(AppBar.MAIN)
+
+export const selectedMemoAtom = atom<SelectedMemo | null>(null)

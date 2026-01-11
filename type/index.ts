@@ -44,3 +44,20 @@ export interface Modal {
     onConfirm: () => Promise<void> | void
     confirmText: string
 }
+
+export enum AppBar {
+    MAIN = "main",
+    FILE = "file",
+    FOLDER_ACTION = "folderAction",
+    PASTE = "paste"
+}
+
+export enum SelectedMemoType {
+    COPY = "copy",
+    CUT = "cut"
+}
+
+export interface SelectedMemo {
+    memo: Memo
+    type: SelectedMemoType
+}

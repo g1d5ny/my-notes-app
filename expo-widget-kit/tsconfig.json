@@ -27,5 +27,6 @@
     "strict": true,
     "target": "esnext",
     "verbatimModuleSyntax": true
-  }
+  },
+  "exclude": ["node_modules", "nitrogen", "**/*.nitro.ts"]
 }

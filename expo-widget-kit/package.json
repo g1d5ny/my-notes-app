@@ -1,5 +1,5 @@
 {
-  "name": "expo-widget-kit",
+  "name": "@jiwon/expo-widget-kit",
   "version": "0.0.1",
   "description": "expo-widget-kit",
   "main": "lib/index",

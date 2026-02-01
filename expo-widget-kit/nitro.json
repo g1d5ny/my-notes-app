@@ -1,0 +1,19 @@
+{
+  "$schema": "https://nitro.margelo.com/nitro.schema.json",
+  "cxxNamespace": [
+    "expowidgetkit"
+  ],
+  "ios": {
+    "iosModuleName": "NitroExpoWidgetKit"
+  },
+  "android": {
+    "androidNamespace": [
+      "expowidgetkit"
+    ],
+    "androidCxxLibName": "NitroExpoWidgetKit"
+  },
+  "autolinking": {},
+  "ignorePaths": [
+    "**/node_modules"
+  ]
+}

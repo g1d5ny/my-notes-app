@@ -41,9 +41,9 @@ export const MainAppBar = () => {
                 )}
             </View>
             <View style={[Styles.row, styles.right]}>
-                <Pressable onPress={() => (translateX.value = withTiming(0, { duration: 300 }))}>
+                {/* <Pressable onPress={() => (translateX.value = withTiming(0, { duration: 300 }))}>
                     <Search theme={theme} />
-                </Pressable>
+                </Pressable> */}
                 <SettingOption />
             </View>
             {/* TODO: 나중에 페이지로 코드 분리 필요 */}

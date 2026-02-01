@@ -1,4 +1,4 @@
-import { CheckOption, ResetOption, SortOption, ThemeOption } from "@/assets/icons/svg/option/icon"
+import { ResetOption, SortOption, ThemeOption } from "@/assets/icons/svg/option/icon"
 import { FontStyles } from "@/constant/Style"
 import { DarkTheme, LightTheme } from "@/constant/Theme"
 import { useDeleteMemo } from "@/hook/useDeleteMemo"
@@ -20,16 +20,16 @@ export const SettingOption = () => {
     const [menuVisible, setMenuVisible] = useState(false)
 
     const mainOptionList: OptionMenuList[] = [
-        {
-            title: "선택",
-            trailingIcon: <CheckOption theme={theme} />,
-            disabled: false,
-            onPress: () => {
-                setMenuVisible(false)
-            },
-            dividerWidth: 2,
-            hasDivider: true
-        },
+        // {
+        //     title: "선택",
+        //     trailingIcon: <CheckOption theme={theme} />,
+        //     disabled: false,
+        //     onPress: () => {
+        //         setMenuVisible(false)
+        //     },
+        //     dividerWidth: 2,
+        //     hasDivider: true
+        // },
         {
             title: "정렬",
             trailingIcon: <SortOption theme={theme} />,

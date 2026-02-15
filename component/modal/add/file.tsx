@@ -3,15 +3,15 @@ import { ContentInput } from "@/component/input/ContentInput"
 import { TitleInput } from "@/component/input/TitleInput"
 import { modalAtom, themeAtom } from "@/store"
 import { FormValues } from "@/type"
-import BottomSheet, { BottomSheetScrollView } from "@gorhom/bottom-sheet"
-import { BottomSheetMethods } from "@gorhom/bottom-sheet/lib/typescript/types"
+import { BottomSheetModal, BottomSheetScrollView } from "@gorhom/bottom-sheet"
+import { BottomSheetModalMethods } from "@gorhom/bottom-sheet/lib/typescript/types"
 import { useAtomValue, useSetAtom } from "jotai"
 import { forwardRef } from "react"
 import { Controller, useForm } from "react-hook-form"
 import { Keyboard, StyleSheet, View } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 
-export const AddFile = forwardRef<BottomSheetMethods>((_, ref) => {
+export const AddFile = forwardRef<BottomSheetModalMethods>((_, ref) => {
     const theme = useAtomValue(themeAtom)
     const setModal = useSetAtom(modalAtom)
     const { top, bottom } = useSafeAreaInsets()
@@ -22,13 +22,13 @@ export const AddFile = forwardRef<BottomSheetMethods>((_, ref) => {
 
     const contentText = watch("content")
 
-    const back = async () => {
+    const back = () => {
+        Keyboard.dismiss()
         if (ref && typeof ref !== "function" && ref.current) {
             ref.current.close()
-            resetField("title")
-            resetField("content")
         }
-        Keyboard.dismiss()
+        resetField("title")
+        resetField("content")
     }
 
     const close = () => {
@@ -37,16 +37,17 @@ export const AddFile = forwardRef<BottomSheetMethods>((_, ref) => {
     }
 
     return (
-        <BottomSheet
+        <BottomSheetModal
             ref={ref}
-            index={-1}
             topInset={top}
             handleComponent={() => <FileCreateAppBar textLength={contentText.length} handleSubmit={handleSubmit} close={close} back={back} />}
-            snapPoints={["100%"]}
             backgroundStyle={{ backgroundColor: theme.background }}
-            enablePanDownToClose={true}
-            enableContentPanningGesture={false}
-            enableHandlePanningGesture={false}
+            snapPoints={["100%"]}
+            enableDynamicSizing={false}
+            android_keyboardInputMode='adjustPan'
+            keyboardBehavior='extend'
+            keyboardBlurBehavior='none'
+            enablePanDownToClose
         >
             <View style={[styles.container, { paddingBottom: bottom }]}>
                 <Controller
@@ -59,7 +60,7 @@ export const AddFile = forwardRef<BottomSheetMethods>((_, ref) => {
                     <Controller control={control} name='content' rules={{ required: true }} render={({ field: { onChange, onBlur, value, ref } }) => <ContentInput ref={ref} onBlur={onBlur} onChangeText={onChange} value={value} />} />
                 </BottomSheetScrollView>
             </View>
-        </BottomSheet>
+        </BottomSheetModal>
     )
 })
 

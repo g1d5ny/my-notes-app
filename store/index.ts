@@ -1,25 +1,13 @@
 import { DarkTheme, LightTheme } from "@/constant/Theme"
 import { AppBar, Modal, SelectedMemo, SortType, ThemeColorPalette } from "@/type"
+import AsyncStorage from "@react-native-async-storage/async-storage"
 import { atom, createStore } from "jotai"
 import { atomWithStorage, createJSONStorage } from "jotai/utils"
 import { Appearance, ColorSchemeName } from "react-native"
-import { createMMKV } from "react-native-mmkv"
 
 export const store = createStore()
 
-export const storage = createMMKV()
-
-const sortStorage = createJSONStorage<SortType>(() => ({
-    getItem: key => {
-        return storage.getString(key) ?? null
-    },
-    setItem: (key, value) => {
-        return storage.set(key, value)
-    },
-    removeItem: key => {
-        return storage.remove(key)
-    }
-}))
+const sortStorage = createJSONStorage<SortType>(() => AsyncStorage)
 
 export const sortAtom = atomWithStorage<SortType>("sortType", SortType.CREATED_AT, sortStorage)
 

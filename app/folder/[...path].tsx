@@ -28,6 +28,8 @@ export default function FolderScreen() {
                 confirmText: "종료"
             })
             return true
+        } else {
+            setAppBar(AppBar.MAIN)
         }
         return false
     })

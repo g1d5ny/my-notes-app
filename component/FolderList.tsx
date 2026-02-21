@@ -7,10 +7,10 @@ import { appBarAtom, selectedMemoAtom, sortAtom, themeAtom } from "@/store"
 import { AppBar, Memo, MemoType, SelectedMemoType } from "@/type"
 import { useQueryClient } from "@tanstack/react-query"
 import { RelativePathString, router, useLocalSearchParams, usePathname } from "expo-router"
-import { useAtom, useAtomValue } from "jotai"
-import { useMemo } from "react"
+import { useAtom, useAtomValue, useSetAtom } from "jotai"
+import { useMemo, useState } from "react"
 import { Controller, FieldPath, useForm } from "react-hook-form"
-import { Dimensions, Pressable, ScrollView, StyleSheet, TextInput, View } from "react-native"
+import { Dimensions, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native"
 
 type FormValues = {
     title: string
@@ -23,7 +23,7 @@ const getItemsPerRow = () => {
     const screenWidth = Dimensions.get("window").width
     const padding = PADDING * 2 // 좌우 패딩 16 * 2
     const availableWidth = screenWidth - padding
-    const itemWidth = ITEM_WIDTH + PADDING // 아이템 너비 + gap
+    const itemWidth = ITEM_WIDTH // 아이템 너비 + gap
     return Math.floor(availableWidth / itemWidth)
 }
 
@@ -33,16 +33,14 @@ export const FolderList = () => {
     const queryClient = useQueryClient()
     const params = useLocalSearchParams()
     const currentPath = usePathname()
-    const [appBar, setAppBar] = useAtom(appBarAtom)
+    const setAppBar = useSetAtom(appBarAtom)
     const [selectedMemo, setSelectedMemo] = useAtom(selectedMemoAtom)
     const { updateFolderTitle, updateFileTitle } = useUpdateMemo()
     const currentId = params.id ? Number(params?.id) : 0
     const memos = queryClient.getQueryData<Memo[]>([MemoType.FOLDER, currentId, sortType]) ?? []
     const { data: filledFolder = [] } = useCheckFilledMemo(memos)
-
-    const { control } = useForm<FormValues>({
-        defaultValues: { title: "" }
-    })
+    const [focusedInputKey, setFocusedInputKey] = useState<string | null>(null)
+    const { control } = useForm<FormValues>({ defaultValues: { title: "" } })
 
     const itemsPerRow = useMemo(() => getItemsPerRow(), [])
 
@@ -69,20 +67,29 @@ export const FolderList = () => {
                     {memos.map((memo, index) => {
                         const { id, title, type, content, parentId } = memo
                         const selected = selectedMemo?.memo.id === id && selectedMemo.memo?.type === type
+
                         return (
                             <View key={index} style={[styles.item, { opacity: selected ? 0.5 : 1 }]}>
                                 <Pressable disabled={selected} onLongPress={() => selectMemo(memo)} onPress={() => open(id, type, title, content, parentId)}>
                                     {type === MemoType.FILE ? <File /> : filledFolder[id] ? <FilledFolder /> : <EmptyFolder />}
                                 </Pressable>
-                                <Pressable disabled={selected} style={styles.titleContainer} onPress={() => open(id, type, title, content, parentId)}>
+                                {focusedInputKey === `${id}-${type}` ? (
                                     <Controller
                                         name={`${id}-${type}` as FieldPath<FormValues>}
                                         control={control}
                                         rules={{ required: true }}
-                                        render={({ field: { onChange, onBlur, value } }) => (
+                                        render={({ field: { onChange, onBlur, value, ref } }) => (
                                             <TextInput
+                                                ref={ref}
+                                                autoFocus
+                                                value={value ?? title}
+                                                onChangeText={onChange}
+                                                onFocus={() => setFocusedInputKey(`${id}-${type}`)}
+                                                focusable={!selected}
+                                                pointerEvents={selected ? "none" : "auto"}
                                                 onBlur={async () => {
                                                     onBlur()
+                                                    setFocusedInputKey(null)
                                                     const currentValue = value
                                                     if (currentValue && currentValue !== title) {
                                                         if (type === MemoType.FILE) {
@@ -94,15 +101,20 @@ export const FolderList = () => {
                                                         onChange(title)
                                                     }
                                                 }}
-                                                onChangeText={onChange}
-                                                value={value ?? title}
-                                                style={[styles.title, { color: theme.text }]}
-                                                scrollEnabled={false}
+                                                style={[styles.title, styles.titleContainer, { color: theme.text, backgroundColor: "rgba(221, 221, 221, 0.47)" }]}
                                                 returnKeyType='done'
+                                                maxLength={30}
+                                                multiline
                                             />
                                         )}
                                     />
-                                </Pressable>
+                                ) : (
+                                    <Pressable disabled={selected} style={styles.titleContainer} onPress={() => setFocusedInputKey(`${id}-${type}`)}>
+                                        <Text style={[styles.title, { color: theme.text }]} numberOfLines={2} ellipsizeMode='tail'>
+                                            {title}
+                                        </Text>
+                                    </Pressable>
+                                )}
                             </View>
                         )
                     })}
@@ -118,16 +130,16 @@ export const FolderList = () => {
 const styles = StyleSheet.create({
     titleContainer: {
         width: "100%",
-        marginTop: 8
+        alignItems: "center",
+        justifyContent: "center",
+        maxHeight: 40,
+        borderRadius: 4,
+        marginTop: 8,
+        padding: 4
     },
     title: {
-        width: "100%",
-        maxHeight: 40,
-        padding: 4,
-        borderRadius: 4,
         textAlign: "center",
         textAlignVertical: "center",
-        backgroundColor: "rgba(221, 221, 221, 0.2)",
         ...FontStyles.BodySmall
     },
     container: {

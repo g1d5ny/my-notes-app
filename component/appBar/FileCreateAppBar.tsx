@@ -1,5 +1,6 @@
 import { AndroidBack, Check, Close, IosBack } from "@/assets/icons/svg/icon"
 import { FontStyles, Styles } from "@/constant/Style"
+import { useBackHandler } from "@/hook/useBackHandler"
 import { useCreateMemo } from "@/hook/useCreateMemo"
 import { themeAtom } from "@/store"
 import { useGlobalSearchParams } from "expo-router"
@@ -44,6 +45,15 @@ export const FileCreateAppBar = ({ textLength, handleSubmit, close, back }: File
             }
         )()
     }
+
+    useBackHandler(() => {
+        if (textLength > 0) {
+            close()
+            return true
+        }
+        back()
+        return true
+    })
 
     return (
         <AppBarParent>

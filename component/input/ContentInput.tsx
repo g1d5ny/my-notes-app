@@ -10,7 +10,7 @@ export const ContentInput = forwardRef<TextInput, TextInputProps>((props, ref) =
     return (
         <TextInput
             ref={ref}
-            style={[FontStyles.SubTitle, styles.content, { color: theme.text }]}
+            style={[FontStyles.Content, styles.content, { color: theme.text }]}
             placeholder='내용을 입력해주세요.'
             placeholderTextColor={theme.gray}
             scrollEnabled={false}
@@ -26,6 +26,7 @@ ContentInput.displayName = "ContentInput"
 
 const styles = StyleSheet.create({
     content: {
+        flex: 1,
         textAlignVertical: "top"
     }
 })

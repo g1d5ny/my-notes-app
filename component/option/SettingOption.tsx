@@ -1,10 +1,11 @@
 import { ResetOption, SortOption, ThemeOption } from "@/assets/icons/svg/option/icon"
 import { FontStyles } from "@/constant/Style"
-import { DarkTheme, LightTheme } from "@/constant/Theme"
+import { DarkTheme, isSameTheme, LightTheme } from "@/constant/Theme"
 import { useDeleteMemo } from "@/hook/useDeleteMemo"
 import { useSort } from "@/hook/useSort"
 import { modalAtom, schemeAtom, sortAtom, themeAtom } from "@/store"
 import { SortType } from "@/type"
+import { useGlobalSearchParams } from "expo-router"
 import { useAtom, useAtomValue, useSetAtom } from "jotai"
 import { useState } from "react"
 import { Image, StyleSheet, Text } from "react-native"
@@ -15,6 +16,8 @@ export const SettingOption = () => {
     const setScheme = useSetAtom(schemeAtom)
     const setModalVisible = useSetAtom(modalAtom)
     const sort = useAtomValue(sortAtom)
+    const params = useGlobalSearchParams()
+    const parentId = params.parentId ? Number(params.parentId) : null
     const { resetMemo } = useDeleteMemo()
     const { sortCreatedAt, sortUpdatedAt, sortTitle } = useSort()
     const [menuVisible, setMenuVisible] = useState(false)
@@ -82,7 +85,7 @@ export const SettingOption = () => {
         },
         {
             title: "라이트 모드",
-            leadingIcon: theme === LightTheme ? <Image source={require("@/assets/icons/icon_selected.png")} style={styles.icon} /> : <></>,
+            leadingIcon: isSameTheme(theme, LightTheme) ? <Image source={require("@/assets/icons/icon_selected.png")} style={styles.icon} /> : <></>,
             disabled: false,
             onPress: () => {
                 setTheme(LightTheme)
@@ -94,7 +97,7 @@ export const SettingOption = () => {
         },
         {
             title: "다크 모드",
-            leadingIcon: theme === DarkTheme ? <Image source={require("@/assets/icons/icon_selected.png")} style={styles.icon} /> : <></>,
+            leadingIcon: isSameTheme(theme, DarkTheme) ? <Image source={require("@/assets/icons/icon_selected.png")} style={styles.icon} /> : <></>,
             disabled: false,
             onPress: () => {
                 setTheme(DarkTheme)
@@ -122,7 +125,7 @@ export const SettingOption = () => {
                 setModalVisible({
                     visible: true,
                     message: "정말 초기화하시겠습니까?",
-                    onConfirm: resetMemo,
+                    onConfirm: () => resetMemo({ parentId }),
                     confirmText: "초기화"
                 })
                 setMenuVisible(false)

@@ -56,7 +56,7 @@ export const AddFile = forwardRef<BottomSheetModalMethods>((_, ref) => {
                     rules={{ required: true }}
                     render={({ field: { onChange, onBlur, value } }) => <TitleInput value={value} onBlur={onBlur} onChangeText={onChange} onSubmitEditing={() => setFocus("content")} />}
                 />
-                <BottomSheetScrollView showsVerticalScrollIndicator>
+                <BottomSheetScrollView showsVerticalScrollIndicator contentContainerStyle={{ flex: 1 }}>
                     <Controller control={control} name='content' rules={{ required: true }} render={({ field: { onChange, onBlur, value, ref } }) => <ContentInput ref={ref} onBlur={onBlur} onChangeText={onChange} value={value} />} />
                 </BottomSheetScrollView>
             </View>

@@ -1,4 +1,4 @@
-import { FontStyles } from "@/constant/Style"
+import { Color, FontStyles } from "@/constant/Style"
 import { StyleSheet, Text, View } from "react-native"
 
 export const EmptyMemo = () => {
@@ -12,7 +12,7 @@ export const EmptyMemo = () => {
 
 const styles = StyleSheet.create({
     text: {
-        color: "#B7B6B6"
+        color: Color.gray
     },
     container: {
         flex: 1,

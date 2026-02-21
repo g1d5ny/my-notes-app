@@ -37,6 +37,13 @@ export const FontStyles = StyleSheet.create({
         letterSpacing: -0.25,
         fontWeight: "600"
     },
+    Content: {
+        fontSize: 18,
+        lineHeight: 24,
+        fontFamily: FontFamilies.regular,
+        letterSpacing: 0,
+        fontWeight: "400"
+    },
     SubTitle: {
         fontSize: 20,
         lineHeight: 28,
@@ -85,10 +92,7 @@ export const Color = {
     white: "#FFFFFF",
     black: "#000000",
     cancel: "#c9c9c9",
-    gray: {
-        1: "#6B6B6B",
-        2: "#EFEFEF"
-    },
+    gray: "#6B6B6B",
     yellow: {
         1: "#FFB02E",
         2: "#FCD53F"

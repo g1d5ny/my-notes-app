@@ -11,22 +11,13 @@ const sortStorage = createJSONStorage<SortType>(() => AsyncStorage)
 
 export const sortAtom = atomWithStorage<SortType>("sortType", SortType.CREATED_AT, sortStorage)
 
-// const themeStorage = createJSONStorage<ThemeColorPalette>(() => ({
-//     getItem: key => {
-//         return storage.getString(key) ?? null
-//     },
-//     setItem: (key, value) => {
-//         return storage.set(key, value)
-//     },
-//     removeItem: key => {
-//         return storage.remove(key)
-//     }
-// }))
+const themeStorage = createJSONStorage<ThemeColorPalette>(() => AsyncStorage)
 
-// export const themeAtom = atomWithStorage<ThemeColorPalette>("theme", Appearance.getColorScheme() === "dark" ? DarkTheme : LightTheme, themeStorage)
-export const themeAtom = atom<ThemeColorPalette>(Appearance.getColorScheme() === "dark" ? DarkTheme : LightTheme)
+export const themeAtom = atomWithStorage<ThemeColorPalette>("theme", Appearance.getColorScheme() === "dark" ? DarkTheme : LightTheme, themeStorage)
 
-export const schemeAtom = atom<ColorSchemeName>(Appearance.getColorScheme())
+const schemeStorage = createJSONStorage<ColorSchemeName>(() => AsyncStorage)
+
+export const schemeAtom = atomWithStorage<ColorSchemeName>("scheme", Appearance.getColorScheme() === "dark" ? "dark" : "light", schemeStorage)
 
 export const modalAtom = atom<Modal>({ visible: false, message: "", onConfirm: () => {}, confirmText: "" })
 // TODO: 추후 보정 필요

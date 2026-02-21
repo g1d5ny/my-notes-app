@@ -1,15 +1,13 @@
 import { DeleteOption, ExportOption, InfoOption } from "@/assets/icons/svg/option/icon"
 import { useDeleteMemo } from "@/hook/useDeleteMemo"
+import { useShareMemo } from "@/hook/useShareMemo"
 import { infoModalVisibleAtom, modalAtom, themeAtom } from "@/store"
 import { useGlobalSearchParams } from "expo-router"
 import { useAtomValue, useSetAtom } from "jotai"
 import { useState } from "react"
 import { OptionMenu, OptionMenuList } from "../OptionMenu"
 
-interface FileEditOptionProps {
-    exportFile: () => void
-}
-export const FileEditOption = ({ exportFile }: FileEditOptionProps) => {
+export const FileEditOption = () => {
     const theme = useAtomValue(themeAtom)
     const setModal = useSetAtom(modalAtom)
     const setInfoModalVisible = useSetAtom(infoModalVisibleAtom)
@@ -17,6 +15,7 @@ export const FileEditOption = ({ exportFile }: FileEditOptionProps) => {
     const params = useGlobalSearchParams()
     const currentId = params.id ? Number(params?.id) : 0
     const { deleteFile } = useDeleteMemo()
+    const { exportFile } = useShareMemo()
 
     const fileEditOptionList: OptionMenuList[] = [
         {

@@ -18,7 +18,7 @@ export const PasteAppBar = () => {
     const [selectedMemo, setSelectedMemo] = useAtom(selectedMemoAtom)
     const setAppBar = useSetAtom(appBarAtom)
     const params = useGlobalSearchParams()
-    const { createFileFn, createFolder, duplicateFolder } = useCreateMemo()
+    const { createFileFn, duplicateFolder } = useCreateMemo()
     const { deleteFileFn, deleteFolderFn } = useDeleteMemo()
 
     const paste = async () => {
@@ -42,16 +42,16 @@ export const PasteAppBar = () => {
         }
         if (selectedMemo) {
             if (selectedMemo?.memo.type === MemoType.FILE) {
-                createFileFn({ title: selectedMemo?.memo.title ?? "", content: selectedMemo?.memo.content ?? "", parentId: params.id ? Number(params.id) : null })
+                await createFileFn({ title: selectedMemo?.memo.title ?? "", content: selectedMemo?.memo.content ?? "", parentId: params.id ? Number(params.id) : null })
             } else {
-                duplicateFolder({ folderId: selectedMemo?.memo.id ?? 0, newParentId: params.id ? Number(params.id) : null })
+                await duplicateFolder({ folderId: selectedMemo?.memo.id ?? 0, newParentId: params.id ? Number(params.id) : null })
             }
 
             if (selectedMemo?.type === SelectedMemoType.CUT) {
                 if (selectedMemo?.memo.type === MemoType.FILE) {
-                    deleteFileFn({ id: selectedMemo?.memo.id ?? 0, parentId: selectedMemo?.memo.parentId ?? null })
+                    await deleteFileFn({ id: selectedMemo?.memo.id ?? 0, parentId: selectedMemo?.memo.parentId ?? null })
                 } else {
-                    deleteFolderFn({ id: selectedMemo?.memo.id ?? 0, parentId: selectedMemo?.memo.parentId ?? null })
+                    await deleteFolderFn({ id: selectedMemo?.memo.id ?? 0, parentId: selectedMemo?.memo.parentId ?? null })
                 }
             }
 

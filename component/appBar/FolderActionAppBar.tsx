@@ -84,7 +84,7 @@ export const FolderActionAppBar = () => {
             </Pressable>
             <View style={[Styles.row, styles.right]}>
                 {icons.map(({ icon, onPress }, index) => (
-                    <Pressable key={index} onPress={onPress}>
+                    <Pressable key={index} onPress={onPress} hitSlop={10}>
                         {icon}
                     </Pressable>
                 ))}

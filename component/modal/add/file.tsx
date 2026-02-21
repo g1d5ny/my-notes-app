@@ -54,7 +54,7 @@ export const AddFile = forwardRef<BottomSheetModalMethods>((_, ref) => {
                     control={control}
                     name='title'
                     rules={{ required: true }}
-                    render={({ field: { onChange, onBlur, value } }) => <TitleInput value={value} onBlur={onBlur} onChangeText={onChange} onSubmitEditing={() => setFocus("content")} />}
+                    render={({ field: { onChange, onBlur, value } }) => <TitleInput value={value} onBlur={onBlur} onChangeText={onChange} onSubmitEditing={() => setFocus("content")} autoFocus />}
                 />
                 <BottomSheetScrollView showsVerticalScrollIndicator contentContainerStyle={{ flex: 1 }}>
                     <Controller control={control} name='content' rules={{ required: true }} render={({ field: { onChange, onBlur, value, ref } }) => <ContentInput ref={ref} onBlur={onBlur} onChangeText={onChange} value={value} />} />

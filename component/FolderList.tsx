@@ -10,7 +10,8 @@ import { RelativePathString, router, useLocalSearchParams, usePathname } from "e
 import { useAtom, useAtomValue } from "jotai"
 import { useMemo, useState } from "react"
 import { Controller, FieldPath, useForm } from "react-hook-form"
-import { Dimensions, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native"
+import { Dimensions, Keyboard, Pressable, StyleSheet, Text, TextInput, View } from "react-native"
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller"
 
 type FormValues = {
     title: string
@@ -56,7 +57,7 @@ export const FolderList = () => {
 
     return (
         <View style={styles.container}>
-            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.contentContainerStyle}>
+            <KeyboardAwareScrollView keyboardShouldPersistTaps='handled' showsVerticalScrollIndicator={false} contentContainerStyle={styles.contentContainerStyle} onTouchEnd={() => Keyboard.dismiss()}>
                 <Pressable
                     style={styles.pressContainer}
                     onPress={() => {
@@ -71,7 +72,6 @@ export const FolderList = () => {
                         return (
                             <View key={index} style={[styles.item, { opacity: selected ? 0.5 : 1 }]}>
                                 <Pressable
-                                    // disabled={selected}
                                     onLongPress={() => selectMemo(memo)}
                                     onPress={() => {
                                         if (appBar === AppBar.FOLDER_ACTION) {
@@ -102,7 +102,10 @@ export const FolderList = () => {
                                                 ref={ref}
                                                 autoFocus
                                                 value={value ?? title}
-                                                onChangeText={onChange}
+                                                onChangeText={text => {
+                                                    const singleLineText = text.replace(/[\r\n]/g, "")
+                                                    onChange(singleLineText)
+                                                }}
                                                 onFocus={() => setFocusedInputKey(`${id}-${type}`)}
                                                 focusable={!selected}
                                                 pointerEvents={selected ? "none" : "auto"}
@@ -150,7 +153,7 @@ export const FolderList = () => {
                         return <View key={index} style={styles.item} />
                     })}
                 </Pressable>
-            </ScrollView>
+            </KeyboardAwareScrollView>
         </View>
     )
 }
@@ -184,7 +187,7 @@ const styles = StyleSheet.create({
         flexGrow: 1
     },
     contentContainerStyle: {
-        flex: 1
+        flexGrow: 1
     },
     item: {
         width: 76,

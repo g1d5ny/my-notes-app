@@ -5,7 +5,8 @@ import { FormValues, MemoType } from "@/type"
 import { useSQLiteContext } from "expo-sqlite"
 import { useEffect } from "react"
 import { Controller, useForm } from "react-hook-form"
-import { ScrollView, StyleSheet } from "react-native"
+import { StyleSheet } from "react-native"
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller"
 import Toast from "react-native-toast-message"
 
 interface FileDetailParams {
@@ -32,7 +33,7 @@ export const FileDetail = ({ id, title, content, parentId }: FileDetailParams) =
     }, [])
 
     return (
-        <ScrollView contentContainerStyle={styles.container}>
+        <KeyboardAwareScrollView keyboardShouldPersistTaps='handled' contentContainerStyle={styles.container}>
             <Controller
                 control={control}
                 name='title'
@@ -83,13 +84,13 @@ export const FileDetail = ({ id, title, content, parentId }: FileDetailParams) =
                     />
                 )}
             />
-        </ScrollView>
+        </KeyboardAwareScrollView>
     )
 }
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        flexGrow: 1,
         padding: 16,
         gap: 12
     }

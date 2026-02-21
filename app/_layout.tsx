@@ -15,6 +15,7 @@ import { Provider, useAtomValue } from "jotai"
 import { Suspense } from "react"
 import { StyleSheet } from "react-native"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
+import { KeyboardProvider, KeyboardToolbar } from "react-native-keyboard-controller"
 import { PaperProvider } from "react-native-paper"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { DATABASE_NAME, MemoType } from "../type"
@@ -29,16 +30,21 @@ function AppContent() {
         <Suspense fallback={<></>}>
             <SQLiteProvider databaseName={DATABASE_NAME} options={{ enableChangeListener: true }} useSuspense onInit={migrateDbIfNeeded}>
                 <PaperProvider>
-                    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
-                        <StatusBar />
-                        <AppBar />
-                        <RoutingHeader />
-                        <Slot />
-                        <AddMemoController />
-                        <MessageModal />
-                        <InfoModal />
-                        <CommonToast />
-                    </SafeAreaView>
+                    <KeyboardProvider>
+                        <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
+                            <StatusBar />
+                            <AppBar />
+                            <RoutingHeader />
+                            <Slot />
+                            <AddMemoController />
+                            <MessageModal />
+                            <InfoModal />
+                            <CommonToast />
+                        </SafeAreaView>
+                        <KeyboardToolbar>
+                            <KeyboardToolbar.Done text='완료' />
+                        </KeyboardToolbar>
+                    </KeyboardProvider>
                 </PaperProvider>
             </SQLiteProvider>
         </Suspense>

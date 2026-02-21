@@ -1,10 +1,10 @@
-import { ResetOption, SortOption, ThemeOption } from "@/assets/icons/svg/option/icon"
+import { CheckOption, ResetOption, SortOption, ThemeOption } from "@/assets/icons/svg/option/icon"
 import { FontStyles } from "@/constant/Style"
 import { DarkTheme, isSameTheme, LightTheme } from "@/constant/Theme"
 import { useDeleteMemo } from "@/hook/useDeleteMemo"
 import { useSort } from "@/hook/useSort"
-import { modalAtom, schemeAtom, sortAtom, themeAtom } from "@/store"
-import { SortType } from "@/type"
+import { appBarAtom, modalAtom, schemeAtom, sortAtom, themeAtom } from "@/store"
+import { AppBar, SortType } from "@/type"
 import { useGlobalSearchParams } from "expo-router"
 import { useAtom, useAtomValue, useSetAtom } from "jotai"
 import { useState } from "react"
@@ -16,6 +16,7 @@ export const SettingOption = () => {
     const setScheme = useSetAtom(schemeAtom)
     const setModalVisible = useSetAtom(modalAtom)
     const sort = useAtomValue(sortAtom)
+    const setMainAppBar = useSetAtom(appBarAtom)
     const params = useGlobalSearchParams()
     const parentId = params.parentId ? Number(params.parentId) : null
     const { resetMemo } = useDeleteMemo()
@@ -23,16 +24,17 @@ export const SettingOption = () => {
     const [menuVisible, setMenuVisible] = useState(false)
 
     const mainOptionList: OptionMenuList[] = [
-        // {
-        //     title: "선택",
-        //     trailingIcon: <CheckOption theme={theme} />,
-        //     disabled: false,
-        //     onPress: () => {
-        //         setMenuVisible(false)
-        //     },
-        //     dividerWidth: 2,
-        //     hasDivider: true
-        // },
+        {
+            title: "선택",
+            trailingIcon: <CheckOption theme={theme} />,
+            disabled: false,
+            onPress: () => {
+                setMenuVisible(false)
+                setMainAppBar(AppBar.FOLDER_ACTION)
+            },
+            dividerWidth: 2,
+            hasDivider: true
+        },
         {
             title: "정렬",
             trailingIcon: <SortOption theme={theme} />,

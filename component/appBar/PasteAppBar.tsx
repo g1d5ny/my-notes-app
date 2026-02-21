@@ -22,7 +22,8 @@ export const PasteAppBar = () => {
     const { deleteFileFn, deleteFolderFn } = useDeleteMemo()
 
     const paste = async () => {
-        if (Number(params.id) === selectedMemo?.memo.id && Number(params.parentId) === selectedMemo?.memo.parentId) {
+        const findSamePathMemo = selectedMemo.memo.find(memo => Number(params.id) === memo.id && Number(params.parentId) === memo.parentId)
+        if (findSamePathMemo) {
             Toast.show({
                 text1: "같은 위치에 붙여넣기 할 수 없습니다.",
                 type: "customToast",
@@ -41,21 +42,15 @@ export const PasteAppBar = () => {
             return
         }
         if (selectedMemo) {
-            if (selectedMemo?.memo.type === MemoType.FILE) {
-                await createFileFn({ title: selectedMemo?.memo.title ?? "", content: selectedMemo?.memo.content ?? "", parentId: params.id ? Number(params.id) : null })
-            } else {
-                await duplicateFolder({ folderId: selectedMemo?.memo.id ?? 0, newParentId: params.id ? Number(params.id) : null })
-            }
-
-            if (selectedMemo?.type === SelectedMemoType.CUT) {
-                if (selectedMemo?.memo.type === MemoType.FILE) {
-                    await deleteFileFn({ id: selectedMemo?.memo.id ?? 0, parentId: selectedMemo?.memo.parentId ?? null })
+            selectedMemo.memo.forEach(async selectedMemo => {
+                if (selectedMemo.type === MemoType.FILE) {
+                    await createFileFn({ title: selectedMemo.title ?? "", content: selectedMemo.content ?? "", parentId: params.id ? Number(params.id) : null })
                 } else {
-                    await deleteFolderFn({ id: selectedMemo?.memo.id ?? 0, parentId: selectedMemo?.memo.parentId ?? null })
+                    await duplicateFolder({ folderId: selectedMemo.id ?? 0, newParentId: params.id ? Number(params.id) : null })
                 }
-            }
+            })
 
-            setSelectedMemo(null)
+            setSelectedMemo({ memo: [], type: SelectedMemoType.COPY })
             setAppBar(AppBar.MAIN)
 
             Toast.show({
@@ -68,7 +63,7 @@ export const PasteAppBar = () => {
     }
 
     const cancel = () => {
-        setSelectedMemo(null)
+        setSelectedMemo({ memo: [], type: SelectedMemoType.COPY })
         setAppBar(AppBar.MAIN)
     }
 

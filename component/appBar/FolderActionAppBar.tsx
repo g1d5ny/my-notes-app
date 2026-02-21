@@ -24,12 +24,14 @@ export const FolderActionAppBar = () => {
         {
             icon: <Duplicate theme={theme} />,
             onPress: () => {
-                if (selectedMemo?.memo.type === MemoType.FILE) {
-                    createFile({ title: selectedMemo?.memo.title ?? "", content: selectedMemo?.memo.content ?? "", parentId: selectedMemo?.memo.parentId ?? null })
-                } else {
-                    duplicateFolder({ folderId: selectedMemo?.memo.id ?? 0, newParentId: selectedMemo?.memo.parentId ?? null })
-                }
-                setSelectedMemo(null)
+                selectedMemo.memo.forEach(selectedMemo => {
+                    if (selectedMemo.type === MemoType.FILE) {
+                        createFile({ title: selectedMemo.title ?? "", content: selectedMemo.content ?? "", parentId: selectedMemo.parentId ?? null })
+                    } else {
+                        duplicateFolder({ folderId: selectedMemo.id ?? 0, newParentId: selectedMemo.parentId ?? null })
+                    }
+                })
+                setSelectedMemo({ memo: [], type: SelectedMemoType.COPY })
                 setAppBar(AppBar.MAIN)
                 Toast.show({
                     text1: "복제 되었습니다.",
@@ -42,12 +44,7 @@ export const FolderActionAppBar = () => {
         {
             icon: <Cut theme={theme} />,
             onPress: () => {
-                setSelectedMemo(prev => {
-                    if (prev) {
-                        return { ...prev, type: SelectedMemoType.CUT }
-                    }
-                    return null
-                })
+                setSelectedMemo(prev => ({ ...prev, type: SelectedMemoType.CUT }))
                 setAppBar(AppBar.PASTE)
             }
         },
@@ -59,13 +56,15 @@ export const FolderActionAppBar = () => {
                     visible: true,
                     message: "정말 삭제하시겠습니까?",
                     onConfirm: () => {
-                        if (selectedMemo?.memo.type === MemoType.FILE) {
-                            deleteFile({ id: selectedMemo?.memo.id ?? 0, parentId: selectedMemo?.memo.parentId ?? null })
-                        } else {
-                            deleteFolder({ id: selectedMemo?.memo.id ?? 0, parentId: selectedMemo?.memo.parentId ?? null })
-                        }
+                        selectedMemo.memo.forEach(selectedMemo => {
+                            if (selectedMemo.type === MemoType.FILE) {
+                                deleteFile({ id: selectedMemo.id ?? 0, parentId: selectedMemo.parentId ?? null })
+                            } else {
+                                deleteFolder({ id: selectedMemo.id ?? 0, parentId: selectedMemo.parentId ?? null })
+                            }
+                        })
                         setAppBar(AppBar.MAIN)
-                        setSelectedMemo(null)
+                        setSelectedMemo({ memo: [], type: SelectedMemoType.COPY })
                     },
                     confirmText: "삭제"
                 }))
@@ -77,7 +76,7 @@ export const FolderActionAppBar = () => {
             <Pressable
                 onPress={() => {
                     setAppBar(AppBar.MAIN)
-                    setSelectedMemo(null)
+                    setSelectedMemo({ memo: [], type: SelectedMemoType.COPY })
                 }}
             >
                 <Close theme={theme} />

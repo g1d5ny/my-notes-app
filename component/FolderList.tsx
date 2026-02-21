@@ -7,7 +7,7 @@ import { appBarAtom, selectedMemoAtom, sortAtom, themeAtom } from "@/store"
 import { AppBar, Memo, MemoType, SelectedMemoType } from "@/type"
 import { useQueryClient } from "@tanstack/react-query"
 import { RelativePathString, router, useLocalSearchParams, usePathname } from "expo-router"
-import { useAtom, useAtomValue, useSetAtom } from "jotai"
+import { useAtom, useAtomValue } from "jotai"
 import { useMemo, useState } from "react"
 import { Controller, FieldPath, useForm } from "react-hook-form"
 import { Dimensions, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native"
@@ -33,7 +33,7 @@ export const FolderList = () => {
     const queryClient = useQueryClient()
     const params = useLocalSearchParams()
     const currentPath = usePathname()
-    const setAppBar = useSetAtom(appBarAtom)
+    const [appBar, setAppBar] = useAtom(appBarAtom)
     const [selectedMemo, setSelectedMemo] = useAtom(selectedMemoAtom)
     const { updateFolderTitle, updateFileTitle } = useUpdateMemo()
     const currentId = params.id ? Number(params?.id) : 0
@@ -50,7 +50,7 @@ export const FolderList = () => {
     }
 
     const selectMemo = (memo: Memo) => {
-        setSelectedMemo({ memo, type: SelectedMemoType.COPY })
+        setSelectedMemo(prev => ({ ...prev, memo: [...prev.memo, memo] }))
         setAppBar(AppBar.FOLDER_ACTION)
     }
 
@@ -60,17 +60,36 @@ export const FolderList = () => {
                 <Pressable
                     style={styles.pressContainer}
                     onPress={() => {
-                        setSelectedMemo(null)
+                        setSelectedMemo({ memo: [], type: SelectedMemoType.COPY })
                         setAppBar(AppBar.MAIN)
                     }}
                 >
                     {memos.map((memo, index) => {
                         const { id, title, type, content, parentId } = memo
-                        const selected = selectedMemo?.memo.id === id && selectedMemo.memo?.type === type
+                        const selected = selectedMemo.memo.some(selectedMemo => selectedMemo.id === id && selectedMemo.type === type)
 
                         return (
                             <View key={index} style={[styles.item, { opacity: selected ? 0.5 : 1 }]}>
-                                <Pressable disabled={selected} onLongPress={() => selectMemo(memo)} onPress={() => open(id, type, title, content, parentId)}>
+                                <Pressable
+                                    // disabled={selected}
+                                    onLongPress={() => selectMemo(memo)}
+                                    onPress={() => {
+                                        if (appBar === AppBar.FOLDER_ACTION) {
+                                            if (selected) {
+                                                setSelectedMemo(prev => {
+                                                    const newMemo = prev.memo.filter(selectedMemo => {
+                                                        return !(selectedMemo.id === id && selectedMemo.type === type)
+                                                    })
+                                                    return { ...prev, memo: newMemo }
+                                                })
+                                                return
+                                            }
+                                            setSelectedMemo(prev => ({ ...prev, memo: [...prev.memo, memo] }))
+                                            return
+                                        }
+                                        open(id, type, title, content, parentId)
+                                    }}
+                                >
                                     {type === MemoType.FILE ? <File /> : filledFolder[id] ? <FilledFolder /> : <EmptyFolder />}
                                 </Pressable>
                                 {focusedInputKey === `${id}-${type}` ? (
@@ -109,7 +128,16 @@ export const FolderList = () => {
                                         )}
                                     />
                                 ) : (
-                                    <Pressable disabled={selected} style={styles.titleContainer} onPress={() => setFocusedInputKey(`${id}-${type}`)}>
+                                    <Pressable
+                                        style={styles.titleContainer}
+                                        onPress={() => {
+                                            if (appBar === AppBar.FOLDER_ACTION) {
+                                                setSelectedMemo(prev => ({ ...prev, memo: [...prev.memo, memo] }))
+                                                return
+                                            }
+                                            setFocusedInputKey(`${id}-${type}`)
+                                        }}
+                                    >
                                         <Text style={[styles.title, { color: theme.text }]} numberOfLines={2} ellipsizeMode='tail'>
                                             {title}
                                         </Text>

@@ -58,6 +58,6 @@ export enum SelectedMemoType {
 }
 
 export interface SelectedMemo {
-    memo: Memo
+    memo: Memo[]
     type: SelectedMemoType
 }

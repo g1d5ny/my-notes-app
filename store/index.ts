@@ -1,5 +1,5 @@
 import { DarkTheme, LightTheme } from "@/constant/Theme"
-import { AppBar, Modal, SelectedMemo, SortType, ThemeColorPalette } from "@/type"
+import { AppBar, Modal, SelectedMemo, SelectedMemoType, SortType, ThemeColorPalette } from "@/type"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { atom, createStore } from "jotai"
 import { atomWithStorage, createJSONStorage } from "jotai/utils"
@@ -25,4 +25,4 @@ export const infoModalVisibleAtom = atom<boolean>(false)
 
 export const appBarAtom = atom<AppBar>(AppBar.MAIN)
 
-export const selectedMemoAtom = atom<SelectedMemo | null>(null)
+export const selectedMemoAtom = atom<SelectedMemo>({ memo: [], type: SelectedMemoType.COPY })

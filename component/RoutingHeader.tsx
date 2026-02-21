@@ -17,7 +17,7 @@ export default function RoutingHeader() {
 
     return (
         <View style={[styles.container, { backgroundColor: theme.background }]}>
-            <Text style={[FontStyles.Body, { color: "rgb(146, 135, 135)" }]} numberOfLines={3} ellipsizeMode='middle'>
+            <Text style={[FontStyles.Body, { color: theme.routing }]} numberOfLines={3} ellipsizeMode='middle'>
                 현재 경로: {rootName}
             </Text>
         </View>

@@ -8,6 +8,7 @@ export interface ThemeColorPalette {
     text: string
     gray: string
     icon: string
+    routing: string
 }
 
 export enum MemoType {

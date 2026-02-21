@@ -6,7 +6,8 @@ export const LightTheme: ThemeColorPalette = {
     border: Color.border.light,
     text: Color.text.light,
     gray: Color.gray,
-    icon: Color.black
+    icon: Color.black,
+    routing: Color.routing.light
 }
 
 export const DarkTheme: ThemeColorPalette = {
@@ -14,7 +15,8 @@ export const DarkTheme: ThemeColorPalette = {
     border: Color.border.dark,
     text: Color.text.dark,
     gray: Color.gray,
-    icon: Color.white
+    icon: Color.white,
+    routing: Color.routing.dark
 }
 
 const themeKeys: (keyof ThemeColorPalette)[] = ["background", "border", "text", "gray", "icon"]

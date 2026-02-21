@@ -62,3 +62,8 @@ export interface SelectedMemo {
     memo: Memo[]
     type: SelectedMemoType
 }
+
+export interface SearchInput {
+    value: string
+    visible: boolean
+}

@@ -1,30 +1,17 @@
-import { AndroidBack, Close, IosBack, Search } from "@/assets/icons/svg/icon"
-import { themeAtom } from "@/store"
+import { AndroidBack, IosBack, Search } from "@/assets/icons/svg/icon"
+import { searchInputAtom, themeAtom } from "@/store"
 import { usePathname, useRouter } from "expo-router"
-import { useAtomValue } from "jotai"
-import { Platform, Pressable, StyleSheet, Text, TextInput, useWindowDimensions, View } from "react-native"
-import Animated, { useAnimatedStyle, useDerivedValue, useSharedValue, withTiming } from "react-native-reanimated"
+import { useAtomValue, useSetAtom } from "jotai"
+import { Platform, Pressable, StyleSheet, Text, View } from "react-native"
 import { FontStyles, Styles } from "../../constant/Style"
 import { SettingOption } from "../option/SettingOption"
 
 export const MainAppBar = () => {
     const theme = useAtomValue(themeAtom)
+    const setSearchInput = useSetAtom(searchInputAtom)
     const router = useRouter()
     const pathname = usePathname()
     const lastPathname = pathname.split("/").pop()
-    const { width } = useWindowDimensions()
-    const translateX = useSharedValue(-width) // 초기값을 화면 너비만큼 밖으로 설정
-
-    const isInputVisible = useDerivedValue(() => {
-        return translateX.value > -width
-    })
-
-    const animatedStyle = useAnimatedStyle(() => {
-        return {
-            display: isInputVisible.value ? "flex" : "none",
-            transform: [{ translateX: translateX.value }]
-        }
-    }, [])
 
     return (
         <>
@@ -41,21 +28,11 @@ export const MainAppBar = () => {
                 )}
             </View>
             <View style={[Styles.row, styles.right]}>
-                {/* <Pressable onPress={() => (translateX.value = withTiming(0, { duration: 300 }))}>
+                <Pressable onPress={() => setSearchInput(prev => ({ value: "", visible: !prev.visible }))}>
                     <Search theme={theme} />
-                </Pressable> */}
+                </Pressable>
                 <SettingOption />
             </View>
-            {/* TODO: 나중에 페이지로 코드 분리 필요 */}
-            <Animated.View style={[Styles.row, styles.container, animatedStyle]}>
-                <Pressable onPress={() => (translateX.value = withTiming(-width, { duration: 300 }))}>
-                    <Close theme={theme} />
-                </Pressable>
-                <View style={[styles.inputContainer, { borderColor: theme.border }]}>
-                    <Search theme={theme} />
-                    <TextInput style={[styles.input, FontStyles.BodySmall, { color: theme.text }]} placeholder='검색하기' placeholderTextColor={theme.gray} />
-                </View>
-            </Animated.View>
         </>
     )
 }
@@ -65,20 +42,6 @@ const styles = StyleSheet.create({
         ...FontStyles.SubTitle,
         flex: 1,
         marginHorizontal: 8
-    },
-    inputContainer: {
-        flex: 1,
-        height: 40,
-        borderRadius: 8,
-        borderWidth: 2,
-        flexDirection: "row",
-        alignItems: "center",
-        gap: 8,
-        paddingHorizontal: 12,
-        paddingVertical: 8
-    },
-    input: {
-        textAlign: "center"
     },
     back: {
         alignSelf: "flex-start"
@@ -90,11 +53,5 @@ const styles = StyleSheet.create({
     },
     left: {
         flex: 1
-    },
-    container: {
-        paddingHorizontal: 16,
-        paddingBottom: 12,
-        gap: 8,
-        marginTop: 16
     }
 })

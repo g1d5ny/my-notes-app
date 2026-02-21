@@ -1,5 +1,6 @@
 import { AppBar } from "@/component/appBar"
 import { CommonToast } from "@/component/CommonToast"
+import { SearchInput } from "@/component/input/SearchInput"
 import { AddMemoController } from "@/component/modal/add"
 import { InfoModal } from "@/component/modal/InfoModal"
 import { MessageModal } from "@/component/modal/MessageModal"
@@ -34,6 +35,7 @@ function AppContent() {
                         <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
                             <StatusBar />
                             <AppBar />
+                            <SearchInput />
                             <RoutingHeader />
                             <Slot />
                             <AddMemoController />

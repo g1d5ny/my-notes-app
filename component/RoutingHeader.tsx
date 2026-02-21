@@ -3,7 +3,7 @@ import { themeAtom } from "@/store"
 import { MemoType } from "@/type"
 import { useGlobalSearchParams, usePathname } from "expo-router"
 import { useAtomValue } from "jotai"
-import { StyleSheet, Text, View } from "react-native"
+import { Keyboard, StyleSheet, Text, View } from "react-native"
 
 export default function RoutingHeader() {
     const pathname = usePathname()
@@ -16,7 +16,7 @@ export default function RoutingHeader() {
     }
 
     return (
-        <View style={[styles.container, { backgroundColor: theme.background }]}>
+        <View style={[styles.container, { backgroundColor: theme.background }]} onTouchEnd={() => Keyboard.dismiss()}>
             <Text style={[FontStyles.Body, { color: theme.routing }]} numberOfLines={3} ellipsizeMode='middle'>
                 현재 경로: {rootName}
             </Text>

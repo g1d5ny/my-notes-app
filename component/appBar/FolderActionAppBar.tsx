@@ -15,6 +15,7 @@ export const FolderActionAppBar = () => {
     const setModal = useSetAtom(modalAtom)
     const { deleteFile, deleteFolder } = useDeleteMemo()
     const { createFile, duplicateFolder } = useCreateMemo()
+    const disabled = selectedMemo.memo.length === 0
 
     const icons = [
         {
@@ -83,7 +84,7 @@ export const FolderActionAppBar = () => {
             </Pressable>
             <View style={[Styles.row, styles.right]}>
                 {icons.map(({ icon, onPress }, index) => (
-                    <Pressable key={index} onPress={onPress} hitSlop={10}>
+                    <Pressable key={index} onPress={onPress} hitSlop={10} disabled={disabled}>
                         {icon}
                     </Pressable>
                 ))}

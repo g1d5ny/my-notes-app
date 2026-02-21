@@ -1,4 +1,3 @@
-// component/MemoList.tsx
 import { EmptyFolder, File, FilledFolder } from "@/assets/icons/svg/icon"
 import { FontStyles } from "@/constant/Style"
 import { useCheckFilledMemo } from "@/hook/useCheckFilledMemo"
@@ -48,7 +47,12 @@ export const FolderList = () => {
 
     const open = (id: number, type: MemoType, title: string, content: string | undefined, parentId: number | null) => {
         const path = (currentPath + `/${title}`) as RelativePathString
-        router.push({ pathname: path, params: { type, id, title, content, parentId } })
+        const pathStack = params.pathStack ? JSON.parse(String(params.pathStack)) : []
+        const nextPathStack = [...pathStack, { id, title, parentId }]
+        router.push({
+            pathname: path,
+            params: { type, id, title, content, parentId, pathStack: JSON.stringify(nextPathStack) }
+        })
     }
 
     const selectMemo = (memo: Memo) => {
@@ -64,7 +68,15 @@ export const FolderList = () => {
 
     return (
         <View style={styles.container}>
-            <KeyboardAwareScrollView keyboardShouldPersistTaps='handled' showsVerticalScrollIndicator={false} contentContainerStyle={styles.contentContainerStyle} onTouchEnd={() => Keyboard.dismiss()}>
+            <KeyboardAwareScrollView
+                keyboardShouldPersistTaps='handled'
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={styles.contentContainerStyle}
+                onTouchEnd={() => {
+                    Keyboard.dismiss()
+                    setSearchInput({ value: "", visible: false })
+                }}
+            >
                 <Pressable
                     style={styles.pressContainer}
                     onPress={() => {

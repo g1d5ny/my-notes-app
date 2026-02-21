@@ -3,13 +3,13 @@ import { FolderDetail } from "@/component/FolderDetail"
 import { useBackHandler } from "@/hook/useBackHandler"
 import { appBarAtom, modalAtom } from "@/store"
 import { AppBar, MemoType } from "@/type"
-import { useGlobalSearchParams } from "expo-router"
+import { useLocalSearchParams } from "expo-router"
 import { useSetAtom } from "jotai"
 import { useEffect } from "react"
 import { BackHandler } from "react-native"
 
 export default function FolderScreen() {
-    const params = useGlobalSearchParams()
+    const params = useLocalSearchParams()
     const currentType = params.type as MemoType
     const setAppBar = useSetAtom(appBarAtom)
     const setModal = useSetAtom(modalAtom)

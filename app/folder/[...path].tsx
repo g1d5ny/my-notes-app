@@ -3,13 +3,14 @@ import { FolderDetail } from "@/component/FolderDetail"
 import { useBackHandler } from "@/hook/useBackHandler"
 import { appBarAtom, modalAtom } from "@/store"
 import { AppBar, MemoType } from "@/type"
-import { useLocalSearchParams } from "expo-router"
+import { useGlobalSearchParams, useLocalSearchParams } from "expo-router"
 import { useSetAtom } from "jotai"
 import { useEffect } from "react"
 import { BackHandler } from "react-native"
 
 export default function FolderScreen() {
     const params = useLocalSearchParams()
+    const globalParams = useGlobalSearchParams()
     const currentType = params.type as MemoType
     const setAppBar = useSetAtom(appBarAtom)
     const setModal = useSetAtom(modalAtom)
@@ -19,7 +20,7 @@ export default function FolderScreen() {
     }, [currentType])
 
     useBackHandler(() => {
-        if (Object.keys(params).length === 0) {
+        if (Object.keys(globalParams).length === 0) {
             setModal({
                 visible: true,
                 message: "폴더노트를 종료하시겠습니까?",

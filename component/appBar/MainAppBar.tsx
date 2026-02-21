@@ -18,7 +18,7 @@ export const MainAppBar = () => {
             <View style={[Styles.row, styles.left]}>
                 {pathname.split("/").length > 2 && (
                     <>
-                        <Pressable style={styles.back} onPress={() => router.back()}>
+                        <Pressable hitSlop={10} style={styles.back} onPress={() => router.back()}>
                             {Platform.OS === "ios" ? <IosBack theme={theme} /> : <AndroidBack theme={theme} />}
                         </Pressable>
                         <Text style={[styles.lastPathname, { color: theme.text }]} numberOfLines={1} ellipsizeMode='tail'>
@@ -28,7 +28,7 @@ export const MainAppBar = () => {
                 )}
             </View>
             <View style={[Styles.row, styles.right]}>
-                <Pressable onPress={() => setSearchInput(prev => ({ value: "", visible: !prev.visible }))}>
+                <Pressable hitSlop={10} onPress={() => setSearchInput(prev => ({ value: "", visible: !prev.visible }))}>
                     <Search theme={theme} />
                 </Pressable>
                 <SettingOption />

@@ -26,16 +26,7 @@ export default function RoutingHeader() {
             return
         }
 
-        router.push({
-            pathname,
-            params: {
-                type: MemoType.FOLDER,
-                id: item.id,
-                title: item.title,
-                parentId: item.parentId ?? 0,
-                pathStack: JSON.stringify(stack)
-            }
-        })
+        router.push({ pathname, params: { type: MemoType.FOLDER, id: item.id, title: item.title, parentId: item.parentId ?? 0, pathStack: JSON.stringify(stack) } })
     }
 
     return (
@@ -52,7 +43,7 @@ export default function RoutingHeader() {
             {pathStack.map((item, index) => (
                 <TouchableOpacity key={index} onPress={() => goToPath(index)} style={Styles.row}>
                     <Text style={[FontStyles.Body, { color: theme.routing }]}>/</Text>
-                    <Text style={[FontStyles.Body, styles.pathItem, { color: theme.routing }]}>{item.title}</Text>
+                    <Text style={[FontStyles.Body, styles.pathItem, { borderColor: theme.routing, color: theme.routing }]}>{item.title}</Text>
                 </TouchableOpacity>
             ))}
         </View>
@@ -62,7 +53,8 @@ export default function RoutingHeader() {
 const styles = StyleSheet.create({
     container: {
         padding: 16,
-        flexDirection: "row"
+        flexDirection: "row",
+        flexWrap: "wrap"
     },
     pathItem: {
         borderBottomWidth: 1

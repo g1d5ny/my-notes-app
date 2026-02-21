@@ -75,6 +75,7 @@ export const FolderActionAppBar = () => {
     return (
         <View style={styles.row}>
             <Pressable
+                hitSlop={10}
                 onPress={() => {
                     setAppBar(AppBar.MAIN)
                     setSelectedMemo({ memo: [], type: SelectedMemoType.COPY })

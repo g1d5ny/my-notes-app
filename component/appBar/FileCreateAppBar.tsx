@@ -60,15 +60,17 @@ export const FileCreateAppBar = ({ textLength, handleSubmit, close, back }: File
             <View style={[Styles.row, styles.container]}>
                 <View style={[Styles.row, styles.back]}>
                     {textLength > 0 ? (
-                        <Pressable onPress={close}>
+                        <Pressable hitSlop={10} onPress={close}>
                             <Close theme={theme} />
                         </Pressable>
                     ) : (
-                        <Pressable onPress={back}>{Platform.OS === "ios" ? <IosBack theme={theme} /> : <AndroidBack theme={theme} />}</Pressable>
+                        <Pressable hitSlop={10} onPress={back}>
+                            {Platform.OS === "ios" ? <IosBack theme={theme} /> : <AndroidBack theme={theme} />}
+                        </Pressable>
                     )}
                     <Text style={[FontStyles.SubTitle, { color: theme.text }]}>{textLength}</Text>
                 </View>
-                <Pressable onPress={submitFile}>
+                <Pressable hitSlop={10} onPress={submitFile}>
                     <Check />
                 </Pressable>
             </View>

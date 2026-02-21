@@ -2,9 +2,11 @@ import { CheckOption, ResetOption, SortOption, ThemeOption } from "@/assets/icon
 import { FontStyles } from "@/constant/Style"
 import { DarkTheme, isSameTheme, LightTheme } from "@/constant/Theme"
 import { useDeleteMemo } from "@/hook/useDeleteMemo"
+import { useReadMemo } from "@/hook/useReadMemo"
 import { useSort } from "@/hook/useSort"
 import { appBarAtom, modalAtom, schemeAtom, sortAtom, themeAtom } from "@/store"
-import { AppBar, SortType } from "@/type"
+import { AppBar, Memo, SortType } from "@/type"
+import { UseQueryResult } from "@tanstack/react-query"
 import { useGlobalSearchParams } from "expo-router"
 import { useAtom, useAtomValue, useSetAtom } from "jotai"
 import { useState } from "react"
@@ -19,6 +21,7 @@ export const SettingOption = () => {
     const setMainAppBar = useSetAtom(appBarAtom)
     const params = useGlobalSearchParams()
     const parentId = params.parentId ? Number(params.parentId) : null
+    const { data: memos = [] } = useReadMemo() as UseQueryResult<Memo[], Error>
     const { resetMemo } = useDeleteMemo()
     const { sortCreatedAt, sortUpdatedAt, sortTitle } = useSort()
     const [menuVisible, setMenuVisible] = useState(false)
@@ -27,7 +30,7 @@ export const SettingOption = () => {
         {
             title: "선택",
             trailingIcon: <CheckOption theme={theme} />,
-            disabled: false,
+            disabled: memos.length === 0,
             onPress: () => {
                 setMenuVisible(false)
                 setMainAppBar(AppBar.FOLDER_ACTION)

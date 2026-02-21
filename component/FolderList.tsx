@@ -113,60 +113,61 @@ export const FolderList = () => {
                                     >
                                         {type === MemoType.FILE ? <File /> : filledFolder[id] ? <FilledFolder /> : <EmptyFolder />}
                                     </Pressable>
-                                    {focusedInputKey === `${id}-${type}` ? (
-                                        <Controller
-                                            name={`${id}-${type}` as FieldPath<FormValues>}
-                                            control={control}
-                                            rules={{ required: true }}
-                                            render={({ field: { onChange, onBlur, value, ref } }) => (
-                                                <TextInput
-                                                    ref={ref}
-                                                    autoFocus
-                                                    value={value ?? title}
-                                                    onChangeText={text => {
-                                                        const singleLineText = text.replace(/[\r\n]/g, "")
-                                                        onChange(singleLineText)
-                                                    }}
-                                                    onFocus={() => setFocusedInputKey(`${id}-${type}`)}
-                                                    focusable={!selected}
-                                                    pointerEvents={selected ? "none" : "auto"}
-                                                    onBlur={async () => {
-                                                        onBlur()
-                                                        setFocusedInputKey(null)
-                                                        const currentValue = value
-                                                        if (currentValue && currentValue !== title) {
-                                                            if (type === MemoType.FILE) {
-                                                                updateFileTitle({ title: currentValue, memoId: id, parentId: parentId ?? 0 })
+                                    <View style={[styles.titleContainer, focusedInputKey === `${id}-${type}` && { backgroundColor: "rgba(221, 221, 221, 0.47)" }]}>
+                                        {focusedInputKey === `${id}-${type}` ? (
+                                            <Controller
+                                                name={`${id}-${type}` as FieldPath<FormValues>}
+                                                control={control}
+                                                rules={{ required: true }}
+                                                render={({ field: { onChange, onBlur, value, ref } }) => (
+                                                    <TextInput
+                                                        ref={ref}
+                                                        autoFocus
+                                                        value={value ?? title}
+                                                        onChangeText={text => {
+                                                            const singleLineText = text.replace(/[\r\n]/g, "")
+                                                            onChange(singleLineText)
+                                                        }}
+                                                        onFocus={() => setFocusedInputKey(`${id}-${type}`)}
+                                                        focusable={!selected}
+                                                        pointerEvents={selected ? "none" : "auto"}
+                                                        onBlur={async () => {
+                                                            onBlur()
+                                                            setFocusedInputKey(null)
+                                                            const currentValue = value
+                                                            if (currentValue && currentValue !== title) {
+                                                                if (type === MemoType.FILE) {
+                                                                    updateFileTitle({ title: currentValue, memoId: id, parentId: parentId ?? 0 })
+                                                                } else {
+                                                                    updateFolderTitle({ title: currentValue, memoId: id, parentId: parentId ?? 0 })
+                                                                }
                                                             } else {
-                                                                updateFolderTitle({ title: currentValue, memoId: id, parentId: parentId ?? 0 })
+                                                                onChange(title)
                                                             }
-                                                        } else {
-                                                            onChange(title)
-                                                        }
-                                                    }}
-                                                    style={[styles.title, styles.titleContainer, { color: theme.text, backgroundColor: "rgba(221, 221, 221, 0.47)" }]}
-                                                    returnKeyType='done'
-                                                    maxLength={30}
-                                                    multiline
-                                                />
-                                            )}
-                                        />
-                                    ) : (
-                                        <Pressable
-                                            style={styles.titleContainer}
-                                            onPress={() => {
-                                                if (appBar === AppBar.FOLDER_ACTION) {
-                                                    setSelectedMemo(prev => ({ ...prev, memo: [...prev.memo, memo] }))
-                                                    return
-                                                }
-                                                setFocusedInputKey(`${id}-${type}`)
-                                            }}
-                                        >
-                                            <Text style={[styles.title, { color: theme.text }]} numberOfLines={2} ellipsizeMode='tail'>
-                                                {title}
-                                            </Text>
-                                        </Pressable>
-                                    )}
+                                                        }}
+                                                        style={[styles.title, { color: theme.text }]}
+                                                        returnKeyType='done'
+                                                        maxLength={30}
+                                                        multiline
+                                                    />
+                                                )}
+                                            />
+                                        ) : (
+                                            <Pressable
+                                                onPress={() => {
+                                                    if (appBar === AppBar.FOLDER_ACTION) {
+                                                        setSelectedMemo(prev => ({ ...prev, memo: [...prev.memo, memo] }))
+                                                        return
+                                                    }
+                                                    setFocusedInputKey(`${id}-${type}`)
+                                                }}
+                                            >
+                                                <Text style={[styles.title, { color: theme.text }]} numberOfLines={2} ellipsizeMode='tail'>
+                                                    {title}
+                                                </Text>
+                                            </Pressable>
+                                        )}
+                                    </View>
                                 </View>
                             )
                         })}

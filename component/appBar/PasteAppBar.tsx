@@ -42,11 +42,19 @@ export const PasteAppBar = () => {
             return
         }
         if (selectedMemo) {
-            selectedMemo.memo.forEach(async selectedMemo => {
-                if (selectedMemo.type === MemoType.FILE) {
-                    await createFileFn({ title: selectedMemo.title ?? "", content: selectedMemo.content ?? "", parentId: params.id ? Number(params.id) : null })
+            selectedMemo.memo.forEach(async memo => {
+                if (memo.type === MemoType.FILE) {
+                    await createFileFn({ title: memo.title ?? "", content: memo.content ?? "", parentId: params.id ? Number(params.id) : null })
                 } else {
-                    await duplicateFolder({ folderId: selectedMemo.id ?? 0, newParentId: params.id ? Number(params.id) : null })
+                    await duplicateFolder({ folderId: memo.id ?? 0, newParentId: params.id ? Number(params.id) : null })
+                }
+
+                if (selectedMemo.type === SelectedMemoType.CUT) {
+                    if (memo.type === MemoType.FILE) {
+                        deleteFileFn({ id: memo.id ?? 0, parentId: memo.parentId ?? null })
+                    } else {
+                        deleteFolderFn({ id: memo.id ?? 0, parentId: memo.parentId ?? null })
+                    }
                 }
             })
 
@@ -75,16 +83,16 @@ export const PasteAppBar = () => {
         <View style={styles.row}>
             <View style={styles.left}>
                 {canBack && (
-                    <Pressable style={styles.back} onPress={() => router.back()}>
+                    <Pressable hitSlop={10} style={styles.back} onPress={() => router.back()}>
                         {Platform.OS === "ios" ? <IosBack theme={theme} /> : <AndroidBack theme={theme} />}
                     </Pressable>
                 )}
             </View>
             <View style={[Styles.row, styles.right]}>
-                <Pressable onPress={cancel}>
+                <Pressable hitSlop={10} onPress={cancel}>
                     <Close theme={theme} />
                 </Pressable>
-                <Pressable onPress={paste}>
+                <Pressable hitSlop={10} onPress={paste}>
                     <Paste theme={theme} />
                 </Pressable>
             </View>

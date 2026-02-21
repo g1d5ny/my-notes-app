@@ -1,4 +1,4 @@
-import { FontStyles, Styles } from "@/constant/Style"
+import { Color, FontStyles, Styles } from "@/constant/Style"
 import { infoModalVisibleAtom, sortAtom, themeAtom } from "@/store"
 import { Memo, MemoType } from "@/type"
 import { useQueryClient } from "@tanstack/react-query"
@@ -27,7 +27,7 @@ export const InfoModal = () => {
 
     return (
         <Modal visible={infoModalVisible} onDismiss={() => setInfoModalVisible(false)} contentContainerStyle={styles.modalContainer} style={styles.center}>
-            <View style={[styles.modal, { backgroundColor: theme.background }]}>
+            <View style={[styles.modal, { backgroundColor: Color.white }]}>
                 <View style={[Styles.row, styles.dateContainer]}>
                     <Text style={[FontStyles.BodySmall, { color: theme.gray }]}>최근 생성 시간</Text>
                     <Text style={[FontStyles.BodySmall, { color: theme.gray }]}>{formatUnixTime(memo?.createdAt ?? 0)}</Text>

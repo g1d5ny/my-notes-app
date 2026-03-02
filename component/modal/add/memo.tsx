@@ -3,6 +3,7 @@ import { FontStyles, Styles } from "@/constant/Style"
 import { DarkTheme, LightTheme } from "@/constant/Theme"
 import { useCreateMemo } from "@/hook/useCreateMemo"
 import { themeAtom } from "@/store"
+import { MemoType } from "@/type"
 import { useGlobalSearchParams } from "expo-router"
 import { useAtomValue } from "jotai"
 import { useState } from "react"
@@ -24,6 +25,7 @@ export const AddMemo = ({ onAddFile }: AddMemoProps) => {
     const params = useGlobalSearchParams()
     const [modalVisible, setModalVisible] = useState(false)
     const parentId = params.id ? Number(params.id) : null
+    const currentType = params.type
 
     const closeModal = () => {
         setModalVisible(false)
@@ -45,7 +47,7 @@ export const AddMemo = ({ onAddFile }: AddMemoProps) => {
 
     return (
         <>
-            {!modalVisible && (
+            {!modalVisible && currentType !== MemoType.FILE && (
                 <Pressable style={[styles.plus, { bottom: bottom + MARGIN }]} onPress={openModal}>
                     <Image source={require("@/assets/icons/icon_plus.png")} style={styles.icon} />
                 </Pressable>

@@ -1,7 +1,7 @@
-import { DeleteOption, ExportOption, InfoOption } from "@/assets/icons/svg/option/icon"
+import { DeleteOption, EditOption, ExportOption, InfoOption } from "@/assets/icons/svg/option/icon"
 import { useDeleteMemo } from "@/hook/useDeleteMemo"
 import { useShareMemo } from "@/hook/useShareMemo"
-import { infoModalVisibleAtom, modalAtom, themeAtom } from "@/store"
+import { editModeAtom, infoModalVisibleAtom, modalAtom, themeAtom } from "@/store"
 import { useGlobalSearchParams } from "expo-router"
 import { useAtomValue, useSetAtom } from "jotai"
 import { useState } from "react"
@@ -14,10 +14,22 @@ export const FileEditOption = () => {
     const [menuVisible, setMenuVisible] = useState(false)
     const params = useGlobalSearchParams()
     const currentId = params.id ? Number(params?.id) : 0
+    const setEditMode = useSetAtom(editModeAtom)
     const { deleteFile } = useDeleteMemo()
     const { exportFile } = useShareMemo()
 
     const fileEditOptionList: OptionMenuList[] = [
+        {
+            title: "편집하기",
+            trailingIcon: <EditOption theme={theme} />,
+            disabled: false,
+            onPress: () => {
+                setEditMode({ id: currentId, isEditMode: true })
+                setMenuVisible(false)
+            },
+            dividerWidth: 1,
+            hasDivider: true
+        },
         {
             title: "삭제하기",
             trailingIcon: <DeleteOption theme={theme} />,

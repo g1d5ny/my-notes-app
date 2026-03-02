@@ -44,14 +44,14 @@ export const useReadMemo = () => {
                 const allResult = [...folderResult, ...fileResult] as Memo[]
                 const result = sort(allResult, sortType) as Memo[]
                 await queryClient.setQueryData([currentType, currentId, sortType], result)
-                return result
+                return result as Memo[]
             }
             // 파일 타입인 경우
             if (currentType === MemoType.FILE) {
                 const fileResult = await db.getAllAsync(`SELECT * FROM ${MemoType.FILE} WHERE id = ?`, [currentId])
                 const result = fileResult[0] as Memo
                 await queryClient.setQueryData([currentType, currentId, sortType], result)
-                return result
+                return result as Memo
             }
             // 폴더 타입인 경우
             const folderResult = await db.getAllAsync(`SELECT * FROM ${MemoType.FOLDER} WHERE parentId = ? ${ORDER_BY[sortType]}`, [currentId])
@@ -59,7 +59,7 @@ export const useReadMemo = () => {
             const allResult = [...folderResult, ...fileResult] as Memo[]
             const result = sort(allResult, sortType) as Memo[]
             await queryClient.setQueryData([currentType, currentId, sortType], result)
-            return result
+            return result as Memo[]
         },
         enabled: currentId >= 0
     })

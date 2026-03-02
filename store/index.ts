@@ -1,5 +1,5 @@
 import { DarkTheme, LightTheme } from "@/constant/Theme"
-import { AppBar, Modal, SearchInput, SelectedMemo, SelectedMemoType, SortType, ThemeColorPalette } from "@/type"
+import { AppBar, EditMode, Modal, SearchInput, SelectedMemo, SelectedMemoType, SortType, ThemeColorPalette } from "@/type"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { atom, createStore } from "jotai"
 import { atomWithStorage, createJSONStorage } from "jotai/utils"
@@ -29,3 +29,5 @@ export const selectedMemoAtom = atom<SelectedMemo>({ memo: [], type: SelectedMem
 export const infoModalVisibleAtom = atom<boolean>(false)
 
 export const searchInputAtom = atom<SearchInput>({ value: "", visible: false })
+
+export const editModeAtom = atom<EditMode>({ id: 0, isEditMode: false })

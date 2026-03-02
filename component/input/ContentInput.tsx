@@ -10,7 +10,7 @@ export const ContentInput = forwardRef<TextInput, TextInputProps>((props, ref) =
     return (
         <TextInput
             ref={ref}
-            style={[FontStyles.Content, styles.content, { color: theme.text }]}
+            style={[FontStyles.Body, styles.content, { color: theme.text }]}
             placeholder='내용을 입력해주세요.'
             placeholderTextColor={theme.gray}
             scrollEnabled={false}

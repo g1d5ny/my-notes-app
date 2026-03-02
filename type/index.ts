@@ -67,3 +67,8 @@ export interface SearchInput {
     value: string
     visible: boolean
 }
+
+export interface EditMode {
+    id: number
+    isEditMode: boolean
+}

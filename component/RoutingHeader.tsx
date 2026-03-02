@@ -26,7 +26,7 @@ export default function RoutingHeader() {
             return
         }
 
-        router.push({ pathname, params: { type: MemoType.FOLDER, id: item.id, title: item.title, parentId: item.parentId ?? 0, pathStack: JSON.stringify(stack) } })
+        router.replace({ pathname, params: { type: MemoType.FOLDER, id: item.id, title: item.title, parentId: item.parentId ?? 0, pathStack: JSON.stringify(stack) } })
     }
 
     return (
@@ -37,9 +37,22 @@ export default function RoutingHeader() {
                 setSearchInput({ value: "", visible: false })
             }}
         >
-            <Text style={[FontStyles.Body, { color: theme.routing }]} numberOfLines={3} ellipsizeMode='middle'>
-                현재 경로 :{" "}
-            </Text>
+            <TouchableOpacity
+                onPress={() => {
+                    if (!params.id && !params.type && !params.pathStack) return
+                    router.dismissAll()
+                    router.replace({ pathname: "/folder" as RelativePathString })
+                }}
+                style={Styles.row}
+            >
+                <Text style={[FontStyles.Body, styles.pathItem, { color: theme.routing }]} numberOfLines={3} ellipsizeMode='middle'>
+                    현재 경로
+                </Text>
+                <Text style={[FontStyles.Body, { color: theme.routing }]} numberOfLines={3} ellipsizeMode='middle'>
+                    {" "}
+                    :{" "}
+                </Text>
+            </TouchableOpacity>
             {pathStack.map((item, index) => (
                 <TouchableOpacity key={index} onPress={() => goToPath(index)} style={Styles.row}>
                     <Text style={[FontStyles.Body, { color: theme.routing }]}>/</Text>

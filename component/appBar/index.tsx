@@ -1,4 +1,4 @@
-import { appBarAtom } from "@/store"
+import { appBarAtom, editModeAtom } from "@/store"
 import { AppBar as AppBarType } from "@/type"
 import { useAtomValue } from "jotai"
 import { AppBarParent } from "./AppBarParent"
@@ -16,6 +16,11 @@ const AppBarComponent = {
 
 export const AppBar = () => {
     const appBar = useAtomValue(appBarAtom)
+    const editMode = useAtomValue(editModeAtom)
+
+    if (editMode.isEditMode) {
+        return <></>
+    }
 
     return <AppBarParent>{AppBarComponent[appBar]}</AppBarParent>
 }

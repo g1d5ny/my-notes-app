@@ -14,7 +14,7 @@ TitleInput.displayName = "TitleInput"
 
 const styles = StyleSheet.create({
     title: {
-        width: "100%",
+        flexShrink: 1,
         textAlignVertical: "center"
     }
 })

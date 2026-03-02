@@ -34,8 +34,10 @@ jobs:
             - name: Expo Build Check
               run: npx expo export --output-dir dist
 
-            # - name: Login to Expo
-            #   run: npx expo login -u ${{ secrets.EXPO_USERNAME }} -p ${{ secrets.EXPO_PASSWORD }}
+            - name: Install EAS CLI
+              run: yarn global add eas-cli
 
-            # - name: Publish to Expo
-            #   run: npx expo publish --non-interactive
+            - name: EAS Update to production (channel ver100)
+              env:
+                  EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+              run: npx eas update --channel ver100 --non-interactive --auto

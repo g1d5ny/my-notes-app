@@ -7,7 +7,7 @@ import { appBarAtom, searchInputAtom, selectedMemoAtom, sortAtom, themeAtom } fr
 import { AppBar, Memo, MemoType, SelectedMemoType } from "@/type"
 import { useQueryClient } from "@tanstack/react-query"
 import { RelativePathString, router, useLocalSearchParams, usePathname } from "expo-router"
-import { useAtom, useAtomValue } from "jotai"
+import { useAtom, useAtomValue, useSetAtom } from "jotai"
 import { useEffect, useMemo, useState } from "react"
 import { Controller, FieldPath, useForm } from "react-hook-form"
 import { Dimensions, Keyboard, Pressable, StyleSheet, Text, TextInput, View } from "react-native"
@@ -36,7 +36,7 @@ export const FolderList = () => {
     const currentPath = usePathname()
     const [appBar, setAppBar] = useAtom(appBarAtom)
     const [selectedMemo, setSelectedMemo] = useAtom(selectedMemoAtom)
-    const [searchInput, setSearchInput] = useAtom(searchInputAtom)
+    const setSearchInput = useSetAtom(searchInputAtom)
     const { updateFolderTitle, updateFileTitle } = useUpdateMemo()
     const currentId = params.id ? Number(params?.id) : 0
     const memos = queryClient.getQueryData<Memo[]>([MemoType.FOLDER, currentId, sortType]) ?? []
@@ -63,6 +63,12 @@ export const FolderList = () => {
 
     useEffect(() => {
         return () => {
+            setSelectedMemo(prev => {
+                if (prev.type === SelectedMemoType.COPY) {
+                    return { memo: [], type: SelectedMemoType.COPY }
+                }
+                return { ...prev }
+            })
             setSearchInput({ value: "", visible: false })
         }
     }, [])
@@ -94,6 +100,9 @@ export const FolderList = () => {
                                 <Pressable
                                     onLongPress={() => selectMemo(memo)}
                                     onPress={() => {
+                                        if (appBar === AppBar.PASTE && selected) {
+                                            return
+                                        }
                                         if (appBar === AppBar.FOLDER_ACTION) {
                                             if (selected) {
                                                 setSelectedMemo(prev => {
@@ -144,6 +153,7 @@ export const FolderList = () => {
                                                     style={[styles.title, { color: theme.text }]}
                                                     returnKeyType='done'
                                                     maxLength={30}
+                                                    multiline
                                                 />
                                             )}
                                         />

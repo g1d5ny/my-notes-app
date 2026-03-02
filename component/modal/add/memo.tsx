@@ -2,11 +2,11 @@ import { FilePlus, FolderPlus } from "@/assets/icons/svg/icon"
 import { FontStyles, Styles } from "@/constant/Style"
 import { DarkTheme, LightTheme } from "@/constant/Theme"
 import { useCreateMemo } from "@/hook/useCreateMemo"
-import { themeAtom } from "@/store"
+import { selectedMemoAtom, themeAtom } from "@/store"
 import { MemoType } from "@/type"
 import { useGlobalSearchParams } from "expo-router"
 import { useAtomValue } from "jotai"
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { Image, Pressable, StyleSheet, Text } from "react-native"
 import { Modal } from "react-native-paper"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
@@ -21,11 +21,16 @@ interface AddMemoProps {
 export const AddMemo = ({ onAddFile }: AddMemoProps) => {
     const { bottom } = useSafeAreaInsets()
     const theme = useAtomValue(themeAtom)
+    const selectedMemo = useAtomValue(selectedMemoAtom)
     const { createFolder } = useCreateMemo()
     const params = useGlobalSearchParams()
     const [modalVisible, setModalVisible] = useState(false)
     const parentId = params.id ? Number(params.id) : null
     const currentType = params.type
+
+    const isVisiblePlusIcon = useMemo(() => {
+        return !modalVisible && currentType !== MemoType.FILE && selectedMemo.memo.length === 0
+    }, [modalVisible, currentType, selectedMemo.memo.length])
 
     const closeModal = () => {
         setModalVisible(false)
@@ -47,7 +52,7 @@ export const AddMemo = ({ onAddFile }: AddMemoProps) => {
 
     return (
         <>
-            {!modalVisible && currentType !== MemoType.FILE && (
+            {isVisiblePlusIcon && (
                 <Pressable style={[styles.plus, { bottom: bottom + MARGIN }]} onPress={openModal}>
                     <Image source={require("@/assets/icons/icon_plus.png")} style={styles.icon} />
                 </Pressable>

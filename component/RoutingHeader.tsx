@@ -45,7 +45,7 @@ export default function RoutingHeader() {
                 }}
                 style={Styles.row}
             >
-                <Text style={[FontStyles.Body, styles.pathItem, { color: theme.routing }]} numberOfLines={3} ellipsizeMode='middle'>
+                <Text style={[FontStyles.Body, styles.pathItem, { borderColor: theme.routing, color: theme.routing }]} numberOfLines={3} ellipsizeMode='middle'>
                     현재 경로
                 </Text>
                 <Text style={[FontStyles.Body, { color: theme.routing }]} numberOfLines={3} ellipsizeMode='middle'>

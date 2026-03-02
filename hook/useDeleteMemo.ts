@@ -1,5 +1,6 @@
 import { MemoType } from "@/type"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { router } from "expo-router"
 import { useSQLiteContext } from "expo-sqlite"
 import Toast from "react-native-toast-message"
 
@@ -35,6 +36,7 @@ export const useDeleteMemo = () => {
             // await db.execAsync(`DROP TABLE IF EXISTS ${MemoType.FILE}`)
             await db.execAsync(`PRAGMA user_version = 0`)
             await invalidateParentAndGrandparent(parentId)
+            router.dismissAll()
         }
     })
 
@@ -49,7 +51,7 @@ export const useDeleteMemo = () => {
         },
         onSuccess: () => {
             Toast.show({
-                text1: "폴더가 삭제되었습니다.",
+                text1: "파일을 삭제했습니다.",
                 type: "customToast",
                 position: "bottom",
                 visibilityTime: 3000
@@ -77,7 +79,7 @@ export const useDeleteMemo = () => {
         },
         onSuccess: () => {
             Toast.show({
-                text1: "글이 삭제되었습니다.",
+                text1: "파일을 삭제했습니다'",
                 type: "customToast",
                 position: "bottom",
                 visibilityTime: 3000

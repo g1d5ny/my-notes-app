@@ -40,4 +40,4 @@ jobs:
             - name: EAS Update to production (channel ver100)
               env:
                   EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-              run: npx eas update --channel ver100 --non-interactive --auto
+              run: eas update --channel ver100 --non-interactive --auto

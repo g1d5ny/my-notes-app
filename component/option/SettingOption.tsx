@@ -11,6 +11,7 @@ import { useGlobalSearchParams } from "expo-router"
 import { useAtom, useAtomValue, useSetAtom } from "jotai"
 import { useState } from "react"
 import { Image, StyleSheet, Text } from "react-native"
+import appConfig from "../../app.json"
 import { OptionMenu, OptionMenuList } from "../OptionMenu"
 
 export const SettingOption = () => {
@@ -114,7 +115,7 @@ export const SettingOption = () => {
         },
         {
             title: "버전 정보",
-            trailingIcon: <Text style={[FontStyles.ButtonText2, { color: theme.text }]}>1.0</Text>,
+            trailingIcon: <Text style={[FontStyles.ButtonText2, styles.versionText, { color: theme.text }]}>{appConfig.expo.version}</Text>,
             disabled: true,
             onPress: () => {
                 setMenuVisible(false)
@@ -143,6 +144,11 @@ export const SettingOption = () => {
 }
 
 const styles = StyleSheet.create({
+    versionText: {
+        width: "150%",
+        height: 20,
+        left: -10
+    },
     icon: {
         width: 24,
         height: 24

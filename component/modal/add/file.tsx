@@ -1,5 +1,5 @@
 import { FileCreateAppBar } from "@/component/appBar/FileCreateAppBar"
-import { ContentInput } from "@/component/input/ContentInput"
+import { BottomSheetContentInput } from "@/component/input/ContentInput"
 import { TitleInput } from "@/component/input/TitleInput"
 import { useCreateMemo } from "@/hook/useCreateMemo"
 import { modalAtom, themeAtom } from "@/store"
@@ -69,9 +69,9 @@ export const AddFile = forwardRef<BottomSheetModalMethods>((_, ref) => {
             snapPoints={["100%"]}
             enableDynamicSizing={false}
             android_keyboardInputMode='adjustPan'
-            keyboardBehavior='extend'
-            keyboardBlurBehavior='none'
-            enablePanDownToClose
+            keyboardBehavior='interactive'
+            keyboardBlurBehavior='restore'
+            enablePanDownToClose={false}
         >
             <View style={[styles.container, { paddingBottom: bottom }]}>
                 <Controller
@@ -80,8 +80,8 @@ export const AddFile = forwardRef<BottomSheetModalMethods>((_, ref) => {
                     rules={{ required: true }}
                     render={({ field: { onChange, onBlur, value } }) => <TitleInput value={value} onBlur={onBlur} onChangeText={onChange} onSubmitEditing={() => setFocus("content")} autoFocus />}
                 />
-                <BottomSheetScrollView showsVerticalScrollIndicator contentContainerStyle={{ flex: 1 }}>
-                    <Controller control={control} name='content' rules={{ required: true }} render={({ field: { onChange, onBlur, value, ref } }) => <ContentInput ref={ref} onBlur={onBlur} onChangeText={onChange} value={value} />} />
+                <BottomSheetScrollView showsVerticalScrollIndicator>
+                    <Controller control={control} name='content' rules={{ required: true }} render={({ field: { onChange, onBlur, value } }) => <BottomSheetContentInput onBlur={onBlur} onChangeText={onChange} value={value} />} />
                 </BottomSheetScrollView>
             </View>
         </BottomSheetModal>

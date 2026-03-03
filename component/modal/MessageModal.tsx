@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
         borderRadius: 12
     },
     modalContainer: {
-        width: 300,
+        width: 340,
         height: 144,
         alignItems: "center"
     }

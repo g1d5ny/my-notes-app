@@ -59,7 +59,7 @@ export const FileDetail = ({ id, title, content, parentId }: FileDetailParams) =
     }
 
     const close = () => {
-        setModal({ visible: true, message: "뒤로 가시면 작성된 글이 삭제됩니다.\n뒤로 가시겠습니까?", onConfirm: back, confirmText: "뒤로 가기" })
+        setModal({ visible: true, message: "뒤로 가시면 작성 중인 글이 저장되지 않습니다.\n뒤로 가시겠습니까?", onConfirm: back, confirmText: "뒤로 가기" })
         Keyboard.dismiss()
     }
 

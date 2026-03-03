@@ -1,4 +1,5 @@
-import { EmptyFolder, File, FilledFolder } from "@/assets/icons/svg/icon"
+import { EmptyFolder, File } from "@/assets/icons/svg/icon"
+import FilledFolder from "@/assets/icons/svg/icon_filled_folder.svg"
 import { FontStyles } from "@/constant/Style"
 import { useCheckFilledMemo } from "@/hook/useCheckFilledMemo"
 import { useSearchedMemo } from "@/hook/useSearchedMemo"

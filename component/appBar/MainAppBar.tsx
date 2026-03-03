@@ -14,7 +14,7 @@ export const MainAppBar = () => {
     const lastPathname = pathname.split("/").pop()
 
     return (
-        <>
+        <View style={[Styles.row, styles.right]}>
             <View style={[Styles.row, styles.left]}>
                 {pathname.split("/").length > 2 && (
                     <>
@@ -27,13 +27,11 @@ export const MainAppBar = () => {
                     </>
                 )}
             </View>
-            <View style={[Styles.row, styles.right]}>
-                <Pressable hitSlop={10} onPress={() => setSearchInput(prev => ({ value: "", visible: !prev.visible }))}>
-                    <Search theme={theme} />
-                </Pressable>
-                <SettingOption />
-            </View>
-        </>
+            <Pressable hitSlop={10} onPress={() => setSearchInput(prev => ({ value: "", visible: !prev.visible }))}>
+                <Search theme={theme} />
+            </Pressable>
+            <SettingOption />
+        </View>
     )
 }
 
@@ -47,7 +45,7 @@ const styles = StyleSheet.create({
         alignSelf: "flex-start"
     },
     right: {
-        alignItems: "center",
+        width: "100%",
         alignSelf: "flex-end",
         gap: 8
     },

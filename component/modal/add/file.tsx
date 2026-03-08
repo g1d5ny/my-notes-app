@@ -14,10 +14,13 @@ import { Keyboard, StyleSheet, View } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import Toast from "react-native-toast-message"
 
+/** react-native-keyboard-controller KeyboardToolbar 기본 높이 (키보드 위 툴바) */
+const KEYBOARD_TOOLBAR_HEIGHT = 42
+
 export const AddFile = forwardRef<BottomSheetModalMethods>((_, ref) => {
     const theme = useAtomValue(themeAtom)
     const setModal = useSetAtom(modalAtom)
-    const { top, bottom } = useSafeAreaInsets()
+    const { top } = useSafeAreaInsets()
     const { createFile } = useCreateMemo()
     const params = useGlobalSearchParams()
     const { control, handleSubmit, resetField, watch, setFocus } = useForm<FormValues>({
@@ -73,7 +76,7 @@ export const AddFile = forwardRef<BottomSheetModalMethods>((_, ref) => {
             keyboardBlurBehavior='restore'
             enablePanDownToClose={false}
         >
-            <View style={[styles.container, { paddingBottom: bottom }]}>
+            <View style={[styles.container, { marginBottom: KEYBOARD_TOOLBAR_HEIGHT }]}>
                 <Controller
                     control={control}
                     name='title'

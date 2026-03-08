@@ -46,8 +46,9 @@ const styles = StyleSheet.create({
     },
     right: {
         width: "100%",
-        alignSelf: "flex-end",
+        justifyContent: "flex-end",
         gap: 8
+        // borderWidth: 2
     },
     left: {
         flex: 1

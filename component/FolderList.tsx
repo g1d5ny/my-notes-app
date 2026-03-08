@@ -63,12 +63,6 @@ export const FolderList = () => {
 
     useEffect(() => {
         return () => {
-            setSelectedMemo(prev => {
-                if (prev.type === SelectedMemoType.COPY) {
-                    return { memo: [], type: SelectedMemoType.COPY }
-                }
-                return { ...prev }
-            })
             setSearchInput({ value: "", visible: false })
         }
     }, [])

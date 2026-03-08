@@ -43,6 +43,7 @@ export const PasteAppBar = () => {
         }
         if (selectedMemo) {
             selectedMemo.memo.forEach(async memo => {
+                console.log("memo.type: ", memo.type)
                 if (memo.type === MemoType.FILE) {
                     await createFileFn({ title: memo.title ?? "", content: memo.content ?? "", parentId: params.id ? Number(params.id) : null })
                 } else {

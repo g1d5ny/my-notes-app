@@ -1,8 +1,8 @@
 import { ContentInput } from "@/component/input/ContentInput"
 import { TitleInput } from "@/component/input/TitleInput"
 import { useUpdateMemo } from "@/hook/useUpdateMemo"
-import { editModeAtom, modalAtom } from "@/store"
-import { FormValues, MemoType } from "@/type"
+import { appBarAtom, editModeAtom, modalAtom } from "@/store"
+import { AppBar, FormValues, MemoType } from "@/type"
 import { useGlobalSearchParams } from "expo-router"
 import { useSQLiteContext } from "expo-sqlite"
 import { useAtom, useSetAtom } from "jotai"
@@ -24,6 +24,7 @@ interface FileDetailParams {
 export const FileDetail = ({ id, title, content, parentId }: FileDetailParams) => {
     const db = useSQLiteContext()
     const setModal = useSetAtom(modalAtom)
+    const setAppBar = useSetAtom(appBarAtom)
     const { updateFileTitle, updateFileContent } = useUpdateMemo()
     const params = useGlobalSearchParams()
     const [editMode, setEditMode] = useAtom(editModeAtom)
@@ -90,6 +91,10 @@ export const FileDetail = ({ id, title, content, parentId }: FileDetailParams) =
 
     useEffect(() => {
         updateViewedAt()
+
+        return () => {
+            setAppBar(AppBar.MAIN)
+        }
     }, [])
 
     return (

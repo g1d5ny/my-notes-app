@@ -15,7 +15,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context"
 import Toast from "react-native-toast-message"
 
 /** react-native-keyboard-controller KeyboardToolbar 기본 높이 (키보드 위 툴바) */
-const KEYBOARD_TOOLBAR_HEIGHT = 42
+const KEYBOARD_TOOLBAR_HEIGHT = 60
 
 export const AddFile = forwardRef<BottomSheetModalMethods>((_, ref) => {
     const theme = useAtomValue(themeAtom)

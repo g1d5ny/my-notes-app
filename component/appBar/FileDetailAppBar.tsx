@@ -23,7 +23,7 @@ export const FileDetailAppBar = () => {
                 {Platform.OS === "ios" ? <IosBack theme={theme} /> : <AndroidBack theme={theme} />}
             </Pressable>
             <Text style={[styles.length, { color: theme.text }]} numberOfLines={1} ellipsizeMode='tail'>
-                {params.content.length}
+                {params.content?.length}
             </Text>
             <FileEditOption />
         </View>

@@ -27,18 +27,7 @@ export const ContentInput = forwardRef<TextInput, TextInputProps>((props, ref) =
 export const BottomSheetContentInput = (props: BottomSheetTextInputProps) => {
     const theme = useAtomValue(themeAtom)
 
-    return (
-        <BottomSheetTextInput
-            style={[FontStyles.Body, styles.content, { color: theme.text }]}
-            placeholder='내용을 입력해주세요.'
-            placeholderTextColor={theme.gray}
-            scrollEnabled={false}
-            multiline
-            textAlignVertical='top'
-            maxLength={10000}
-            {...props}
-        />
-    )
+    return <BottomSheetTextInput style={[FontStyles.Body, styles.content, { color: theme.text }]} placeholder='내용을 입력해주세요.' placeholderTextColor={theme.gray} multiline textAlignVertical='top' maxLength={10000} {...props} />
 }
 
 ContentInput.displayName = "ContentInput"

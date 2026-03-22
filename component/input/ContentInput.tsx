@@ -3,22 +3,24 @@ import { themeAtom } from "@/store"
 import { BottomSheetTextInput } from "@gorhom/bottom-sheet"
 import { BottomSheetTextInputProps } from "@gorhom/bottom-sheet/lib/typescript/components/bottomSheetTextInput"
 import { useAtomValue } from "jotai"
-import { forwardRef } from "react"
+import { forwardRef, useState } from "react"
 import { StyleSheet, TextInput, TextInputProps } from "react-native"
 
 export const ContentInput = forwardRef<TextInput, TextInputProps>((props, ref) => {
     const theme = useAtomValue(themeAtom)
+    const [height, setHeight] = useState(100)
 
     return (
         <TextInput
             ref={ref}
-            style={[FontStyles.Body, styles.content, { color: theme.text }]}
+            style={[FontStyles.Body, styles.content, { color: theme.text, height }]}
             placeholder='내용을 입력해주세요.'
             placeholderTextColor={theme.gray}
             scrollEnabled={false}
             multiline
             textAlignVertical='top'
             maxLength={10000}
+            onContentSizeChange={e => setHeight(e.nativeEvent.contentSize.height)}
             {...props}
         />
     )

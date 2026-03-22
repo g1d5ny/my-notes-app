@@ -7,7 +7,7 @@ import { StyleSheet, TextInput, TextInputProps } from "react-native"
 export const TitleInput = forwardRef<TextInput, TextInputProps>((props, ref) => {
     const theme = useAtomValue(themeAtom)
 
-    return <TextInput ref={ref} style={[FontStyles.Title, styles.title, { color: theme.text }]} placeholder='제목을 입력해주세요.' placeholderTextColor={theme.gray} returnKeyType='next' maxLength={30} multiline {...props} />
+    return <TextInput ref={ref} style={[FontStyles.Title, styles.title, { color: theme.text }]} placeholder='제목을 입력해주세요.' placeholderTextColor={theme.gray} returnKeyType='next' maxLength={30} multiline submitBehavior="blurAndSubmit" {...props} />
 })
 
 TitleInput.displayName = "TitleInput"

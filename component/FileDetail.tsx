@@ -47,7 +47,6 @@ export const FileDetail = ({ id, title, content, parentId }: FileDetailParams) =
         const now = Date.now()
         if (now - lastTapTime < 300) {
             setEditMode({ id: currentId, isEditMode: true })
-            setFocus("title")
         }
         lastTapTime = now
     }
@@ -90,6 +89,12 @@ export const FileDetail = ({ id, title, content, parentId }: FileDetailParams) =
     }
 
     useEffect(() => {
+        if (editMode.isEditMode) {
+            setFocus("content")
+        }
+    }, [editMode.isEditMode])
+
+    useEffect(() => {
         updateViewedAt()
 
         return () => {
@@ -101,7 +106,7 @@ export const FileDetail = ({ id, title, content, parentId }: FileDetailParams) =
         <>
             {editMode.isEditMode && <FileCreateAppBar textLength={contentText.length} submitFile={submitFile} close={close} back={back} />}
             <KeyboardAwareScrollView keyboardShouldPersistTaps='handled' contentContainerStyle={styles.container} onTouchEnd={handleTouchEnd}>
-                <Controller control={control} name='title' rules={{ required: true }} render={({ field: { onChange, value, ref } }) => <TitleInput ref={ref} value={value} onChangeText={onChange} editable={editable} />} />
+                <Controller control={control} name='title' rules={{ required: true }} render={({ field: { onChange, value, ref } }) => <TitleInput ref={ref} value={value} onChangeText={onChange} onSubmitEditing={() => setFocus("content")} editable={editable} />} />
                 <Controller control={control} name='content' rules={{ required: true }} render={({ field: { onChange, value, ref } }) => <ContentInput ref={ref} value={value} onChangeText={onChange} editable={editable} />} />
             </KeyboardAwareScrollView>
         </>

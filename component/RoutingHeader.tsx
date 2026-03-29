@@ -13,20 +13,19 @@ export default function RoutingHeader() {
     const params = useGlobalSearchParams()
     const pathStack = params.pathStack ? (JSON.parse(String(params.pathStack)) as PathStackItem[]) : []
 
-    if (params.type === MemoType.FILE) {
-        return <View />
-    }
-
     const goToPath = (index: number) => {
-        const stack = pathStack.slice(0, index + 1)
-        const pathname = `/folder${stack.map(s => `/${s.title}`).join("")}` as RelativePathString
-        const item = stack[index]
+        const item = pathStack[index]
 
         if (item.id === Number(params.id)) {
             return
         }
 
-        router.replace({ pathname, params: { type: MemoType.FOLDER, id: item.id, title: item.title, parentId: item.parentId ?? 0, pathStack: JSON.stringify(stack) } })
+        const stepsBack = pathStack.length - 1 - index
+        router.dismiss(stepsBack)
+    }
+
+    if (params.type === MemoType.FILE) {
+        return <View />
     }
 
     return (

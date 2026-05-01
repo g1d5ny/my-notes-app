@@ -21,7 +21,7 @@ extensions.configure(com.facebook.react.ReactSettingsExtension) { ex ->
   }
 }
 
-rootProject.name = 'MyNotesApp'
+rootProject.name = '오늘모쓰지'
 
 dependencyResolutionManagement {
   versionCatalogs {

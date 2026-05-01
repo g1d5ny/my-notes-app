@@ -28,7 +28,7 @@ export default function FolderScreen() {
         if (Object.keys(globalParams).length === 0) {
             setModal({
                 visible: true,
-                message: "폴더노트를 종료하시겠습니까?",
+                message: "오늘모쓰지를 종료하시겠습니까?",
                 onConfirm: BackHandler.exitApp,
                 confirmText: "종료"
             })

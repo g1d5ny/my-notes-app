@@ -1,5 +1,5 @@
 import { Search } from "@/assets/icons/svg/icon"
-import { FontStyles } from "@/constant/Style"
+import { FontStyles, Radius } from "@/constant/Style"
 import { searchInputAtom, themeAtom } from "@/store"
 import { useAtom, useAtomValue } from "jotai"
 import { useCallback } from "react"
@@ -54,7 +54,7 @@ export const SearchInput = () => {
 
     return (
         <Animated.View style={animatedStyle}>
-            <View style={[styles.inputContainer, { borderColor: theme.border }]}>
+            <View style={[styles.inputContainer, { backgroundColor: theme.surfaceVariant }]}>
                 <Search theme={theme} />
                 <Controller
                     control={control}
@@ -83,8 +83,7 @@ const styles = StyleSheet.create({
     inputContainer: {
         flex: 1,
         height: 40,
-        borderRadius: 8,
-        borderWidth: 2,
+        borderRadius: Radius.md,
         flexDirection: "row",
         alignItems: "center",
         gap: 8,

@@ -14,7 +14,7 @@ import { RelativePathString, router, useLocalSearchParams, usePathname } from "e
 import { useAtom, useAtomValue, useSetAtom } from "jotai"
 import { useEffect, useMemo, useRef, useState } from "react"
 import { Controller, FieldPath, useForm } from "react-hook-form"
-import { Dimensions, Keyboard, Pressable, StyleSheet, Text, TextInput, View } from "react-native"
+import { Dimensions, Keyboard, Pressable, StyleSheet, TextInput, View } from "react-native"
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller"
 import { useSharedValue } from "react-native-reanimated"
 import Toast from "react-native-toast-message"
@@ -176,21 +176,21 @@ export const FolderList = ({ memos }: { memos: Memo[] }) => {
                                     </View>
                                 </DraggableMemoIcon>
                                 <View style={[styles.titleContainer, focusedInputKey === `${id}-${type}` && { backgroundColor: theme.surfaceVariant }]}>
-                                    {focusedInputKey === `${id}-${type}` ? (
-                                        <Controller
-                                            name={`${id}-${type}` as FieldPath<FormValues>}
-                                            control={control}
-                                            rules={{ required: true }}
-                                            render={({ field: { onChange, onBlur, value, ref } }) => (
+                                    <Controller
+                                        name={`${id}-${type}` as FieldPath<FormValues>}
+                                        control={control}
+                                        rules={{ required: true }}
+                                        render={({ field: { onChange, onBlur, value, ref } }) => {
+                                            const editing = focusedInputKey === `${id}-${type}`
+                                            const inSelection = appBar === AppBar.FOLDER_ACTION
+                                            return (
                                                 <TextInput
                                                     ref={ref}
-                                                    autoFocus
                                                     value={value ?? title}
+                                                    editable={!inSelection}
                                                     onChangeText={onChange}
                                                     onFocus={() => setFocusedInputKey(`${id}-${type}`)}
-                                                    focusable={!selected}
-                                                    pointerEvents={selected ? "none" : "auto"}
-                                                    onBlur={async () => {
+                                                    onBlur={() => {
                                                         onBlur()
                                                         setFocusedInputKey(null)
                                                         const currentValue = value
@@ -205,26 +205,23 @@ export const FolderList = ({ memos }: { memos: Memo[] }) => {
                                                         }
                                                     }}
                                                     style={[styles.title, { color: theme.text }]}
+                                                    // 편집 중이 아닐 땐 2줄로 보이게(텍스트처럼), 편집 중엔 전체 표시.
+                                                    numberOfLines={editing ? undefined : 2}
+                                                    scrollEnabled={false}
                                                     returnKeyType='done'
                                                     maxLength={30}
                                                     multiline
                                                 />
-                                            )}
-                                        />
-                                    ) : (
+                                            )
+                                        }}
+                                    />
+                                    {/* 선택 모드에서만 위에 투명 오버레이 → 탭은 편집이 아니라 선택을 담당.
+                                        평소엔 오버레이가 없어 입력창이 직접 탭을 받아 키보드가 정상적으로 올라온다. */}
+                                    {appBar === AppBar.FOLDER_ACTION && (
                                         <Pressable
-                                            onPress={() => {
-                                                if (appBar === AppBar.FOLDER_ACTION) {
-                                                    setSelectedMemo(prev => ({ ...prev, memo: [...prev.memo, memo] }))
-                                                    return
-                                                }
-                                                setFocusedInputKey(`${id}-${type}`)
-                                            }}
-                                        >
-                                            <Text style={[styles.title, { color: theme.text }]} numberOfLines={2} ellipsizeMode='tail'>
-                                                {title}
-                                            </Text>
-                                        </Pressable>
+                                            style={StyleSheet.absoluteFill}
+                                            onPress={() => setSelectedMemo(prev => (prev.memo.some(s => s.id === id && s.type === type) ? prev : { ...prev, memo: [...prev.memo, memo] }))}
+                                        />
                                     )}
                                 </View>
                             </View>

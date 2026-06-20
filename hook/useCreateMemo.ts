@@ -1,3 +1,4 @@
+import { invalidateMemoQueries } from "@/function/invalidate"
 import { MemoType } from "@/type"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useSQLiteContext } from "expo-sqlite"
@@ -20,20 +21,6 @@ export const useCreateMemo = () => {
     const db = useSQLiteContext()
     const queryClient = useQueryClient()
 
-    // parentId와 그 부모(parentId의 parentId)만 invalidate하는 함수
-    const invalidateParentAndGrandparent = async (parentId: number | null) => {
-        // parentId 자체 invalidate
-        await queryClient.invalidateQueries({ queryKey: [MemoType.FOLDER, parentId ?? 0] })
-
-        // parentId가 null이 아니면 그 부모도 찾아서 invalidate
-        if (parentId !== null) {
-            const folder = await db.getFirstAsync<{ parentId: number | null }>(`SELECT parentId FROM ${MemoType.FOLDER} WHERE id = ?`, [parentId])
-            if (folder?.parentId !== null) {
-                await queryClient.invalidateQueries({ queryKey: [MemoType.FOLDER, folder?.parentId] })
-            }
-        }
-    }
-
     const createFileFn = async ({ title, content, parentId }: CreateFileProps) => {
         const now = Math.floor(Date.now() / 1000)
 
@@ -42,12 +29,12 @@ export const useCreateMemo = () => {
                 VALUES (?, ?, ?, ?, ?, ?, ?)`,
             [MemoType.FILE, title, content, parentId, now, now, now]
         )
-        await invalidateParentAndGrandparent(parentId)
+        await invalidateMemoQueries(queryClient, [parentId])
     }
 
     const { mutate: createFile } = useMutation({
         mutationFn: async ({ title, content, parentId }: CreateFileProps) => {
-            createFileFn({ title, content, parentId })
+            await createFileFn({ title, content, parentId })
         },
         onSuccess: () => {
             Toast.show({
@@ -78,7 +65,7 @@ export const useCreateMemo = () => {
                 [MemoType.FOLDER, "새 폴더", parentId, now, now]
             )
 
-            await invalidateParentAndGrandparent(parentId)
+            await invalidateMemoQueries(queryClient, [parentId])
         }
     })
 
@@ -146,7 +133,7 @@ export const useCreateMemo = () => {
     const { mutate: duplicateFolder } = useMutation({
         mutationFn: async ({ folderId, newParentId }: DuplicateFolderProps) => {
             await duplicateFolderRecursive(folderId, newParentId)
-            await invalidateParentAndGrandparent(newParentId)
+            await invalidateMemoQueries(queryClient, [newParentId])
         },
         onSuccess: () => {
             Toast.show({

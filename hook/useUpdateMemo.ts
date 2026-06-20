@@ -1,3 +1,4 @@
+import { invalidateMemoQueries } from "@/function/invalidate"
 import { MemoType } from "@/type"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useSQLiteContext } from "expo-sqlite"
@@ -55,10 +56,8 @@ export const useUpdateMemo = () => {
             const now = Math.floor(Date.now() / 1000)
             await db.runAsync(`UPDATE ${type} SET parentId = ?, updatedAt = ? WHERE id = ?`, [toParentId, now, memoId])
 
-            // 출발/도착 목록 + 폴더 채움여부 아이콘까지 모두 갱신
-            await queryClient.invalidateQueries({ queryKey: [MemoType.FOLDER] })
-            await queryClient.invalidateQueries({ queryKey: [MemoType.FILE] })
-            await queryClient.invalidateQueries({ queryKey: ["checkFilledMemo"] })
+            // 출발/도착 목록 + 폴더 채움여부 아이콘 갱신
+            await invalidateMemoQueries(queryClient, [fromParentId, toParentId])
         }
     })
 

@@ -8,9 +8,8 @@ import { hapticPress, hapticSuccess, hapticTap, hapticWarning } from "@/function
 import { useCheckFilledMemo } from "@/hook/useCheckFilledMemo"
 import { useSearchedMemo } from "@/hook/useSearchedMemo"
 import { useUpdateMemo } from "@/hook/useUpdateMemo"
-import { appBarAtom, searchInputAtom, selectedMemoAtom, sortAtom, themeAtom } from "@/store"
+import { appBarAtom, searchInputAtom, selectedMemoAtom, themeAtom } from "@/store"
 import { AppBar, Memo, MemoType, SelectedMemoType } from "@/type"
-import { useQueryClient } from "@tanstack/react-query"
 import { RelativePathString, router, useLocalSearchParams, usePathname } from "expo-router"
 import { useAtom, useAtomValue, useSetAtom } from "jotai"
 import { useEffect, useMemo, useRef, useState } from "react"
@@ -35,23 +34,19 @@ const getItemsPerRow = () => {
     return Math.floor(availableWidth / itemWidth)
 }
 
-export const FolderList = () => {
+export const FolderList = ({ memos }: { memos: Memo[] }) => {
     const theme = useAtomValue(themeAtom)
-    const sortType = useAtomValue(sortAtom)
-    const queryClient = useQueryClient()
     const params = useLocalSearchParams()
     const currentPath = usePathname()
     const [appBar, setAppBar] = useAtom(appBarAtom)
     const [selectedMemo, setSelectedMemo] = useAtom(selectedMemoAtom)
     const setSearchInput = useSetAtom(searchInputAtom)
     const { updateFolderTitle, updateFileTitle, moveMemo } = useUpdateMemo()
-    const currentId = params.id ? Number(params?.id) : 0
     // 드롭/hover 판정의 정본 Map(ref) — 동시 등록 race 없음.
     const itemRects = useRef<Map<string, RectMap[string]>>(new Map())
     const hoveredRef = useRef<string | null>(null)
     // 폴더 확대 애니메이션이 반응할 현재 hover key (JS에서 설정)
     const hoveredKey = useSharedValue<string | null>(null)
-    const memos = queryClient.getQueryData<Memo[]>([MemoType.FOLDER, currentId, sortType]) ?? []
     const { data: filledFolder = [] } = useCheckFilledMemo(memos)
     const [focusedInputKey, setFocusedInputKey] = useState<string | null>(null)
     const { control } = useForm<FormValues>({ defaultValues: { title: "" } })
@@ -131,7 +126,8 @@ export const FolderList = () => {
         moveMemo({ memoId: dragged.id, type: dragged.type, fromParentId: dragged.parentId ?? null, toParentId: target.id })
             .then(() => {
                 hapticSuccess()
-                Toast.show({ text1: `'${target.title}'(으)로 이동했어요.`, type: "customToast", position: "bottom", visibilityTime: 2000 })
+                const name = target.title.replace(/\s+/g, " ").trim()
+                Toast.show({ text1: `'${name}'(으)로 이동했어요.`, type: "customToast", position: "bottom", visibilityTime: 2000 })
             })
             .catch(() => {
                 hapticWarning()

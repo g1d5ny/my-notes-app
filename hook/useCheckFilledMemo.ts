@@ -4,31 +4,28 @@ import { useSQLiteContext } from "expo-sqlite"
 
 export const useCheckFilledMemo = (memos: Memo[]) => {
     const db = useSQLiteContext()
-    const folderIds = memos?.filter(m => m.type === MemoType.FOLDER).map(m => m.id)
-
-    // 각 폴더 아이템마다 내용이 있는지 체크
-    const checkFolderFilled = async (folderId: number) => {
-        const result = await db.getFirstAsync<{ totalCount: number }>(
-            `SELECT 
-            (SELECT COUNT(*) FROM folder WHERE parentId = ?) + 
-            (SELECT COUNT(*) FROM file WHERE parentId = ?) as totalCount`,
-            [folderId, folderId]
-        )
-        return (result?.totalCount ?? 0) > 0
-    }
+    const folderIds = memos?.filter(m => m.type === MemoType.FOLDER).map(m => m.id) ?? []
 
     return useQuery({
         queryKey: ["checkFilledMemo", folderIds],
         queryFn: async () => {
-            const map: Record<number, boolean> = {}
-            await Promise.all(
-                folderIds.map(async id => {
-                    map[id] = await checkFolderFilled(id)
-                })
+            // 폴더마다 COUNT N번 대신, 자식이 있는 parentId를 한 방에 조회
+            const placeholders = folderIds.map(() => "?").join(", ")
+            const rows = await db.getAllAsync<{ parentId: number }>(
+                `SELECT parentId FROM (
+                    SELECT parentId FROM ${MemoType.FOLDER} WHERE parentId IN (${placeholders})
+                    UNION ALL
+                    SELECT parentId FROM ${MemoType.FILE} WHERE parentId IN (${placeholders})
+                 ) GROUP BY parentId`,
+                [...folderIds, ...folderIds]
             )
-
+            const filledSet = new Set(rows.map(r => r.parentId))
+            const map: Record<number, boolean> = {}
+            folderIds.forEach(id => {
+                map[id] = filledSet.has(id)
+            })
             return map
         },
-        enabled: folderIds?.length > 0
+        enabled: folderIds.length > 0
     })
 }

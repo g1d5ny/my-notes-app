@@ -1,14 +1,11 @@
-import { AndroidBack, Close, IosBack, Paste } from "@/assets/icons/svg/icon"
-import { Styles } from "@/constant/Style"
-import { useCreateMemo } from "@/hook/useCreateMemo"
-import { useDeleteMemo } from "@/hook/useDeleteMemo"
+import { AndroidBack, Close, IosBack } from "@/assets/icons/svg/icon"
+import { FontStyles } from "@/constant/Style"
 import { appBarAtom, selectedMemoAtom, themeAtom } from "@/store"
-import { AppBar, MemoType, SelectedMemoType } from "@/type"
-import { useGlobalSearchParams, usePathname, useRouter } from "expo-router"
+import { AppBar, SelectedMemoType } from "@/type"
+import { usePathname, useRouter } from "expo-router"
 import { useAtom, useAtomValue, useSetAtom } from "jotai"
 import { useEffect, useState } from "react"
-import { Platform, Pressable, StyleSheet, View } from "react-native"
-import Toast from "react-native-toast-message"
+import { Platform, Pressable, StyleSheet, Text, View } from "react-native"
 
 export const PasteAppBar = () => {
     const theme = useAtomValue(themeAtom)
@@ -17,59 +14,7 @@ export const PasteAppBar = () => {
     const [canBack, setCanBack] = useState(pathname.split("/").length > 2)
     const [selectedMemo, setSelectedMemo] = useAtom(selectedMemoAtom)
     const setAppBar = useSetAtom(appBarAtom)
-    const params = useGlobalSearchParams()
-    const { createFileFn, duplicateFolder } = useCreateMemo()
-    const { deleteFileFn, deleteFolderFn } = useDeleteMemo()
-
-    const paste = async () => {
-        const findSamePathMemo = selectedMemo.memo.find(memo => Number(params.id) === memo.id && Number(params.parentId) === memo.parentId)
-        if (findSamePathMemo) {
-            Toast.show({
-                text1: "같은 위치에 붙여넣기 할 수 없습니다.",
-                type: "customToast",
-                position: "bottom",
-                visibilityTime: 3000
-            })
-            return
-        }
-        if (params.type === MemoType.FILE) {
-            Toast.show({
-                text1: "파일에 붙여넣기 할 수 없습니다.",
-                type: "customToast",
-                position: "bottom",
-                visibilityTime: 3000
-            })
-            return
-        }
-        if (selectedMemo) {
-            selectedMemo.memo.forEach(async memo => {
-                console.log("memo.type: ", memo.type)
-                if (memo.type === MemoType.FILE) {
-                    await createFileFn({ title: memo.title ?? "", content: memo.content ?? "", parentId: params.id ? Number(params.id) : null })
-                } else {
-                    await duplicateFolder({ folderId: memo.id ?? 0, newParentId: params.id ? Number(params.id) : null })
-                }
-
-                if (selectedMemo.type === SelectedMemoType.CUT) {
-                    if (memo.type === MemoType.FILE) {
-                        deleteFileFn({ id: memo.id ?? 0, parentId: memo.parentId ?? null })
-                    } else {
-                        deleteFolderFn({ id: memo.id ?? 0, parentId: memo.parentId ?? null })
-                    }
-                }
-            })
-
-            setSelectedMemo({ memo: [], type: SelectedMemoType.COPY })
-            setAppBar(AppBar.MAIN)
-
-            Toast.show({
-                text1: "붙여넣기 되었습니다.",
-                type: "customToast",
-                position: "bottom",
-                visibilityTime: 5000
-            })
-        }
-    }
+    const count = selectedMemo.memo.length
 
     const cancel = () => {
         setSelectedMemo({ memo: [], type: SelectedMemoType.COPY })
@@ -82,21 +27,17 @@ export const PasteAppBar = () => {
 
     return (
         <View style={styles.row}>
-            <View style={styles.left}>
-                {canBack && (
-                    <Pressable hitSlop={10} style={styles.back} onPress={() => router.back()}>
-                        {Platform.OS === "ios" ? <IosBack theme={theme} /> : <AndroidBack theme={theme} />}
-                    </Pressable>
-                )}
-            </View>
-            <View style={[Styles.row, styles.right]}>
-                <Pressable hitSlop={10} onPress={cancel}>
-                    <Close theme={theme} />
+            {canBack ? (
+                <Pressable hitSlop={10} onPress={() => router.back()}>
+                    {Platform.OS === "ios" ? <IosBack theme={theme} /> : <AndroidBack theme={theme} />}
                 </Pressable>
-                <Pressable hitSlop={10} onPress={paste}>
-                    <Paste theme={theme} />
-                </Pressable>
-            </View>
+            ) : (
+                <View style={styles.spacer} />
+            )}
+            <Text style={[FontStyles.SubTitle, { color: theme.text }]}>{count > 0 ? `${count}개 선택` : "붙여넣기"}</Text>
+            <Pressable hitSlop={10} onPress={cancel}>
+                <Close theme={theme} />
+            </Pressable>
         </View>
     )
 }
@@ -108,15 +49,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "space-between"
     },
-    back: {
-        alignSelf: "flex-start"
-    },
-    right: {
-        alignItems: "center",
-        alignSelf: "flex-end",
-        gap: 8
-    },
-    left: {
-        flex: 1
+    spacer: {
+        width: 24
     }
 })

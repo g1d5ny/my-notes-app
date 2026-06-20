@@ -1,6 +1,7 @@
 import EmptyFolder from "@/assets/icons/svg/icon_empty_folder.svg"
 import File from "@/assets/icons/svg/icon_file.svg"
 import FilledFolder from "@/assets/icons/svg/icon_filled_folder.svg"
+import { CheckIcon } from "@/assets/icons/svg/addMenu"
 import { FontStyles } from "@/constant/Style"
 import { hapticPress, hapticTap } from "@/function/haptics"
 import { useCheckFilledMemo } from "@/hook/useCheckFilledMemo"
@@ -95,7 +96,7 @@ export const FolderList = () => {
                         const selected = selectedMemo.memo.some(selectedMemo => selectedMemo.id === id && selectedMemo.type === type)
 
                         return (
-                            <View key={index} style={[styles.item, { opacity: selected ? 0.5 : 1 }]}>
+                            <View key={index} style={styles.item}>
                                 <Pressable
                                     onLongPress={() => selectMemo(memo)}
                                     onPress={() => {
@@ -118,7 +119,14 @@ export const FolderList = () => {
                                         open(id, type, title, content, parentId)
                                     }}
                                 >
-                                    {type === MemoType.FILE ? <File /> : filledFolder[id] ? <FilledFolder /> : <EmptyFolder />}
+                                    <View style={[styles.iconWrap, selected && { backgroundColor: theme.accentSoft }]}>
+                                        {type === MemoType.FILE ? <File /> : filledFolder[id] ? <FilledFolder /> : <EmptyFolder />}
+                                        {selected && (
+                                            <View style={[styles.badge, { backgroundColor: theme.accent, borderColor: theme.background }]}>
+                                                <CheckIcon color={theme.onAccent} size={13} />
+                                            </View>
+                                        )}
+                                    </View>
                                 </Pressable>
                                 <View style={[styles.titleContainer, focusedInputKey === `${id}-${type}` && { backgroundColor: theme.surfaceVariant }]}>
                                     {focusedInputKey === `${id}-${type}` ? (
@@ -219,5 +227,20 @@ const styles = StyleSheet.create({
     item: {
         width: 76,
         alignItems: "center"
+    },
+    iconWrap: {
+        borderRadius: 16,
+        padding: 4
+    },
+    badge: {
+        position: "absolute",
+        top: -2,
+        right: -2,
+        width: 22,
+        height: 22,
+        borderRadius: 11,
+        alignItems: "center",
+        justifyContent: "center",
+        borderWidth: 2
     }
 })

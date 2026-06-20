@@ -1,4 +1,6 @@
 import { AppBar } from "@/component/appBar"
+import { FolderActionBottomBar } from "@/component/appBar/FolderActionBottomBar"
+import { PasteBottomBar } from "@/component/appBar/PasteBottomBar"
 import { CommonToast } from "@/component/CommonToast"
 import { SearchInput } from "@/component/input/SearchInput"
 import { AddMemoController } from "@/component/modal/add"
@@ -56,6 +58,8 @@ function AppContent() {
                             <RoutingHeader />
                             <Slot />
                             <AddMemoController />
+                            <FolderActionBottomBar />
+                            <PasteBottomBar />
                             <MessageModal />
                             <InfoModal />
                             <CommonToast />

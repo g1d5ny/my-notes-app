@@ -45,6 +45,8 @@ export const FolderList = ({ memos }: { memos: Memo[] }) => {
     // 드롭/hover 판정의 정본 Map(ref) — 동시 등록 race 없음.
     const itemRects = useRef<Map<string, RectMap[string]>>(new Map())
     const hoveredRef = useRef<string | null>(null)
+    // 제목 입력창 ref 맵 — 탭 시 프로그램적으로 focus()해서 키보드를 확실히 띄운다.
+    const inputRefs = useRef<Map<string, TextInput>>(new Map())
     // 폴더 확대 애니메이션이 반응할 현재 hover key (JS에서 설정)
     const hoveredKey = useSharedValue<string | null>(null)
     const { data: filledFolder = [] } = useCheckFilledMemo(memos)
@@ -143,22 +145,19 @@ export const FolderList = ({ memos }: { memos: Memo[] }) => {
 
     return (
         <View style={styles.container}>
-            <KeyboardAwareScrollView
-                keyboardShouldPersistTaps='handled'
-                showsVerticalScrollIndicator={false}
-                contentContainerStyle={styles.contentContainerStyle}
-                onTouchEnd={() => {
-                    Keyboard.dismiss()
-                    setSearchInput({ value: "", visible: false })
-                }}
-            >
+            <KeyboardAwareScrollView keyboardShouldPersistTaps='handled' showsVerticalScrollIndicator={false} contentContainerStyle={styles.contentContainerStyle}>
+                {/* 빈 공간 탭 전용 배경 레이어: 키보드/검색 닫기 + 선택 해제.
+                    항목들은 위(box-none 컨테이너)에서 자기 탭을 소비하므로 여기로 내려오지 않는다. */}
                 <Pressable
-                    style={styles.pressContainer}
+                    style={StyleSheet.absoluteFill}
                     onPress={() => {
+                        Keyboard.dismiss()
+                        setSearchInput({ value: "", visible: false })
                         setSelectedMemo({ memo: [], type: SelectedMemoType.COPY })
                         setAppBar(AppBar.MAIN)
                     }}
-                >
+                />
+                <View style={styles.pressContainer} pointerEvents='box-none'>
                     {(searchedMemos.length > 0 ? searchedMemos : memos).map((memo, index) => {
                         const { id, title, type, content, parentId } = memo
                         const selected = selectedMemo.memo.some(selectedMemo => selectedMemo.id === id && selectedMemo.type === type)
@@ -185,7 +184,11 @@ export const FolderList = ({ memos }: { memos: Memo[] }) => {
                                             const inSelection = appBar === AppBar.FOLDER_ACTION
                                             return (
                                                 <TextInput
-                                                    ref={ref}
+                                                    ref={node => {
+                                                        ref(node)
+                                                        if (node) inputRefs.current.set(`${id}-${type}`, node)
+                                                        else inputRefs.current.delete(`${id}-${type}`)
+                                                    }}
                                                     value={value ?? title}
                                                     editable={!inSelection}
                                                     onChangeText={onChange}
@@ -215,12 +218,19 @@ export const FolderList = ({ memos }: { memos: Memo[] }) => {
                                             )
                                         }}
                                     />
-                                    {/* 선택 모드에서만 위에 투명 오버레이 → 탭은 편집이 아니라 선택을 담당.
-                                        평소엔 오버레이가 없어 입력창이 직접 탭을 받아 키보드가 정상적으로 올라온다. */}
-                                    {appBar === AppBar.FOLDER_ACTION && (
+                                    {/* 편집 중이 아닐 때만 탭 레이어를 올린다. 바깥 Pressable이 탭을 가로채도
+                                        여기서 직접 focus()를 호출해 키보드를 확실히 띄운다(또는 선택 모드면 선택).
+                                        편집이 시작되면(focusedInputKey 설정) 레이어가 사라져 커서 이동·타이핑은 네이티브로. */}
+                                    {focusedInputKey !== `${id}-${type}` && (
                                         <Pressable
                                             style={StyleSheet.absoluteFill}
-                                            onPress={() => setSelectedMemo(prev => (prev.memo.some(s => s.id === id && s.type === type) ? prev : { ...prev, memo: [...prev.memo, memo] }))}
+                                            onPress={() => {
+                                                if (appBar === AppBar.FOLDER_ACTION) {
+                                                    setSelectedMemo(prev => (prev.memo.some(s => s.id === id && s.type === type) ? prev : { ...prev, memo: [...prev.memo, memo] }))
+                                                    return
+                                                }
+                                                inputRefs.current.get(`${id}-${type}`)?.focus()
+                                            }}
                                         />
                                     )}
                                 </View>
@@ -230,7 +240,7 @@ export const FolderList = ({ memos }: { memos: Memo[] }) => {
                     {Array.from({ length: Math.max(0, itemsPerRow - (memos.length % itemsPerRow)) }).map((_, index) => {
                         return <View key={index} style={styles.item} />
                     })}
-                </Pressable>
+                </View>
             </KeyboardAwareScrollView>
         </View>
     )

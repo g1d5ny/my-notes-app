@@ -48,11 +48,14 @@ function AppContent() {
     }, [scheme, theme])
 
     return (
-        <Suspense fallback={<></>}>
-            <SQLiteProvider databaseName={DATABASE_NAME} options={{ enableChangeListener: true }} useSuspense onInit={migrateDbIfNeeded}>
-                <PaperProvider theme={paperTheme}>
-                    <KeyboardProvider>
-                        <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
+        // 루트 뷰에도 테마 배경을 깔아, 시스템 바(상·하단) 인셋 영역에 비치던
+        // 기본 윈도우 색(#FAFAFA) 띠를 없앤다.
+        <GestureHandlerRootView style={[styles.container, { backgroundColor: theme.background }]}>
+            <Suspense fallback={<></>}>
+                <SQLiteProvider databaseName={DATABASE_NAME} options={{ enableChangeListener: true }} useSuspense onInit={migrateDbIfNeeded}>
+                    <PaperProvider theme={paperTheme}>
+                        <KeyboardProvider>
+                            <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
                             <StatusBar />
                             <AppBar />
                             <SearchInput />
@@ -65,25 +68,24 @@ function AppContent() {
                             <InfoModal />
                             <CommonToast />
                             <ThemeTransition />
-                        </SafeAreaView>
-                        <KeyboardToolbar>
-                            <KeyboardToolbar.Done text='완료' />
-                        </KeyboardToolbar>
-                    </KeyboardProvider>
-                </PaperProvider>
-            </SQLiteProvider>
-        </Suspense>
+                            </SafeAreaView>
+                            <KeyboardToolbar>
+                                <KeyboardToolbar.Done text='완료' />
+                            </KeyboardToolbar>
+                        </KeyboardProvider>
+                    </PaperProvider>
+                </SQLiteProvider>
+            </Suspense>
+        </GestureHandlerRootView>
     )
 }
 
 export default function RootLayout() {
     return (
         <QueryClientProvider client={queryClient}>
-            <GestureHandlerRootView style={{ flex: 1 }}>
-                <Provider store={store}>
-                    <AppContent />
-                </Provider>
-            </GestureHandlerRootView>
+            <Provider store={store}>
+                <AppContent />
+            </Provider>
         </QueryClientProvider>
     )
 }

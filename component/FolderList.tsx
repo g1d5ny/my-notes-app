@@ -2,7 +2,7 @@ import EmptyFolder from "@/assets/icons/svg/icon_empty_folder.svg"
 import File from "@/assets/icons/svg/icon_file.svg"
 import FilledFolder from "@/assets/icons/svg/icon_filled_folder.svg"
 import { CheckIcon } from "@/assets/icons/svg/addMenu"
-import { DraggableMemoIcon, Rect } from "@/component/DraggableMemoIcon"
+import { DraggableMemoIcon, Rect, RectMap } from "@/component/DraggableMemoIcon"
 import { FontStyles } from "@/constant/Style"
 import { hapticPress, hapticSuccess, hapticTap, hapticWarning } from "@/function/haptics"
 import { useCheckFilledMemo } from "@/hook/useCheckFilledMemo"
@@ -17,6 +17,7 @@ import { useEffect, useMemo, useRef, useState } from "react"
 import { Controller, FieldPath, useForm } from "react-hook-form"
 import { Dimensions, Keyboard, Pressable, StyleSheet, Text, TextInput, View } from "react-native"
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller"
+import { useSharedValue } from "react-native-reanimated"
 import Toast from "react-native-toast-message"
 
 type FormValues = {
@@ -45,7 +46,11 @@ export const FolderList = () => {
     const setSearchInput = useSetAtom(searchInputAtom)
     const { updateFolderTitle, updateFileTitle, moveMemo } = useUpdateMemo()
     const currentId = params.id ? Number(params?.id) : 0
-    const itemRects = useRef<Map<string, Rect>>(new Map())
+    // 드롭/hover 판정의 정본 Map(ref) — 동시 등록 race 없음.
+    const itemRects = useRef<Map<string, RectMap[string]>>(new Map())
+    const hoveredRef = useRef<string | null>(null)
+    // 폴더 확대 애니메이션이 반응할 현재 hover key (JS에서 설정)
+    const hoveredKey = useSharedValue<string | null>(null)
     const memos = queryClient.getQueryData<Memo[]>([MemoType.FOLDER, currentId, sortType]) ?? []
     const { data: filledFolder = [] } = useCheckFilledMemo(memos)
     const [focusedInputKey, setFocusedInputKey] = useState<string | null>(null)
@@ -70,10 +75,32 @@ export const FolderList = () => {
         setAppBar(AppBar.FOLDER_ACTION)
     }
 
-    // 드래그 대상 판정을 위한 화면 위치 등록
+    // 드래그 대상 위치 등록
     const registerRect = (key: string, rect: Rect | null) => {
-        if (rect) itemRects.current.set(key, rect)
+        if (rect) itemRects.current.set(key, { ...rect, isFolder: key.endsWith(MemoType.FOLDER) })
         else itemRects.current.delete(key)
+    }
+
+    // 드래그 중: 손가락 밑 폴더 찾아 hover 표시(+햅틱). 바뀔 때만 갱신.
+    const onDragMove = (draggedKey: string, x: number, y: number) => {
+        let found: string | null = null
+        for (const [k, r] of itemRects.current) {
+            if (k === draggedKey || !r.isFolder) continue
+            if (x >= r.x && x <= r.x + r.w && y >= r.y && y <= r.y + r.h) {
+                found = k
+                break
+            }
+        }
+        if (found !== hoveredRef.current) {
+            hoveredRef.current = found
+            hoveredKey.value = found
+            if (found) hapticTap()
+        }
+    }
+
+    const onDragEnd = () => {
+        hoveredRef.current = null
+        hoveredKey.value = null
     }
 
     // 짧게 탭: 열기 / 붙여넣기·선택 모드에선 토글
@@ -142,7 +169,7 @@ export const FolderList = () => {
 
                         return (
                             <View key={index} style={styles.item}>
-                                <DraggableMemoIcon rectKey={`${id}-${type}`} registerRect={registerRect} onTap={() => handleTap(memo, selected)} onSelect={() => selectMemo(memo)} onDrop={(x, y) => handleDrop(memo, x, y)}>
+                                <DraggableMemoIcon rectKey={`${id}-${type}`} registerRect={registerRect} hoveredKey={hoveredKey} onDragMove={onDragMove} onDragEnd={onDragEnd} onTap={() => handleTap(memo, selected)} onSelect={() => selectMemo(memo)} onDrop={(x, y) => handleDrop(memo, x, y)}>
                                     <View style={[styles.iconWrap, selected && { backgroundColor: theme.accentSoft }]}>
                                         {type === MemoType.FILE ? <File /> : filledFolder[id] ? <FilledFolder /> : <EmptyFolder />}
                                         {selected && (
@@ -246,7 +273,9 @@ const styles = StyleSheet.create({
         flexGrow: 1
     },
     contentContainerStyle: {
-        flexGrow: 1
+        flexGrow: 1,
+        // 선택 배지·드래그 hover 시 커진 폴더가 위에서 잘리지 않도록 여백
+        paddingTop: 18
     },
     item: {
         width: 76,

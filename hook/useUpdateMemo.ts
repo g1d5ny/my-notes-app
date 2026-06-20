@@ -55,9 +55,10 @@ export const useUpdateMemo = () => {
             const now = Math.floor(Date.now() / 1000)
             await db.runAsync(`UPDATE ${type} SET parentId = ?, updatedAt = ? WHERE id = ?`, [toParentId, now, memoId])
 
-            // 출발 폴더 + 도착 폴더 목록 둘 다 갱신
-            await queryClient.invalidateQueries({ queryKey: [MemoType.FOLDER, fromParentId ?? 0] })
-            await queryClient.invalidateQueries({ queryKey: [MemoType.FOLDER, toParentId ?? 0] })
+            // 출발/도착 목록 + 폴더 채움여부 아이콘까지 모두 갱신
+            await queryClient.invalidateQueries({ queryKey: [MemoType.FOLDER] })
+            await queryClient.invalidateQueries({ queryKey: [MemoType.FILE] })
+            await queryClient.invalidateQueries({ queryKey: ["checkFilledMemo"] })
         }
     })
 

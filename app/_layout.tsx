@@ -8,6 +8,7 @@ import { InfoModal } from "@/component/modal/InfoModal"
 import { MessageModal } from "@/component/modal/MessageModal"
 import RoutingHeader from "@/component/RoutingHeader"
 import { StatusBar } from "@/component/StatusBar"
+import { ThemeTransition } from "@/component/ThemeTransition"
 import { customFontsToLoad } from "@/constant/Style"
 import { schemeAtom, store, themeAtom } from "@/store"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
@@ -63,6 +64,7 @@ function AppContent() {
                             <MessageModal />
                             <InfoModal />
                             <CommonToast />
+                            <ThemeTransition />
                         </SafeAreaView>
                         <KeyboardToolbar>
                             <KeyboardToolbar.Done text='완료' />

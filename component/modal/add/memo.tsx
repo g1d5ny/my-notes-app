@@ -1,19 +1,47 @@
-import { FilePlus, FolderPlus } from "@/assets/icons/svg/icon"
-import { FontStyles, Styles } from "@/constant/Style"
-import { DarkTheme, LightTheme } from "@/constant/Theme"
+import { FolderAddIcon, NoteAddIcon, PlusIcon } from "@/assets/icons/svg/addMenu"
+import { Elevation, FontStyles, Radius, Spacing } from "@/constant/Style"
 import { hapticTap } from "@/function/haptics"
 import { useCreateMemo } from "@/hook/useCreateMemo"
 import { selectedMemoAtom, themeAtom } from "@/store"
-import { MemoType } from "@/type"
+import { MemoType, ThemeColorPalette } from "@/type"
 import { useGlobalSearchParams } from "expo-router"
 import { useAtomValue } from "jotai"
-import { useMemo, useState } from "react"
-import { Image, Pressable, StyleSheet, Text } from "react-native"
-import { Modal } from "react-native-paper"
+import { ReactNode, useState } from "react"
+import { Pressable, StyleSheet, Text, View } from "react-native"
+import Animated, { interpolate, SharedValue, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 
 const MARGIN = 16
-const ICON_SIZE = 80
+const FAB = 56
+const GAP = 14
+
+interface ActionItemProps {
+    progress: SharedValue<number>
+    open: boolean
+    label: string
+    icon: ReactNode
+    onPress: () => void
+    bottomOffset: number
+    theme: ThemeColorPalette
+}
+
+const ActionItem = ({ progress, open, label, icon, onPress, bottomOffset, theme }: ActionItemProps) => {
+    const animatedStyle = useAnimatedStyle(() => ({
+        opacity: progress.value,
+        transform: [{ translateY: interpolate(progress.value, [0, 1], [12, 0]) }]
+    }))
+
+    return (
+        <Animated.View pointerEvents={open ? "auto" : "none"} style={[styles.actionRow, { bottom: bottomOffset }, animatedStyle]}>
+            <Pressable style={styles.actionInner} onPress={onPress}>
+                <View style={[styles.chip, Elevation.low, { backgroundColor: theme.surface }]}>
+                    <Text style={[FontStyles.ButtonText2, { color: theme.text }]}>{label}</Text>
+                </View>
+                <View style={[styles.circle, Elevation.medium, { backgroundColor: theme.accent }]}>{icon}</View>
+            </Pressable>
+        </Animated.View>
+    )
+}
 
 interface AddMemoProps {
     onAddFile: () => void
@@ -25,73 +53,104 @@ export const AddMemo = ({ onAddFile }: AddMemoProps) => {
     const selectedMemo = useAtomValue(selectedMemoAtom)
     const { createFolder } = useCreateMemo()
     const params = useGlobalSearchParams()
-    const [modalVisible, setModalVisible] = useState(false)
+    const [open, setOpen] = useState(false)
+    const progress = useSharedValue(0)
     const parentId = params.id ? Number(params.id) : null
     const currentType = params.type
 
-    const isVisiblePlusIcon = useMemo(() => {
-        return !modalVisible && currentType !== MemoType.FILE && selectedMemo.memo.length === 0
-    }, [modalVisible, currentType, selectedMemo.memo.length])
+    const visible = currentType !== MemoType.FILE && selectedMemo.memo.length === 0
 
-    const closeModal = () => {
-        setModalVisible(false)
+    const animate = (next: boolean) => {
+        setOpen(next)
+        progress.value = withTiming(next ? 1 : 0, { duration: 200 })
     }
 
-    const openModal = () => {
+    const toggle = () => {
         hapticTap()
-        setModalVisible(true)
+        animate(!open)
     }
+
+    const close = () => animate(false)
 
     const handleAddFile = () => {
-        closeModal()
+        hapticTap()
+        close()
         onAddFile()
     }
 
     const handleAddFolder = () => {
-        closeModal()
+        hapticTap()
+        close()
         createFolder({ parentId })
     }
 
+    const fabIconStyle = useAnimatedStyle(() => ({
+        transform: [{ rotate: `${interpolate(progress.value, [0, 1], [0, 45])}deg` }]
+    }))
+
+    const backdropStyle = useAnimatedStyle(() => ({
+        opacity: interpolate(progress.value, [0, 1], [0, 0.45])
+    }))
+
+    if (!visible) return null
+
+    const base = bottom + MARGIN
+
     return (
         <>
-            {isVisiblePlusIcon && (
-                <Pressable style={[styles.plus, { bottom: bottom + MARGIN }]} onPress={openModal}>
-                    <Image source={require("@/assets/icons/icon_plus.png")} style={styles.icon} />
-                </Pressable>
-            )}
-            <Modal visible={modalVisible} onDismiss={closeModal} style={styles.modal}>
-                <Pressable style={[Styles.row, styles.plus, { bottom: bottom + MARGIN + ICON_SIZE * 2 }]} onPress={handleAddFile}>
-                    <Text style={styles.text}>파일</Text>
-                    <FilePlus theme={theme === LightTheme ? DarkTheme : LightTheme} />
-                </Pressable>
-                <Pressable style={[Styles.row, styles.plus, { bottom: bottom + MARGIN + ICON_SIZE }]} onPress={handleAddFolder}>
-                    <Text style={styles.text}>폴더</Text>
-                    <FolderPlus theme={theme === LightTheme ? DarkTheme : LightTheme} />
-                </Pressable>
-                <Pressable style={[styles.plus, { bottom: bottom + MARGIN }]} onPress={closeModal}>
-                    <Image source={require("@/assets/icons/icon_plus.png")} style={[styles.icon, { transform: [{ rotate: "45deg" }] }]} />
-                </Pressable>
-            </Modal>
+            {/* 딤 배경 — 빈 곳 누르면 닫힘 */}
+            <Animated.View pointerEvents={open ? "auto" : "none"} style={[StyleSheet.absoluteFill, styles.backdrop, backdropStyle]}>
+                <Pressable style={StyleSheet.absoluteFill} onPress={close} />
+            </Animated.View>
+
+            <ActionItem progress={progress} open={open} label='파일' icon={<NoteAddIcon color={theme.onAccent} />} onPress={handleAddFile} bottomOffset={base + (FAB + GAP) * 2} theme={theme} />
+            <ActionItem progress={progress} open={open} label='폴더' icon={<FolderAddIcon color={theme.onAccent} />} onPress={handleAddFolder} bottomOffset={base + (FAB + GAP)} theme={theme} />
+
+            {/* FAB — 제자리에서 +↔X 회전 */}
+            <Pressable style={[styles.fab, Elevation.high, { bottom: base, backgroundColor: theme.accent }]} onPress={toggle}>
+                <Animated.View style={fabIconStyle}>
+                    <PlusIcon color={theme.onAccent} size={30} />
+                </Animated.View>
+            </Pressable>
         </>
     )
 }
 
 const styles = StyleSheet.create({
-    modal: {
-        alignItems: "flex-end",
-        justifyContent: "flex-end"
+    backdrop: {
+        backgroundColor: "#000000"
     },
-    icon: {
-        width: ICON_SIZE,
-        height: ICON_SIZE
-    },
-    text: {
-        ...FontStyles.SubTitle,
-        color: "#CFD0D4"
-    },
-    plus: {
+    fab: {
         position: "absolute",
         right: MARGIN,
-        zIndex: 0
+        width: FAB,
+        height: FAB,
+        borderRadius: Radius.full,
+        alignItems: "center",
+        justifyContent: "center"
+    },
+    actionRow: {
+        position: "absolute",
+        right: MARGIN,
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "flex-end"
+    },
+    actionInner: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: Spacing.md
+    },
+    chip: {
+        paddingHorizontal: Spacing.lg,
+        paddingVertical: Spacing.sm,
+        borderRadius: Radius.full
+    },
+    circle: {
+        width: FAB,
+        height: FAB,
+        borderRadius: Radius.full,
+        alignItems: "center",
+        justifyContent: "center"
     }
 })

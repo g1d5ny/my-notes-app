@@ -1,5 +1,6 @@
 import { CheckOption, ResetOption, SortOption, ThemeOption } from "@/assets/icons/svg/option/icon"
 import { FontStyles } from "@/constant/Style"
+import { DarkTheme, LightTheme } from "@/constant/Theme"
 import { useDeleteMemo } from "@/hook/useDeleteMemo"
 import { useReadMemo } from "@/hook/useReadMemo"
 import { useSort } from "@/hook/useSort"
@@ -14,7 +15,7 @@ import appConfig from "../../app.json"
 import { OptionMenu, OptionMenuList } from "../OptionMenu"
 
 export const SettingOption = () => {
-    const theme = useAtomValue(themeAtom)
+    const [theme, setTheme] = useAtom(themeAtom)
     const [scheme, setScheme] = useAtom(schemeAtom)
     const setModalVisible = useSetAtom(modalAtom)
     const sort = useAtomValue(sortAtom)
@@ -93,6 +94,7 @@ export const SettingOption = () => {
             leadingIcon: scheme === "light" ? <Image source={require("@/assets/icons/icon_selected.png")} style={styles.icon} /> : <></>,
             disabled: false,
             onPress: () => {
+                setTheme(LightTheme)
                 setScheme("light")
                 setMenuVisible(false)
             },
@@ -104,6 +106,7 @@ export const SettingOption = () => {
             leadingIcon: scheme === "dark" ? <Image source={require("@/assets/icons/icon_selected.png")} style={styles.icon} /> : <></>,
             disabled: false,
             onPress: () => {
+                setTheme(DarkTheme)
                 setScheme("dark")
                 setMenuVisible(false)
             },

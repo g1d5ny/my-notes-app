@@ -15,8 +15,11 @@ const schemeStorage = createJSONStorage<ColorSchemeName>(() => AsyncStorage)
 
 export const schemeAtom = atomWithStorage<ColorSchemeName>("scheme", Appearance.getColorScheme() === "dark" ? "dark" : "light", schemeStorage)
 
-// 테마는 scheme에서 파생 — 항상 최신 팔레트 정의를 반영하고, LightTheme/DarkTheme 참조 동일성도 보장된다.
-export const themeAtom = atom<ThemeColorPalette>(get => (get(schemeAtom) === "dark" ? DarkTheme : LightTheme))
+// 테마는 직접 저장(persist)한다. scheme에서 파생하면 비동기 hydration 후
+// 일부 소비자에 갱신 통지가 누락돼 재시작 시 테마가 어긋나는 버그가 있었다.
+const themeStorage = createJSONStorage<ThemeColorPalette>(() => AsyncStorage)
+
+export const themeAtom = atomWithStorage<ThemeColorPalette>("theme", Appearance.getColorScheme() === "dark" ? DarkTheme : LightTheme, themeStorage)
 
 export const modalAtom = atom<Modal>({ visible: false, message: "", onConfirm: () => {}, confirmText: "" })
 

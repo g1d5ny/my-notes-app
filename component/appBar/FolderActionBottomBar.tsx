@@ -79,6 +79,7 @@ export const FolderActionBottomBar = () => {
                 setModal(prev => ({
                     ...prev,
                     visible: true,
+                    destructive: true,
                     message: "정말 삭제하시겠습니까?",
                     onConfirm: () => {
                         selectedMemo.memo.forEach(item => {

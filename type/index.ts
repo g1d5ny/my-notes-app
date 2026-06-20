@@ -50,6 +50,8 @@ export interface Modal {
     message: string
     onConfirm: () => Promise<void> | void
     confirmText: string
+    /** 삭제·초기화 등 위험 동작이면 확인 버튼을 빨강으로 */
+    destructive?: boolean
 }
 
 export enum AppBar {

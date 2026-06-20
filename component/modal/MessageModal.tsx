@@ -7,7 +7,7 @@ import { Modal } from "react-native-paper"
 
 export const MessageModal = () => {
     const theme = useAtomValue(themeAtom)
-    const [{ visible, message, onConfirm, confirmText }, setModal] = useAtom(modalAtom)
+    const [{ visible, message, onConfirm, confirmText, destructive }, setModal] = useAtom(modalAtom)
 
     const onDismiss = () => {
         setModal(prev => ({ ...prev, visible: false }))
@@ -31,7 +31,7 @@ export const MessageModal = () => {
                             onDismiss()
                         }}
                     >
-                        <Text style={[FontStyles.SubTitle, { color: theme.accent }]}>{confirmText}</Text>
+                        <Text style={[FontStyles.SubTitle, { color: destructive ? "#FF3B30" : theme.accent }]}>{confirmText}</Text>
                     </TouchableOpacity>
                 </View>
             </View>

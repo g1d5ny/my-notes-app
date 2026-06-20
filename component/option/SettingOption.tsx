@@ -128,6 +128,7 @@ export const SettingOption = () => {
             onPress: () => {
                 setModalVisible({
                     visible: true,
+                    destructive: true,
                     message: "정말 초기화하시겠습니까?",
                     onConfirm: () => resetMemo({ parentId }),
                     confirmText: "초기화"

@@ -174,7 +174,7 @@ export const FolderList = ({ memos }: { memos: Memo[] }) => {
                                         )}
                                     </View>
                                 </DraggableMemoIcon>
-                                <View style={[styles.titleContainer, focusedInputKey === `${id}-${type}` ? { backgroundColor: theme.surfaceVariant } : { maxHeight: 40 }]}>
+                                <View style={[styles.titleContainer, focusedInputKey === `${id}-${type}` && { backgroundColor: theme.surfaceVariant }]}>
                                     <Controller
                                         name={`${id}-${type}` as FieldPath<FormValues>}
                                         control={control}
@@ -212,7 +212,8 @@ export const FolderList = ({ memos }: { memos: Memo[] }) => {
                                                     numberOfLines={editing ? undefined : 2}
                                                     // 편집이 끝나면 커서/스크롤을 맨 앞으로 → 줄바꿈 있는 제목도 첫 줄부터 보인다.
                                                     selection={editing ? undefined : { start: 0, end: 0 }}
-                                                    scrollEnabled={false}
+                                                    // 높이는 maxHeight(2줄)로 고정. 편집 중엔 그 안에서 스크롤 허용.
+                                                    scrollEnabled={editing}
                                                     returnKeyType='done'
                                                     maxLength={30}
                                                     multiline
@@ -253,6 +254,7 @@ const styles = StyleSheet.create({
         width: "100%",
         alignItems: "center",
         justifyContent: "flex-start",
+        maxHeight: 40,
         borderRadius: 4,
         marginTop: 8,
         padding: 4

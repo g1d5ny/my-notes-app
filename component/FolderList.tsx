@@ -210,6 +210,8 @@ export const FolderList = ({ memos }: { memos: Memo[] }) => {
                                                     style={[styles.title, { color: theme.text }]}
                                                     // 편집 중이 아닐 땐 2줄로 보이게(텍스트처럼), 편집 중엔 전체 표시.
                                                     numberOfLines={editing ? undefined : 2}
+                                                    // 편집이 끝나면 커서/스크롤을 맨 앞으로 → 줄바꿈 있는 제목도 첫 줄부터 보인다.
+                                                    selection={editing ? undefined : { start: 0, end: 0 }}
                                                     scrollEnabled={false}
                                                     returnKeyType='done'
                                                     maxLength={30}

@@ -1,4 +1,6 @@
-import { FolderAddIcon, NoteAddIcon, PlusIcon } from "@/assets/icons/svg/addMenu"
+import { PlusIcon } from "@/assets/icons/svg/addMenu"
+import FolderIcon from "@/assets/icons/svg/icon_empty_folder.svg"
+import NoteIcon from "@/assets/icons/svg/icon_file.svg"
 import { Elevation, FontStyles, Radius, Spacing } from "@/constant/Style"
 import { hapticTap } from "@/function/haptics"
 import { useCreateMemo } from "@/hook/useCreateMemo"
@@ -37,7 +39,7 @@ const ActionItem = ({ progress, open, label, icon, onPress, bottomOffset, theme 
                 <View style={[styles.chip, Elevation.low, { backgroundColor: theme.surface }]}>
                     <Text style={[FontStyles.ButtonText2, { color: theme.text }]}>{label}</Text>
                 </View>
-                <View style={[styles.circle, Elevation.medium, { backgroundColor: theme.accent }]}>{icon}</View>
+                <View style={[styles.circle, Elevation.medium, { backgroundColor: theme.surface }]}>{icon}</View>
             </Pressable>
         </Animated.View>
     )
@@ -103,8 +105,8 @@ export const AddMemo = ({ onAddFile }: AddMemoProps) => {
                 <Pressable style={StyleSheet.absoluteFill} onPress={close} />
             </Animated.View>
 
-            <ActionItem progress={progress} open={open} label='파일' icon={<NoteAddIcon color={theme.onAccent} />} onPress={handleAddFile} bottomOffset={base + (FAB + GAP) * 2} theme={theme} />
-            <ActionItem progress={progress} open={open} label='폴더' icon={<FolderAddIcon color={theme.onAccent} />} onPress={handleAddFolder} bottomOffset={base + (FAB + GAP)} theme={theme} />
+            <ActionItem progress={progress} open={open} label='파일' icon={<NoteIcon width={38} height={38} />} onPress={handleAddFile} bottomOffset={base + (FAB + GAP) * 2} theme={theme} />
+            <ActionItem progress={progress} open={open} label='폴더' icon={<FolderIcon width={40} height={40} />} onPress={handleAddFolder} bottomOffset={base + (FAB + GAP)} theme={theme} />
 
             {/* FAB — 제자리에서 +↔X 회전 */}
             <Pressable style={[styles.fab, Elevation.high, { bottom: base, backgroundColor: theme.accent }]} onPress={toggle}>

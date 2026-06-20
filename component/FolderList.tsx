@@ -2,8 +2,9 @@ import EmptyFolder from "@/assets/icons/svg/icon_empty_folder.svg"
 import File from "@/assets/icons/svg/icon_file.svg"
 import FilledFolder from "@/assets/icons/svg/icon_filled_folder.svg"
 import { CheckIcon } from "@/assets/icons/svg/addMenu"
+import { DraggableMemoIcon, Rect } from "@/component/DraggableMemoIcon"
 import { FontStyles } from "@/constant/Style"
-import { hapticPress, hapticTap } from "@/function/haptics"
+import { hapticPress, hapticSuccess, hapticTap, hapticWarning } from "@/function/haptics"
 import { useCheckFilledMemo } from "@/hook/useCheckFilledMemo"
 import { useSearchedMemo } from "@/hook/useSearchedMemo"
 import { useUpdateMemo } from "@/hook/useUpdateMemo"
@@ -12,10 +13,11 @@ import { AppBar, Memo, MemoType, SelectedMemoType } from "@/type"
 import { useQueryClient } from "@tanstack/react-query"
 import { RelativePathString, router, useLocalSearchParams, usePathname } from "expo-router"
 import { useAtom, useAtomValue, useSetAtom } from "jotai"
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { Controller, FieldPath, useForm } from "react-hook-form"
 import { Dimensions, Keyboard, Pressable, StyleSheet, Text, TextInput, View } from "react-native"
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller"
+import Toast from "react-native-toast-message"
 
 type FormValues = {
     title: string
@@ -41,8 +43,9 @@ export const FolderList = () => {
     const [appBar, setAppBar] = useAtom(appBarAtom)
     const [selectedMemo, setSelectedMemo] = useAtom(selectedMemoAtom)
     const setSearchInput = useSetAtom(searchInputAtom)
-    const { updateFolderTitle, updateFileTitle } = useUpdateMemo()
+    const { updateFolderTitle, updateFileTitle, moveMemo } = useUpdateMemo()
     const currentId = params.id ? Number(params?.id) : 0
+    const itemRects = useRef<Map<string, Rect>>(new Map())
     const memos = queryClient.getQueryData<Memo[]>([MemoType.FOLDER, currentId, sortType]) ?? []
     const { data: filledFolder = [] } = useCheckFilledMemo(memos)
     const [focusedInputKey, setFocusedInputKey] = useState<string | null>(null)
@@ -63,8 +66,50 @@ export const FolderList = () => {
 
     const selectMemo = (memo: Memo) => {
         hapticPress()
-        setSelectedMemo(prev => ({ ...prev, memo: [...prev.memo, memo] }))
+        setSelectedMemo(prev => (prev.memo.some(s => s.id === memo.id && s.type === memo.type) ? prev : { ...prev, memo: [...prev.memo, memo] }))
         setAppBar(AppBar.FOLDER_ACTION)
+    }
+
+    // 드래그 대상 판정을 위한 화면 위치 등록
+    const registerRect = (key: string, rect: Rect | null) => {
+        if (rect) itemRects.current.set(key, rect)
+        else itemRects.current.delete(key)
+    }
+
+    // 짧게 탭: 열기 / 붙여넣기·선택 모드에선 토글
+    const handleTap = (memo: Memo, selected: boolean) => {
+        const { id, type, title, content, parentId } = memo
+        if (appBar === AppBar.PASTE && selected) return
+        if (appBar === AppBar.FOLDER_ACTION) {
+            if (selected) {
+                setSelectedMemo(prev => ({ ...prev, memo: prev.memo.filter(s => !(s.id === id && s.type === type)) }))
+                return
+            }
+            setSelectedMemo(prev => ({ ...prev, memo: [...prev.memo, memo] }))
+            return
+        }
+        open(id, type, title, content, parentId)
+    }
+
+    // 드래그 후 폴더 위에 떨어뜨리면 그 폴더로 이동
+    const handleDrop = (dragged: Memo, dropX: number, dropY: number) => {
+        const list = searchedMemos.length > 0 ? searchedMemos : memos
+        const target = list.find(m => {
+            if (m.type !== MemoType.FOLDER) return false
+            if (m.id === dragged.id && m.type === dragged.type) return false
+            const r = itemRects.current.get(`${m.id}-${m.type}`)
+            return !!r && dropX >= r.x && dropX <= r.x + r.w && dropY >= r.y && dropY <= r.y + r.h
+        })
+        if (!target) return
+        moveMemo({ memoId: dragged.id, type: dragged.type, fromParentId: dragged.parentId ?? null, toParentId: target.id })
+            .then(() => {
+                hapticSuccess()
+                Toast.show({ text1: `'${target.title}'(으)로 이동했어요.`, type: "customToast", position: "bottom", visibilityTime: 2000 })
+            })
+            .catch(() => {
+                hapticWarning()
+                Toast.show({ text1: "여기로 옮길 수 없어요.", type: "customToast", position: "bottom", visibilityTime: 2000 })
+            })
     }
 
     useEffect(() => {
@@ -97,28 +142,7 @@ export const FolderList = () => {
 
                         return (
                             <View key={index} style={styles.item}>
-                                <Pressable
-                                    onLongPress={() => selectMemo(memo)}
-                                    onPress={() => {
-                                        if (appBar === AppBar.PASTE && selected) {
-                                            return
-                                        }
-                                        if (appBar === AppBar.FOLDER_ACTION) {
-                                            if (selected) {
-                                                setSelectedMemo(prev => {
-                                                    const newMemo = prev.memo.filter(selectedMemo => {
-                                                        return !(selectedMemo.id === id && selectedMemo.type === type)
-                                                    })
-                                                    return { ...prev, memo: newMemo }
-                                                })
-                                                return
-                                            }
-                                            setSelectedMemo(prev => ({ ...prev, memo: [...prev.memo, memo] }))
-                                            return
-                                        }
-                                        open(id, type, title, content, parentId)
-                                    }}
-                                >
+                                <DraggableMemoIcon rectKey={`${id}-${type}`} registerRect={registerRect} onTap={() => handleTap(memo, selected)} onSelect={() => selectMemo(memo)} onDrop={(x, y) => handleDrop(memo, x, y)}>
                                     <View style={[styles.iconWrap, selected && { backgroundColor: theme.accentSoft }]}>
                                         {type === MemoType.FILE ? <File /> : filledFolder[id] ? <FilledFolder /> : <EmptyFolder />}
                                         {selected && (
@@ -127,7 +151,7 @@ export const FolderList = () => {
                                             </View>
                                         )}
                                     </View>
-                                </Pressable>
+                                </DraggableMemoIcon>
                                 <View style={[styles.titleContainer, focusedInputKey === `${id}-${type}` && { backgroundColor: theme.surfaceVariant }]}>
                                     {focusedInputKey === `${id}-${type}` ? (
                                         <Controller

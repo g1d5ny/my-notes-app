@@ -43,8 +43,8 @@ export const SettingOption = () => {
             title: "정렬",
             trailingIcon: <SortOption theme={theme} />,
             disabled: true,
-            dividerWidth: 1,
-            hasDivider: true
+            isSection: true,
+            hasDivider: false
         },
         {
             title: "생성 시간 순",
@@ -83,11 +83,8 @@ export const SettingOption = () => {
             title: "테마",
             trailingIcon: <ThemeOption theme={theme} />,
             disabled: true,
-            onPress: () => {
-                setMenuVisible(false)
-            },
-            dividerWidth: 1,
-            hasDivider: true
+            isSection: true,
+            hasDivider: false
         },
         {
             title: "라이트 모드",
@@ -127,6 +124,7 @@ export const SettingOption = () => {
             title: "데이터 초기화",
             trailingIcon: <ResetOption theme={theme} />,
             disabled: false,
+            destructive: true,
             onPress: () => {
                 setModalVisible({
                     visible: true,

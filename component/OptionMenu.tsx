@@ -1,10 +1,12 @@
 import { AndroidDots, IosDots } from "@/assets/icons/svg/icon"
-import { Elevation, FontStyles, Radius } from "@/constant/Style"
+import { Elevation, FontStyles, Radius, Spacing } from "@/constant/Style"
 import { themeAtom } from "@/store"
 import { useAtomValue } from "jotai"
 import { Dispatch, SetStateAction } from "react"
-import { Platform, Pressable, StyleSheet, View } from "react-native"
+import { Platform, Pressable, StyleSheet, Text, View } from "react-native"
 import { Divider, Menu } from "react-native-paper"
+
+const DANGER = "#FF3B30"
 
 export interface OptionMenuList {
     title: string
@@ -14,6 +16,10 @@ export interface OptionMenuList {
     onPress?: () => void
     dividerWidth?: number
     hasDivider: boolean
+    /** 섹션 라벨(정렬·테마 등) — 작은 보조 캡션으로 표시, 탭 불가 */
+    isSection?: boolean
+    /** 위험 동작(데이터 초기화 등) — 빨강 */
+    destructive?: boolean
 }
 
 interface OptionMenuProps {
@@ -33,23 +39,31 @@ export const OptionMenu = ({ list, menuVisible, setMenuVisible }: OptionMenuProp
     return (
         <Menu visible={menuVisible} onDismiss={closeMenu} anchor={<Pressable onPress={openMenu}>{<Dots />}</Pressable>} contentStyle={[styles.contentStyle, Elevation.medium, { backgroundColor: theme.surface }]}>
             {list.map((item, index) => {
+                // 섹션 라벨 — 일반 항목과 구분되는 작은 캡션
+                if (item.isSection) {
+                    return (
+                        <View key={index} style={styles.section}>
+                            <Text style={[FontStyles.Caption, { color: theme.textSecondary }]}>{item.title}</Text>
+                            {item.trailingIcon}
+                        </View>
+                    )
+                }
+
+                const titleColor = item.destructive ? DANGER : theme.text
                 return (
                     <View key={index}>
                         <Menu.Item
                             disabled={item.disabled}
                             onPress={item.onPress}
                             title={item.title}
-                            trailingIcon={() => {
-                                return item?.trailingIcon
-                            }}
-                            {...(item.leadingIcon && {
-                                leadingIcon: () => item.leadingIcon
-                            })}
+                            trailingIcon={() => item?.trailingIcon}
+                            {...(item.leadingIcon && { leadingIcon: () => item.leadingIcon })}
                             style={styles.menuItem}
-                            titleStyle={[FontStyles.ButtonText2, { color: theme.text }]}
+                            titleStyle={[FontStyles.ButtonText2, { color: titleColor }]}
                             containerStyle={styles.containerStyle}
                         />
-                        {item.hasDivider && <Divider style={[item.dividerWidth === 2 ? styles.thickDivider : styles.thinDivider, { backgroundColor: theme.border }]} />}
+                        {/* 그룹 경계에서만 hairline 구분선 (줄마다 X) */}
+                        {item.dividerWidth === 2 && <Divider style={[styles.divider, { backgroundColor: theme.border }]} />}
                     </View>
                 )
             })}
@@ -62,16 +76,22 @@ const styles = StyleSheet.create({
         justifyContent: "space-between"
     },
     contentStyle: {
-        borderRadius: Radius.md
+        borderRadius: Radius.md,
+        paddingVertical: Spacing.xs
     },
-    thickDivider: {
-        height: 2
+    section: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        paddingHorizontal: Spacing.lg,
+        paddingTop: Spacing.md,
+        paddingBottom: Spacing.xs
     },
-    thinDivider: {
-        height: 1
+    divider: {
+        height: StyleSheet.hairlineWidth,
+        marginVertical: Spacing.xs
     },
     menuItem: {
-        height: 40
-        // paddingHorizontal: 16
+        height: 44
     }
 })

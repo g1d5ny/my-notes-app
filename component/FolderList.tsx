@@ -2,6 +2,7 @@ import EmptyFolder from "@/assets/icons/svg/icon_empty_folder.svg"
 import File from "@/assets/icons/svg/icon_file.svg"
 import FilledFolder from "@/assets/icons/svg/icon_filled_folder.svg"
 import { FontStyles } from "@/constant/Style"
+import { hapticPress, hapticTap } from "@/function/haptics"
 import { useCheckFilledMemo } from "@/hook/useCheckFilledMemo"
 import { useSearchedMemo } from "@/hook/useSearchedMemo"
 import { useUpdateMemo } from "@/hook/useUpdateMemo"
@@ -49,6 +50,7 @@ export const FolderList = () => {
     const itemsPerRow = useMemo(() => getItemsPerRow(), [])
 
     const open = (id: number, type: MemoType, title: string, content: string | undefined, parentId: number | null) => {
+        hapticTap()
         const path = (currentPath + `/${title}`) as RelativePathString
         const pathStack = params.pathStack ? JSON.parse(String(params.pathStack)) : []
         const nextPathStack = [...pathStack, { id, title, parentId }]
@@ -59,6 +61,7 @@ export const FolderList = () => {
     }
 
     const selectMemo = (memo: Memo) => {
+        hapticPress()
         setSelectedMemo(prev => ({ ...prev, memo: [...prev.memo, memo] }))
         setAppBar(AppBar.FOLDER_ACTION)
     }
@@ -117,7 +120,7 @@ export const FolderList = () => {
                                 >
                                     {type === MemoType.FILE ? <File /> : filledFolder[id] ? <FilledFolder /> : <EmptyFolder />}
                                 </Pressable>
-                                <View style={[styles.titleContainer, focusedInputKey === `${id}-${type}` && { backgroundColor: "rgba(221, 221, 221, 0.47)" }]}>
+                                <View style={[styles.titleContainer, focusedInputKey === `${id}-${type}` && { backgroundColor: theme.surfaceVariant }]}>
                                     {focusedInputKey === `${id}-${type}` ? (
                                         <Controller
                                             name={`${id}-${type}` as FieldPath<FormValues>}

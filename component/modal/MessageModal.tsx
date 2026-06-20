@@ -1,4 +1,5 @@
-import { Color, FontStyles } from "@/constant/Style"
+import { Elevation, FontStyles } from "@/constant/Style"
+import { hapticTap } from "@/function/haptics"
 import { modalAtom, themeAtom } from "@/store"
 import { useAtom, useAtomValue } from "jotai"
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native"
@@ -14,22 +15,23 @@ export const MessageModal = () => {
 
     return (
         <Modal visible={visible} onDismiss={onDismiss} contentContainerStyle={styles.modalContainer} style={styles.center}>
-            <View style={[styles.modal, { backgroundColor: theme.background }]}>
+            <View style={[styles.modal, Elevation.high, { backgroundColor: theme.surface }]}>
                 <View style={styles.messageContainer}>
                     <Text style={[FontStyles.Body, { color: theme.text, textAlign: "center" }]}>{message}</Text>
                 </View>
                 <View style={[styles.bottom, { borderColor: theme.border }]}>
-                    <TouchableOpacity style={[styles.bottomOption, { borderRightWidth: 1, borderColor: theme.border }]} onPress={onDismiss}>
-                        <Text style={[FontStyles.SubTitle, { color: Color.cancel }]}>취소</Text>
+                    <TouchableOpacity style={[styles.bottomOption, { borderRightWidth: StyleSheet.hairlineWidth, borderColor: theme.border }]} onPress={onDismiss}>
+                        <Text style={[FontStyles.SubTitle, { color: theme.textSecondary }]}>취소</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                         style={styles.bottomOption}
                         onPress={async () => {
+                            hapticTap()
                             await onConfirm()
                             onDismiss()
                         }}
                     >
-                        <Text style={[FontStyles.SubTitle, { color: Color.yellow[1] }]}>{confirmText}</Text>
+                        <Text style={[FontStyles.SubTitle, { color: theme.accent }]}>{confirmText}</Text>
                     </TouchableOpacity>
                 </View>
             </View>
@@ -54,14 +56,15 @@ const styles = StyleSheet.create({
     },
     bottom: {
         width: "100%",
-        height: 44,
+        height: 52,
         flexDirection: "row",
         alignItems: "center",
-        borderTopWidth: 1
+        borderTopWidth: StyleSheet.hairlineWidth
     },
     modal: {
         alignItems: "center",
-        borderRadius: 12
+        borderRadius: 16,
+        overflow: "hidden"
     },
     modalContainer: {
         width: 340,

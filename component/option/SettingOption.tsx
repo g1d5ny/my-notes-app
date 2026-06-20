@@ -1,6 +1,5 @@
 import { CheckOption, ResetOption, SortOption, ThemeOption } from "@/assets/icons/svg/option/icon"
 import { FontStyles } from "@/constant/Style"
-import { DarkTheme, isSameTheme, LightTheme } from "@/constant/Theme"
 import { useDeleteMemo } from "@/hook/useDeleteMemo"
 import { useReadMemo } from "@/hook/useReadMemo"
 import { useSort } from "@/hook/useSort"
@@ -15,8 +14,8 @@ import appConfig from "../../app.json"
 import { OptionMenu, OptionMenuList } from "../OptionMenu"
 
 export const SettingOption = () => {
-    const [theme, setTheme] = useAtom(themeAtom)
-    const setScheme = useSetAtom(schemeAtom)
+    const theme = useAtomValue(themeAtom)
+    const [scheme, setScheme] = useAtom(schemeAtom)
     const setModalVisible = useSetAtom(modalAtom)
     const sort = useAtomValue(sortAtom)
     const setMainAppBar = useSetAtom(appBarAtom)
@@ -91,10 +90,9 @@ export const SettingOption = () => {
         },
         {
             title: "라이트 모드",
-            leadingIcon: isSameTheme(theme, LightTheme) ? <Image source={require("@/assets/icons/icon_selected.png")} style={styles.icon} /> : <></>,
+            leadingIcon: scheme === "light" ? <Image source={require("@/assets/icons/icon_selected.png")} style={styles.icon} /> : <></>,
             disabled: false,
             onPress: () => {
-                setTheme(LightTheme)
                 setScheme("light")
                 setMenuVisible(false)
             },
@@ -103,10 +101,9 @@ export const SettingOption = () => {
         },
         {
             title: "다크 모드",
-            leadingIcon: isSameTheme(theme, DarkTheme) ? <Image source={require("@/assets/icons/icon_selected.png")} style={styles.icon} /> : <></>,
+            leadingIcon: scheme === "dark" ? <Image source={require("@/assets/icons/icon_selected.png")} style={styles.icon} /> : <></>,
             disabled: false,
             onPress: () => {
-                setTheme(DarkTheme)
                 setScheme("dark")
                 setMenuVisible(false)
             },

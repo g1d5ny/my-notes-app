@@ -1,4 +1,5 @@
-import { FontStyles, Styles } from "@/constant/Style"
+import { FontStyles, Spacing } from "@/constant/Style"
+import { hapticTap } from "@/function/haptics"
 import { searchInputAtom, themeAtom } from "@/store"
 import { MemoType } from "@/type"
 import { RelativePathString, router, useGlobalSearchParams } from "expo-router"
@@ -20,55 +21,68 @@ export default function RoutingHeader() {
             return
         }
 
+        hapticTap()
         const stepsBack = pathStack.length - 1 - index
         router.dismiss(stepsBack)
+    }
+
+    const goRoot = () => {
+        if (!params.id && !params.type && !params.pathStack) return
+        hapticTap()
+        router.dismissAll()
+        router.replace({ pathname: "/folder" as RelativePathString })
     }
 
     if (params.type === MemoType.FILE) {
         return <View />
     }
 
+    const lastIndex = pathStack.length - 1
+
     return (
         <View
-            style={[styles.container, { backgroundColor: theme.background }]}
+            style={styles.container}
             onTouchEnd={() => {
                 Keyboard.dismiss()
                 setSearchInput({ value: "", visible: false })
             }}
         >
-            <TouchableOpacity
-                onPress={() => {
-                    if (!params.id && !params.type && !params.pathStack) return
-                    router.dismissAll()
-                    router.replace({ pathname: "/folder" as RelativePathString })
-                }}
-                style={Styles.row}
-            >
-                <Text style={[FontStyles.Body, styles.pathItem, { borderColor: theme.routing, color: theme.routing }]} numberOfLines={3} ellipsizeMode='middle'>
-                    현재 경로
-                </Text>
-                <Text style={[FontStyles.Body, { color: theme.routing }]} numberOfLines={3} ellipsizeMode='middle'>
-                    {" "}
-                    :{" "}
-                </Text>
+            <TouchableOpacity onPress={goRoot} hitSlop={6}>
+                <Text style={[FontStyles.BodySmall, styles.crumb, { color: pathStack.length === 0 ? theme.text : theme.routing }]}>현재 경로</Text>
             </TouchableOpacity>
-            {pathStack.map((item, index) => (
-                <TouchableOpacity key={index} onPress={() => goToPath(index)} style={Styles.row}>
-                    <Text style={[FontStyles.Body, { color: theme.routing }]}>/</Text>
-                    <Text style={[FontStyles.Body, styles.pathItem, { borderColor: theme.routing, color: theme.routing }]}>{item.title}</Text>
-                </TouchableOpacity>
-            ))}
+            {pathStack.map((item, index) => {
+                const isCurrent = index === lastIndex
+                return (
+                    <View key={index} style={styles.segment}>
+                        <Text style={[FontStyles.BodySmall, styles.separator, { color: theme.textSecondary }]}>›</Text>
+                        <TouchableOpacity onPress={() => goToPath(index)} hitSlop={6}>
+                            <Text style={[isCurrent ? FontStyles.ButtonText2 : FontStyles.BodySmall, styles.crumb, { color: isCurrent ? theme.text : theme.routing }]} numberOfLines={1} ellipsizeMode='middle'>
+                                {item.title}
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
+                )
+            })}
         </View>
     )
 }
 
 const styles = StyleSheet.create({
     container: {
-        padding: 16,
+        paddingHorizontal: Spacing.lg,
+        paddingVertical: Spacing.sm,
         flexDirection: "row",
+        alignItems: "center",
         flexWrap: "wrap"
     },
-    pathItem: {
-        borderBottomWidth: 1
+    segment: {
+        flexDirection: "row",
+        alignItems: "center"
+    },
+    crumb: {
+        maxWidth: 140
+    },
+    separator: {
+        marginHorizontal: Spacing.sm
     }
 })

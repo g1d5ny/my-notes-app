@@ -1,4 +1,4 @@
-import { Color, FontStyles, Styles } from "@/constant/Style"
+import { Elevation, FontStyles, Radius, Styles } from "@/constant/Style"
 import { infoModalVisibleAtom, sortAtom, themeAtom } from "@/store"
 import { Memo, MemoType } from "@/type"
 import { useQueryClient } from "@tanstack/react-query"
@@ -27,18 +27,18 @@ export const InfoModal = () => {
 
     return (
         <Modal visible={infoModalVisible} onDismiss={() => setInfoModalVisible(false)} contentContainerStyle={styles.modalContainer} style={styles.center}>
-            <View style={[styles.modal, { backgroundColor: Color.white }]}>
+            <View style={[styles.modal, Elevation.medium, { backgroundColor: theme.surface }]}>
                 <View style={[Styles.row, styles.dateContainer]}>
-                    <Text style={[FontStyles.BodySmall, { color: theme.gray }]}>최근 생성 시간</Text>
-                    <Text style={[FontStyles.BodySmall, { color: theme.gray }]}>{formatUnixTime(memo?.createdAt ?? 0)}</Text>
+                    <Text style={[FontStyles.BodySmall, { color: theme.textSecondary }]}>최근 생성 시간</Text>
+                    <Text style={[FontStyles.ButtonText2, { color: theme.text }]}>{formatUnixTime(memo?.createdAt ?? 0)}</Text>
                 </View>
                 <View style={[Styles.row, styles.dateContainer]}>
-                    <Text style={[FontStyles.BodySmall, { color: theme.gray }]}>최근 수정 시간</Text>
-                    <Text style={[FontStyles.BodySmall, { color: theme.gray }]}>{formatUnixTime(memo?.updatedAt ?? 0)}</Text>
+                    <Text style={[FontStyles.BodySmall, { color: theme.textSecondary }]}>최근 수정 시간</Text>
+                    <Text style={[FontStyles.ButtonText2, { color: theme.text }]}>{formatUnixTime(memo?.updatedAt ?? 0)}</Text>
                 </View>
                 <View style={[Styles.row, styles.dateContainer]}>
-                    <Text style={[FontStyles.BodySmall, { color: theme.gray }]}>최근 조회 시간</Text>
-                    <Text style={[FontStyles.BodySmall, { color: theme.gray }]}>{formatUnixTime(memo?.viewedAt ?? 0)}</Text>
+                    <Text style={[FontStyles.BodySmall, { color: theme.textSecondary }]}>최근 조회 시간</Text>
+                    <Text style={[FontStyles.ButtonText2, { color: theme.text }]}>{formatUnixTime(memo?.viewedAt ?? 0)}</Text>
                 </View>
             </View>
         </Modal>
@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
     },
     modal: {
         alignItems: "center",
-        borderRadius: 10,
+        borderRadius: Radius.lg,
         paddingHorizontal: 28,
         paddingVertical: 16
     },

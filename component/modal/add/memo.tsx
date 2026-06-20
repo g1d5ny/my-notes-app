@@ -1,6 +1,7 @@
 import { FilePlus, FolderPlus } from "@/assets/icons/svg/icon"
 import { FontStyles, Styles } from "@/constant/Style"
 import { DarkTheme, LightTheme } from "@/constant/Theme"
+import { hapticTap } from "@/function/haptics"
 import { useCreateMemo } from "@/hook/useCreateMemo"
 import { selectedMemoAtom, themeAtom } from "@/store"
 import { MemoType } from "@/type"
@@ -37,6 +38,7 @@ export const AddMemo = ({ onAddFile }: AddMemoProps) => {
     }
 
     const openModal = () => {
+        hapticTap()
         setModalVisible(true)
     }
 

@@ -1,14 +1,16 @@
 import { ContentInput } from "@/component/input/ContentInput"
 import { TitleInput } from "@/component/input/TitleInput"
+import { Spacing } from "@/constant/Style"
+import { hapticSuccess, hapticTap, hapticWarning } from "@/function/haptics"
 import { useUpdateMemo } from "@/hook/useUpdateMemo"
-import { appBarAtom, editModeAtom, modalAtom } from "@/store"
+import { appBarAtom, editModeAtom, modalAtom, themeAtom } from "@/store"
 import { AppBar, FormValues, MemoType } from "@/type"
 import { useGlobalSearchParams } from "expo-router"
 import { useSQLiteContext } from "expo-sqlite"
-import { useAtom, useSetAtom } from "jotai"
+import { useAtom, useAtomValue, useSetAtom } from "jotai"
 import { useEffect } from "react"
 import { Controller, useForm } from "react-hook-form"
-import { Keyboard, StyleSheet } from "react-native"
+import { Keyboard, StyleSheet, View } from "react-native"
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller"
 import Toast from "react-native-toast-message"
 import { FileCreateAppBar } from "./appBar/FileCreateAppBar"
@@ -31,6 +33,8 @@ export const FileDetail = ({ id, title, content, parentId }: FileDetailParams) =
     const currentId = params.id ? Number(params.id) : 0
     const editable = editMode.id === currentId && editMode.isEditMode
 
+    const theme = useAtomValue(themeAtom)
+
     const { control, watch, resetField, setFocus } = useForm<FormValues>({
         defaultValues: { title, content }
     })
@@ -46,6 +50,7 @@ export const FileDetail = ({ id, title, content, parentId }: FileDetailParams) =
     const handleTouchEnd = () => {
         const now = Date.now()
         if (now - lastTapTime < 300) {
+            hapticTap()
             setEditMode({ id: currentId, isEditMode: true })
         }
         lastTapTime = now
@@ -66,6 +71,7 @@ export const FileDetail = ({ id, title, content, parentId }: FileDetailParams) =
     const submitFile = () => {
         Keyboard.dismiss()
         if (titleText.length === 0) {
+            hapticWarning()
             Toast.show({
                 text1: "제목을 입력해주세요.",
                 type: "customToast",
@@ -75,6 +81,7 @@ export const FileDetail = ({ id, title, content, parentId }: FileDetailParams) =
             return
         }
         if (contentText.length === 0) {
+            hapticWarning()
             Toast.show({
                 text1: "내용을 입력해주세요.",
                 type: "customToast",
@@ -85,6 +92,7 @@ export const FileDetail = ({ id, title, content, parentId }: FileDetailParams) =
         }
         updateFileTitle({ title: titleText, memoId: id, parentId })
         updateFileContent({ content: contentText, memoId: id, parentId })
+        hapticSuccess()
         setEditMode({ id: 0, isEditMode: false })
     }
 
@@ -105,8 +113,9 @@ export const FileDetail = ({ id, title, content, parentId }: FileDetailParams) =
     return (
         <>
             {editMode.isEditMode && <FileCreateAppBar textLength={contentText.length} submitFile={submitFile} close={close} back={back} />}
-            <KeyboardAwareScrollView keyboardShouldPersistTaps='handled' contentContainerStyle={styles.container} onTouchEnd={handleTouchEnd}>
+            <KeyboardAwareScrollView keyboardShouldPersistTaps='handled' style={{ backgroundColor: theme.surface }} contentContainerStyle={styles.container} onTouchEnd={handleTouchEnd}>
                 <Controller control={control} name='title' rules={{ required: true }} render={({ field: { onChange, value, ref } }) => <TitleInput ref={ref} value={value} onChangeText={onChange} onSubmitEditing={() => setFocus("content")} editable={editable} />} />
+                <View style={[styles.divider, { backgroundColor: theme.border }]} />
                 <Controller control={control} name='content' rules={{ required: true }} render={({ field: { onChange, value, ref } }) => <ContentInput ref={ref} value={value} onChangeText={onChange} editable={editable} />} />
             </KeyboardAwareScrollView>
         </>
@@ -116,7 +125,13 @@ export const FileDetail = ({ id, title, content, parentId }: FileDetailParams) =
 const styles = StyleSheet.create({
     container: {
         flexGrow: 1,
-        padding: 16,
-        gap: 12
+        paddingHorizontal: Spacing.xl,
+        paddingTop: Spacing.lg,
+        paddingBottom: Spacing.xxl,
+        gap: Spacing.md
+    },
+    divider: {
+        height: StyleSheet.hairlineWidth,
+        marginVertical: Spacing.xs
     }
 })

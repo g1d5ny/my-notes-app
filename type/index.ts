@@ -4,11 +4,17 @@ export const DATABASE_NAME = "memo"
 
 export interface ThemeColorPalette {
     background: string
+    surface: string
+    surfaceVariant: string
     border: string
     text: string
+    textSecondary: string
     gray: string
     icon: string
     routing: string
+    accent: string
+    onAccent: string
+    accentSoft: string
 }
 
 export enum MemoType {

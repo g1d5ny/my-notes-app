@@ -1,5 +1,5 @@
 import { AndroidDots, IosDots } from "@/assets/icons/svg/icon"
-import { FontStyles } from "@/constant/Style"
+import { Elevation, FontStyles, Radius } from "@/constant/Style"
 import { themeAtom } from "@/store"
 import { useAtomValue } from "jotai"
 import { Dispatch, SetStateAction } from "react"
@@ -31,7 +31,7 @@ export const OptionMenu = ({ list, menuVisible, setMenuVisible }: OptionMenuProp
     }
 
     return (
-        <Menu visible={menuVisible} onDismiss={closeMenu} anchor={<Pressable onPress={openMenu}>{<Dots />}</Pressable>} contentStyle={[styles.contentStyle, { backgroundColor: theme.background }]}>
+        <Menu visible={menuVisible} onDismiss={closeMenu} anchor={<Pressable onPress={openMenu}>{<Dots />}</Pressable>} contentStyle={[styles.contentStyle, Elevation.medium, { backgroundColor: theme.surface }]}>
             {list.map((item, index) => {
                 return (
                     <View key={index}>
@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
         justifyContent: "space-between"
     },
     contentStyle: {
-        borderRadius: 10
+        borderRadius: Radius.md
     },
     thickDivider: {
         height: 2

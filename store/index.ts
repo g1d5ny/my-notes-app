@@ -11,13 +11,12 @@ const sortStorage = createJSONStorage<SortType>(() => AsyncStorage)
 
 export const sortAtom = atomWithStorage<SortType>("sortType", SortType.CREATED_AT, sortStorage)
 
-const themeStorage = createJSONStorage<ThemeColorPalette>(() => AsyncStorage)
-
-export const themeAtom = atomWithStorage<ThemeColorPalette>("theme", Appearance.getColorScheme() === "dark" ? DarkTheme : LightTheme, themeStorage)
-
 const schemeStorage = createJSONStorage<ColorSchemeName>(() => AsyncStorage)
 
 export const schemeAtom = atomWithStorage<ColorSchemeName>("scheme", Appearance.getColorScheme() === "dark" ? "dark" : "light", schemeStorage)
+
+// 테마는 scheme에서 파생 — 항상 최신 팔레트 정의를 반영하고, LightTheme/DarkTheme 참조 동일성도 보장된다.
+export const themeAtom = atom<ThemeColorPalette>(get => (get(schemeAtom) === "dark" ? DarkTheme : LightTheme))
 
 export const modalAtom = atom<Modal>({ visible: false, message: "", onConfirm: () => {}, confirmText: "" })
 

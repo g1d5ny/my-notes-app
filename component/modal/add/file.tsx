@@ -1,6 +1,8 @@
 import { FileCreateAppBar } from "@/component/appBar/FileCreateAppBar"
 import { BottomSheetContentInput } from "@/component/input/ContentInput"
 import { TitleInput } from "@/component/input/TitleInput"
+import { Spacing } from "@/constant/Style"
+import { hapticSuccess, hapticWarning } from "@/function/haptics"
 import { useCreateMemo } from "@/hook/useCreateMemo"
 import { modalAtom, themeAtom } from "@/store"
 import { FormValues } from "@/type"
@@ -33,11 +35,13 @@ export const AddFile = forwardRef<BottomSheetModalMethods>((_, ref) => {
         handleSubmit(
             async data => {
                 createFile({ title: data.title, content: data.content, parentId: params.id ? Number(params.id) : null })
+                hapticSuccess()
                 back()
             },
             errors => {
                 const titleError = errors.title
                 const errorText = titleError ? "제목을 입력해주세요." : "내용을 입력해주세요."
+                hapticWarning()
                 console.error("메모 저장 실패:", errors)
                 Toast.show({
                     text1: errorText,
@@ -68,7 +72,7 @@ export const AddFile = forwardRef<BottomSheetModalMethods>((_, ref) => {
             ref={ref}
             topInset={top}
             handleComponent={() => <FileCreateAppBar textLength={contentText.length} submitFile={submitFile} close={close} back={back} />}
-            backgroundStyle={{ backgroundColor: theme.background }}
+            backgroundStyle={{ backgroundColor: theme.surface }}
             snapPoints={["100%"]}
             enableDynamicSizing={false}
             android_keyboardInputMode='adjustPan'
@@ -83,6 +87,7 @@ export const AddFile = forwardRef<BottomSheetModalMethods>((_, ref) => {
                     rules={{ required: true }}
                     render={({ field: { onChange, onBlur, value } }) => <TitleInput value={value} onBlur={onBlur} onChangeText={onChange} onSubmitEditing={() => setFocus("content")} autoFocus />}
                 />
+                <View style={[styles.divider, { backgroundColor: theme.border }]} />
                 <BottomSheetScrollView showsVerticalScrollIndicator contentContainerStyle={{ flex: 1 }}>
                     <Controller control={control} name='content' rules={{ required: true }} render={({ field: { onChange, onBlur, value } }) => <BottomSheetContentInput onBlur={onBlur} onChangeText={onChange} value={value} />} />
                 </BottomSheetScrollView>
@@ -99,7 +104,12 @@ const styles = StyleSheet.create({
     },
     container: {
         flex: 1,
-        margin: 16,
-        gap: 12
+        marginHorizontal: Spacing.xl,
+        marginVertical: Spacing.lg,
+        gap: Spacing.md
+    },
+    divider: {
+        height: StyleSheet.hairlineWidth,
+        marginVertical: Spacing.xs
     }
 })

@@ -97,20 +97,93 @@ export const Color = {
         1: "#FFB02E",
         2: "#FCD53F"
     },
+    // 브랜드 액센트 (FAB·선택·활성 상태 등 포인트). 흰 배경에서도 읽히도록 노랑보다 진한 앰버.
+    accent: {
+        light: "#F59E0B",
+        dark: "#FFC53D"
+    },
+    // 액센트 위에 올라가는 텍스트/아이콘 색
+    onAccent: {
+        light: "#1C1C1E",
+        dark: "#1C1C1E"
+    },
+    // 액센트의 옅은 톤 (선택 배경·하이라이트)
+    accentSoft: {
+        light: "#FFF4E0",
+        dark: "rgba(255, 197, 61, 0.18)"
+    },
     background: {
+        // 살짝 톤 다운된 베이스 (그 위 surface가 떠 보이게)
+        light: "#F2F2F7",
+        dark: "#1C1C1E"
+    },
+    // 카드·입력 영역 등 배경 위에 올라가는 면
+    surface: {
         light: "#FFFFFF",
-        dark: "#212121"
+        dark: "#2C2C2E"
+    },
+    // 눌림·구분 등 한 단계 약한 면
+    surfaceVariant: {
+        light: "#E9E9EE",
+        dark: "#3A3A3C"
     },
     border: {
-        light: "#E1E1E1",
-        dark: "#636364"
+        light: "#E5E5EA",
+        dark: "#38383A"
     },
     text: {
-        light: "#090909",
-        dark: "#EEEEEE"
+        light: "#1C1C1E",
+        dark: "#F2F2F7"
+    },
+    // 보조 텍스트 (날짜·메타·placeholder 등)
+    textSecondary: {
+        light: "#8E8E93",
+        dark: "#98989F"
     },
     routing: {
-        light: "rgba(0, 0, 0, 0.8)",
-        dark: "rgba(255, 255, 255, 0.8)"
+        light: "rgba(60, 60, 67, 0.6)",
+        dark: "rgba(235, 235, 245, 0.6)"
     }
 }
+
+// 디자인 토큰 — 일관된 모서리·여백·그림자를 위해 전 화면 공유
+export const Radius = {
+    sm: 8,
+    md: 12,
+    lg: 16,
+    xl: 20,
+    full: 999
+}
+
+export const Spacing = {
+    xs: 4,
+    sm: 8,
+    md: 12,
+    lg: 16,
+    xl: 24,
+    xxl: 32
+}
+
+export const Elevation = StyleSheet.create({
+    low: {
+        shadowColor: "#000000",
+        shadowOpacity: 0.06,
+        shadowRadius: 6,
+        shadowOffset: { width: 0, height: 2 },
+        elevation: 2
+    },
+    medium: {
+        shadowColor: "#000000",
+        shadowOpacity: 0.1,
+        shadowRadius: 12,
+        shadowOffset: { width: 0, height: 4 },
+        elevation: 4
+    },
+    high: {
+        shadowColor: "#000000",
+        shadowOpacity: 0.16,
+        shadowRadius: 20,
+        shadowOffset: { width: 0, height: 8 },
+        elevation: 8
+    }
+})

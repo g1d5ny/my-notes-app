@@ -3,9 +3,9 @@ import { FolderDetail } from "@/component/FolderDetail"
 import { useBackHandler } from "@/hook/useBackHandler"
 import { appBarAtom, modalAtom, searchInputAtom } from "@/store"
 import { AppBar, MemoType } from "@/type"
-import { useGlobalSearchParams, useLocalSearchParams } from "expo-router"
+import { useFocusEffect, useGlobalSearchParams, useLocalSearchParams } from "expo-router"
 import { useAtom, useSetAtom } from "jotai"
-import { useEffect } from "react"
+import { useCallback } from "react"
 import { BackHandler } from "react-native"
 
 export default function FolderScreen() {
@@ -16,9 +16,13 @@ export default function FolderScreen() {
     const setModal = useSetAtom(modalAtom)
     const [searchInput, setSearchInput] = useAtom(searchInputAtom)
 
-    useEffect(() => {
-        setAppBar(prev => (prev === AppBar.PASTE ? prev : currentType === MemoType.FILE ? AppBar.FILE : AppBar.MAIN))
-    }, [currentType])
+    // 포커스된 화면 기준으로 앱바 종류를 확정 → 화면별 마운트/언마운트 타이밍 경쟁 없이
+    // (iOS 엣지 스와이프 백 포함) 항상 현재 화면 타입에 맞는 앱바가 뜬다.
+    useFocusEffect(
+        useCallback(() => {
+            setAppBar(prev => (prev === AppBar.PASTE ? prev : currentType === MemoType.FILE ? AppBar.FILE : AppBar.MAIN))
+        }, [currentType])
+    )
 
     useBackHandler(() => {
         if (searchInput.visible) {

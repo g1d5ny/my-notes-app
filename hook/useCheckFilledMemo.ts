@@ -4,7 +4,7 @@ import { useSQLiteContext } from "expo-sqlite"
 
 export const useCheckFilledMemo = (memos: Memo[]) => {
     const db = useSQLiteContext()
-    const folderIds = memos?.filter(m => m.type === MemoType.FOLDER).map(m => m.id) ?? []
+    const folderIds = (Array.isArray(memos) ? memos : []).filter(m => m.type === MemoType.FOLDER).map(m => m.id)
 
     return useQuery({
         queryKey: ["checkFilledMemo", folderIds],

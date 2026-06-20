@@ -1,7 +1,7 @@
 import { sortAtom } from "@/store"
 import { Memo, MemoType, SortType } from "@/type"
 import { useQuery } from "@tanstack/react-query"
-import { useGlobalSearchParams } from "expo-router"
+import { useGlobalSearchParams, useLocalSearchParams } from "expo-router"
 import { useSQLiteContext } from "expo-sqlite"
 import { useAtomValue } from "jotai"
 
@@ -23,9 +23,16 @@ const sort = (memos: Memo[], sortType: SortType) => {
     return memos
 }
 
-export const useReadMemo = () => {
+/**
+ * @param useLocal 화면 자신의 라우트 파라미터로 읽을지 여부.
+ *   - false(기본): 포커스된 라우트 기준(global). 루트 앱바의 공유/설정처럼 화면 트리 밖에서 호출하는 경우.
+ *   - true: 자신의 라우트 기준(local). 폴더 화면이 그 위에 파일이 push돼도 자기 폴더 내용을 유지하도록.
+ */
+export const useReadMemo = (useLocal = false) => {
     const db = useSQLiteContext()
-    const params = useGlobalSearchParams()
+    const globalParams = useGlobalSearchParams()
+    const localParams = useLocalSearchParams()
+    const params = useLocal ? localParams : globalParams
     const sortType = useAtomValue(sortAtom)
     const currentId = params.id ? Number(params?.id) : 0
     const currentType = (params.type as MemoType) ?? MemoType.FOLDER

@@ -27,6 +27,8 @@ interface Props {
 }
 
 const MOVE_THRESHOLD = 8
+// 원위치 복귀 스프링: 안드로이드에서도 확실히 0으로 수렴하도록 약간 단단하게.
+const SPRING_BACK = { damping: 18, stiffness: 260, mass: 0.6 }
 
 export const DraggableMemoIcon = ({ rectKey, children, onTap, onSelect, onDrop, onDragMove, onDragEnd, registerRect, hoveredKey }: Props) => {
     const ref = useRef<View>(null)
@@ -58,6 +60,7 @@ export const DraggableMemoIcon = ({ rectKey, children, onTap, onSelect, onDrop, 
             runOnJS(onDragMove)(rectKey, e.absoluteX, e.absoluteY)
         })
         .onEnd(e => {
+            // 드롭/선택 "판정"만 onEnd에서. 위치 복귀는 onFinalize 한 곳에서만 처리한다.
             const moved = Math.abs(e.translationX) > MOVE_THRESHOLD || Math.abs(e.translationY) > MOVE_THRESHOLD
             if (moved) {
                 runOnJS(onDrop)(e.absoluteX, e.absoluteY)
@@ -65,13 +68,14 @@ export const DraggableMemoIcon = ({ rectKey, children, onTap, onSelect, onDrop, 
                 runOnJS(onSelect)()
             }
         })
-        // onEnd는 제스처가 취소되면 안 불릴 수 있어, 시각 복귀는 항상 호출되는 onFinalize에서
+        // onEnd는 안드로이드에서 제스처 취소 시 호출되지 않을 수 있어, 항상 불리는 onFinalize에서
+        // 단일하게 원위치 복귀시킨다. (onEnd/onFinalize 양쪽 리셋 시 같은 프레임 경쟁으로 안드로이드에서 멈춤)
         .onFinalize(() => {
             runOnJS(onDragEnd)()
-            tx.value = withSpring(0)
-            ty.value = withSpring(0)
-            scale.value = withSpring(1)
             lifted.value = 0
+            tx.value = withSpring(0, SPRING_BACK)
+            ty.value = withSpring(0, SPRING_BACK)
+            scale.value = withSpring(1, SPRING_BACK)
         })
 
     const gesture = Gesture.Exclusive(pan, tap)

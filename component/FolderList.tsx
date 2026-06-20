@@ -174,7 +174,7 @@ export const FolderList = ({ memos }: { memos: Memo[] }) => {
                                         )}
                                     </View>
                                 </DraggableMemoIcon>
-                                <View style={[styles.titleContainer, focusedInputKey === `${id}-${type}` && { backgroundColor: theme.surfaceVariant }]}>
+                                <View style={[styles.titleContainer, focusedInputKey === `${id}-${type}` ? { backgroundColor: theme.surfaceVariant } : { maxHeight: 40 }]}>
                                     <Controller
                                         name={`${id}-${type}` as FieldPath<FormValues>}
                                         control={control}
@@ -252,15 +252,14 @@ const styles = StyleSheet.create({
     titleContainer: {
         width: "100%",
         alignItems: "center",
-        justifyContent: "center",
-        maxHeight: 40,
+        justifyContent: "flex-start",
         borderRadius: 4,
         marginTop: 8,
         padding: 4
     },
     title: {
         textAlign: "center",
-        textAlignVertical: "center",
+        textAlignVertical: "top",
         ...FontStyles.BodySmall
     },
     container: {

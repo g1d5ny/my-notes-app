@@ -48,13 +48,13 @@ export default function RoutingHeader() {
             }}
         >
             <TouchableOpacity onPress={goRoot} hitSlop={6}>
-                <Text style={[FontStyles.BodySmall, styles.crumb, { color: pathStack.length === 0 ? theme.text : theme.routing }]}>현재 경로</Text>
+                <Text style={[FontStyles.BodySmall, styles.crumb, { color: pathStack.length === 0 ? theme.text : theme.routing }]}>홈</Text>
             </TouchableOpacity>
             {pathStack.map((item, index) => {
                 const isCurrent = index === lastIndex
                 return (
                     <View key={index} style={styles.segment}>
-                        <Text style={[FontStyles.BodySmall, styles.separator, { color: theme.textSecondary }]}>›</Text>
+                        <Text style={[FontStyles.BodySmall, styles.separator, { color: theme.textSecondary }]}>{">"}</Text>
                         <TouchableOpacity onPress={() => goToPath(index)} hitSlop={6}>
                             <Text style={[isCurrent ? FontStyles.ButtonText2 : FontStyles.BodySmall, styles.crumb, { color: isCurrent ? theme.text : theme.routing }]} numberOfLines={1} ellipsizeMode='middle'>
                                 {item.title}

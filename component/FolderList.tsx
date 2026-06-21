@@ -298,6 +298,8 @@ const styles = StyleSheet.create({
     },
     iconWrap: {
         borderRadius: 16,
+        // Android(Fabric)에서 borderRadius가 배경에 안 먹는 경우가 있어 overflow로 강제 클리핑.
+        overflow: "hidden",
         padding: 4
     },
     badge: {

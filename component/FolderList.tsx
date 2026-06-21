@@ -191,6 +191,8 @@ export const FolderList = ({ memos }: { memos: Memo[] }) => {
                                             const inSelection = appBar === AppBar.FOLDER_ACTION
                                             return (
                                                 <TextInput
+                                                    // iOS TextInput은 color prop 변경을 라이브로 재적용 안 함 → 테마 바뀌면 remount해 글자색 갱신.
+                                                    key={theme.text}
                                                     ref={node => {
                                                         ref(node)
                                                         if (node) inputRefs.current.set(`${id}-${type}`, node)

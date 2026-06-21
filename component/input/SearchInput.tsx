@@ -54,9 +54,11 @@ export const SearchInput = () => {
 
     return (
         // New Architecture(Fabric) Android에서 overflow:hidden+transform 뷰가 배경을 검게 렌더하는 버그가 있어
-        // 테마 배경색을 명시해 검은 띠를 방지한다.
-        <Animated.View style={[{ backgroundColor: theme.background }, animatedStyle]}>
-            <View style={[styles.inputContainer, { backgroundColor: theme.surfaceVariant }]}>
+        // 테마 배경색을 명시해 검은 띠를 방지한다. 또 height 0↔64로 레이어가 매 토글마다 생성/파괴되며
+        // 첫 프레임에 themed 배경이 합성되기 전 플랫폼 기본색이 번쩍이므로(라이트=검정·다크=흰색),
+        // collapsable={false}로 뷰 평탄화를 막아 레이어를 고정한다.
+        <Animated.View collapsable={false} style={[{ backgroundColor: theme.background }, animatedStyle]}>
+            <View collapsable={false} style={[styles.inputContainer, { backgroundColor: theme.surfaceVariant }]}>
                 <Search theme={theme} />
                 <Controller
                     control={control}

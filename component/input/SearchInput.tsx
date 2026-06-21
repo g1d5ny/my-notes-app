@@ -44,7 +44,7 @@ export const SearchInput = () => {
         return {
             height: visibility.value * 64,
             paddingHorizontal: visibility.value * 16,
-            paddingVertical: visibility.value * 12,
+            paddingVertical: visibility.value * 6,
             gap: visibility.value * 8,
             flexDirection: "row" as const,
             transform: [{ translateX: (visibility.value - 1) * width }],
@@ -84,13 +84,15 @@ export const SearchInput = () => {
 const styles = StyleSheet.create({
     inputContainer: {
         flex: 1,
-        height: 40,
+        // 세로 여유가 부족하면 한글 글리프가 위아래로 잘려 placeholder/입력값이 점·대시처럼 깨져 보인다.
+        // (바깥 Animated.View 높이 64 - 패딩에서 남는 공간이 빠듯했던 게 원인) minHeight·패딩으로 여유 확보.
+        minHeight: 44,
         borderRadius: Radius.md,
         flexDirection: "row",
         alignItems: "center",
         gap: 8,
         paddingHorizontal: 12,
-        paddingVertical: 8
+        paddingVertical: 4
     },
     input: {
         flex: 1,

@@ -42,9 +42,6 @@ export const SearchInput = () => {
     const animatedStyle = useAnimatedStyle(() => {
         "worklet"
         return {
-            // 배경색을 워클릿 출력에 포함해야 테마 변경 시 다시 적용된다. 스타일 배열의 정적
-            // backgroundColor는 Reanimated가 Animated.View에 갱신하지 않아 이전 테마색이 남는다.
-            backgroundColor: theme.background,
             height: visibility.value * 64,
             paddingHorizontal: visibility.value * 16,
             paddingVertical: visibility.value * 6,
@@ -53,13 +50,15 @@ export const SearchInput = () => {
             transform: [{ translateX: (visibility.value - 1) * width }],
             overflow: "hidden" as const
         }
-    }, [width, theme.background])
+    }, [width])
 
     return (
-        // 배경색은 animatedStyle(워클릿) 안에서 적용한다 — Animated.View의 정적 backgroundColor는
-        // 테마 변경 시 Reanimated가 갱신하지 않아 이전 테마색이 남기 때문(검은 띠 방지 + 라이브 테마 추종).
+        // key={theme.background}: Reanimated는 useAnimatedStyle 안의 color든 정적 style의 color든
+        // 테마 변경 시 Fabric 네이티브 뷰에 다시 push하지 않아(특히 화면 밖으로 translate된 닫힌 상태)
+        // 이전 테마색(검은/흰 띠)이 남는다. 테마가 바뀌면 remount해 새 배경색으로 다시 그린다.
+        // (FolderList 제목의 key={theme.text}와 동일한 검증된 패턴.)
         // collapsable={false}는 height 0↔64로 레이어가 평탄화/재생성되며 생기는 깜빡임을 막는다.
-        <Animated.View collapsable={false} style={animatedStyle}>
+        <Animated.View key={theme.background} collapsable={false} style={[animatedStyle, { backgroundColor: theme.background }]}>
             <View collapsable={false} style={[styles.inputContainer, { backgroundColor: theme.surfaceVariant }]}>
                 <Search theme={theme} />
                 <Controller

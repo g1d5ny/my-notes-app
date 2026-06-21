@@ -1,7 +1,7 @@
+import { CheckIcon } from "@/assets/icons/svg/addMenu"
 import EmptyFolder from "@/assets/icons/svg/icon_empty_folder.svg"
 import File from "@/assets/icons/svg/icon_file.svg"
 import FilledFolder from "@/assets/icons/svg/icon_filled_folder.svg"
-import { CheckIcon } from "@/assets/icons/svg/addMenu"
 import { DraggableMemoIcon, Rect, RectMap } from "@/component/DraggableMemoIcon"
 import { FontStyles } from "@/constant/Style"
 import { hapticPress, hapticSuccess, hapticTap, hapticWarning } from "@/function/haptics"
@@ -14,7 +14,7 @@ import { RelativePathString, router, useLocalSearchParams, usePathname } from "e
 import { useAtom, useAtomValue, useSetAtom } from "jotai"
 import { useEffect, useMemo, useRef, useState } from "react"
 import { Controller, FieldPath, useForm } from "react-hook-form"
-import { Dimensions, Keyboard, Pressable, StyleSheet, TextInput, View } from "react-native"
+import { Dimensions, Keyboard, Platform, Pressable, StyleSheet, TextInput, View } from "react-native"
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller"
 import { useSharedValue } from "react-native-reanimated"
 import Toast from "react-native-toast-message"
@@ -146,8 +146,6 @@ export const FolderList = ({ memos }: { memos: Memo[] }) => {
     return (
         <View style={styles.container}>
             <KeyboardAwareScrollView keyboardShouldPersistTaps='handled' showsVerticalScrollIndicator={false} contentContainerStyle={styles.contentContainerStyle}>
-                {/* 빈 공간 탭 전용 배경 레이어: 키보드/검색 닫기 + 선택 해제.
-                    항목들은 위(box-none 컨테이너)에서 자기 탭을 소비하므로 여기로 내려오지 않는다. */}
                 <Pressable
                     style={StyleSheet.absoluteFill}
                     onPress={() => {
@@ -161,10 +159,20 @@ export const FolderList = ({ memos }: { memos: Memo[] }) => {
                     {(searchedMemos.length > 0 ? searchedMemos : memos).map((memo, index) => {
                         const { id, title, type, content, parentId } = memo
                         const selected = selectedMemo.memo.some(selectedMemo => selectedMemo.id === id && selectedMemo.type === type)
+                        const editing = focusedInputKey === `${id}-${type}`
 
                         return (
-                            <View key={index} style={styles.item}>
-                                <DraggableMemoIcon rectKey={`${id}-${type}`} registerRect={registerRect} hoveredKey={hoveredKey} onDragMove={onDragMove} onDragEnd={onDragEnd} onTap={() => handleTap(memo, selected)} onSelect={() => selectMemo(memo)} onDrop={(x, y) => handleDrop(memo, x, y)}>
+                            <View key={`${type}:${id}`} style={styles.item}>
+                                <DraggableMemoIcon
+                                    rectKey={`${id}-${type}`}
+                                    registerRect={registerRect}
+                                    hoveredKey={hoveredKey}
+                                    onDragMove={onDragMove}
+                                    onDragEnd={onDragEnd}
+                                    onTap={() => handleTap(memo, selected)}
+                                    onSelect={() => selectMemo(memo)}
+                                    onDrop={(x, y) => handleDrop(memo, x, y)}
+                                >
                                     <View style={[styles.iconWrap, selected && { backgroundColor: theme.accentSoft }]}>
                                         {type === MemoType.FILE ? <File /> : filledFolder[id] ? <FilledFolder /> : <EmptyFolder />}
                                         {selected && (
@@ -174,13 +182,12 @@ export const FolderList = ({ memos }: { memos: Memo[] }) => {
                                         )}
                                     </View>
                                 </DraggableMemoIcon>
-                                <View style={[styles.titleContainer, focusedInputKey === `${id}-${type}` && { backgroundColor: theme.surfaceVariant }]}>
+                                <View style={[styles.titleContainer, editing && { backgroundColor: theme.surfaceVariant }]}>
                                     <Controller
                                         name={`${id}-${type}` as FieldPath<FormValues>}
                                         control={control}
                                         rules={{ required: true }}
                                         render={({ field: { onChange, onBlur, value, ref } }) => {
-                                            const editing = focusedInputKey === `${id}-${type}`
                                             const inSelection = appBar === AppBar.FOLDER_ACTION
                                             return (
                                                 <TextInput
@@ -208,12 +215,13 @@ export const FolderList = ({ memos }: { memos: Memo[] }) => {
                                                         }
                                                     }}
                                                     style={[styles.title, { color: theme.text }]}
-                                                    // 편집 중이 아닐 땐 2줄로 보이게(텍스트처럼), 편집 중엔 전체 표시.
-                                                    numberOfLines={editing ? undefined : 2}
-                                                    // 편집이 끝나면 커서/스크롤을 맨 앞으로 → 줄바꿈 있는 제목도 첫 줄부터 보인다.
+                                                    // numberOfLines는 Android에서 1줄 내용도 그 줄 수만큼 높이를 예약해 아래 여백을 만든다.
+                                                    numberOfLines={2}
+                                                    // 편집이 끝나면 커서를 맨 앞으로 → 줄바꿈 있는 제목도 첫 줄부터 보인다.
                                                     selection={editing ? undefined : { start: 0, end: 0 }}
-                                                    // 높이는 maxHeight(2줄)로 고정. 편집 중엔 그 안에서 스크롤 허용.
+                                                    // 편집 중엔 2줄 박스 안에서 스크롤 허용(iOS). 표시 중엔 스크롤 없이 잘림.
                                                     scrollEnabled={editing}
+                                                    underlineColorAndroid='transparent'
                                                     returnKeyType='done'
                                                     maxLength={30}
                                                     multiline
@@ -241,7 +249,7 @@ export const FolderList = ({ memos }: { memos: Memo[] }) => {
                         )
                     })}
                     {Array.from({ length: Math.max(0, itemsPerRow - (memos.length % itemsPerRow)) }).map((_, index) => {
-                        return <View key={index} style={styles.item} />
+                        return <View key={`filler-${index}`} style={styles.item} />
                     })}
                 </View>
             </KeyboardAwareScrollView>
@@ -254,14 +262,16 @@ const styles = StyleSheet.create({
         width: "100%",
         alignItems: "center",
         justifyContent: "flex-start",
-        maxHeight: 40,
         borderRadius: 4,
-        marginTop: 8,
-        padding: 4
+        padding: 4,
+        maxHeight: 50,
+        overflow: "hidden"
     },
     title: {
+        width: "100%",
         textAlign: "center",
-        textAlignVertical: "top",
+        textAlignVertical: "center",
+        lineHeight: Platform.OS === "android" ? 20 : undefined,
         ...FontStyles.BodySmall
     },
     container: {
@@ -280,7 +290,6 @@ const styles = StyleSheet.create({
     },
     contentContainerStyle: {
         flexGrow: 1,
-        // 선택 배지·드래그 hover 시 커진 폴더가 위에서 잘리지 않도록 여백
         paddingTop: 18
     },
     item: {

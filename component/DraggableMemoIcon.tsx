@@ -2,7 +2,7 @@ import { hapticPress } from "@/function/haptics"
 import { ReactNode, useRef } from "react"
 import { View } from "react-native"
 import { Gesture, GestureDetector } from "react-native-gesture-handler"
-import Animated, { runOnJS, SharedValue, useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated"
+import Animated, { cancelAnimation, runOnJS, SharedValue, useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated"
 
 export type Rect = { x: number; y: number; w: number; h: number }
 export type RectMap = Record<string, { x: number; y: number; w: number; h: number; isFolder: boolean }>
@@ -50,6 +50,12 @@ export const DraggableMemoIcon = ({ rectKey, children, onTap, onSelect, onDrop, 
     const pan = Gesture.Pan()
         .activateAfterLongPress(250)
         .onStart(() => {
+            // 직전 복귀 스프링이 아직 돌고 있으면 취소하고 깨끗한 0에서 시작.
+            cancelAnimation(tx)
+            cancelAnimation(ty)
+            cancelAnimation(scale)
+            tx.value = 0
+            ty.value = 0
             lifted.value = 1
             scale.value = withSpring(1.12)
             runOnJS(hapticPress)()
@@ -71,11 +77,15 @@ export const DraggableMemoIcon = ({ rectKey, children, onTap, onSelect, onDrop, 
         // onEnd는 안드로이드에서 제스처 취소 시 호출되지 않을 수 있어, 항상 불리는 onFinalize에서
         // 단일하게 원위치 복귀시킨다. (onEnd/onFinalize 양쪽 리셋 시 같은 프레임 경쟁으로 안드로이드에서 멈춤)
         .onFinalize(() => {
-            runOnJS(onDragEnd)()
+            // 비동기 mutation과 무관하게, 놓는 즉시 UI 복귀를 확정한다.
+            cancelAnimation(tx)
+            cancelAnimation(ty)
+            cancelAnimation(scale)
             lifted.value = 0
             tx.value = withSpring(0, SPRING_BACK)
             ty.value = withSpring(0, SPRING_BACK)
             scale.value = withSpring(1, SPRING_BACK)
+            runOnJS(onDragEnd)()
         })
 
     const gesture = Gesture.Exclusive(pan, tap)

@@ -14,8 +14,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import * as Font from "expo-font"
 import { Slot } from "expo-router"
 import { SQLiteDatabase, SQLiteProvider } from "expo-sqlite"
+import * as SystemUI from "expo-system-ui"
 import { Provider, useAtomValue } from "jotai"
-import { Suspense, useMemo } from "react"
+import { Suspense, useEffect, useMemo } from "react"
 import { StyleSheet } from "react-native"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { KeyboardProvider, KeyboardToolbar } from "react-native-keyboard-controller"
@@ -29,6 +30,12 @@ const queryClient = new QueryClient()
 function AppContent() {
     const theme = useAtomValue(themeAtom)
     const scheme = useAtomValue(schemeAtom)
+
+    // edge-to-edge에선 상태바·내비바가 투명이라 그 뒤로 "네이티브 윈도우 배경"이 비친다.
+    // 윈도우 기본색은 밝은색이라 다크모드 콜드 스타트 때 상태바 영역만 밝게 보였음 → 테마색으로 맞춘다.
+    useEffect(() => {
+        SystemUI.setBackgroundColorAsync(theme.background)
+    }, [theme.background])
 
     // Paper의 Modal 백드롭·Menu surface 등 기본값을 앱 팔레트/스킴에 맞춘다.
     const paperTheme = useMemo(() => {

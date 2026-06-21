@@ -21,7 +21,7 @@ import { StyleSheet } from "react-native"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { KeyboardProvider, KeyboardToolbar } from "react-native-keyboard-controller"
 import { MD3DarkTheme, MD3LightTheme, PaperProvider } from "react-native-paper"
-import { SafeAreaView } from "react-native-safe-area-context"
+import { initialWindowMetrics, SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context"
 import { DATABASE_NAME, MemoType } from "../type"
 
 Font.loadAsync(customFontsToLoad)
@@ -48,26 +48,28 @@ function AppContent() {
     }, [scheme, theme])
 
     return (
-        // 루트 뷰에도 테마 배경을 깔아, 시스템 바(상·하단) 인셋 영역에 비치던
-        // 기본 윈도우 색(#FAFAFA) 띠를 없앤다.
+        // edge-to-edge(app.json android.edgeToEdgeEnabled)로 윈도우가 풀블리드라, GHR 테마 배경이
+        // 시스템 바 밑까지 깔린다. 인셋은 SafeAreaView가 "한 번만" 적용(이중 인셋/콜드 스타트 레이스 제거).
         <GestureHandlerRootView style={[styles.container, { backgroundColor: theme.background }]}>
             <Suspense fallback={<></>}>
                 <SQLiteProvider databaseName={DATABASE_NAME} options={{ enableChangeListener: true }} useSuspense onInit={migrateDbIfNeeded}>
                     <PaperProvider theme={paperTheme}>
                         <KeyboardProvider>
-                            <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
-                            <StatusBar />
-                            <AppBar />
-                            <SearchInput />
-                            <RoutingHeader />
-                            <Slot />
-                            <AddMemoController />
-                            <FolderActionBottomBar />
-                            <PasteBottomBar />
-                            <MessageModal />
-                            <InfoModal />
-                            <CommonToast />
-                            <ThemeTransition />
+                            {/* bottom은 제외: 하단 바·FAB가 absolute 오버레이로 각자 insets.bottom을 처리하므로
+                                여기서 bottom까지 패딩하면 그 부분만 인셋이 이중 적용된다. */}
+                            <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]} edges={["top", "left", "right"]}>
+                                <StatusBar />
+                                <AppBar />
+                                <SearchInput />
+                                <RoutingHeader />
+                                <Slot />
+                                <AddMemoController />
+                                <FolderActionBottomBar />
+                                <PasteBottomBar />
+                                <MessageModal />
+                                <InfoModal />
+                                <CommonToast />
+                                <ThemeTransition />
                             </SafeAreaView>
                             <KeyboardToolbar>
                                 <KeyboardToolbar.Done text='완료' />
@@ -84,7 +86,10 @@ export default function RootLayout() {
     return (
         <QueryClientProvider client={queryClient}>
             <Provider store={store}>
-                <AppContent />
+                {/* initialMetrics로 첫 프레임부터 인셋 확정 → 콜드 스타트 시 헤더가 밀렸다 돌아오는 깜빡임 제거. */}
+                <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+                    <AppContent />
+                </SafeAreaProvider>
             </Provider>
         </QueryClientProvider>
     )

@@ -41,7 +41,7 @@ export default function RoutingHeader() {
 
     return (
         <View
-            style={styles.container}
+            style={[styles.container, { backgroundColor: theme.background }]}
             onTouchEnd={() => {
                 Keyboard.dismiss()
                 setSearchInput({ value: "", visible: false })

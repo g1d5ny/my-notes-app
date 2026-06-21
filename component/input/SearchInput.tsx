@@ -53,7 +53,9 @@ export const SearchInput = () => {
     }, [width])
 
     return (
-        <Animated.View style={animatedStyle}>
+        // New Architecture(Fabric) Android에서 overflow:hidden+transform 뷰가 배경을 검게 렌더하는 버그가 있어
+        // 테마 배경색을 명시해 검은 띠를 방지한다.
+        <Animated.View style={[{ backgroundColor: theme.background }, animatedStyle]}>
             <View style={[styles.inputContainer, { backgroundColor: theme.surfaceVariant }]}>
                 <Search theme={theme} />
                 <Controller

@@ -10,12 +10,13 @@ import RoutingHeader from "@/component/RoutingHeader"
 import { customFontsToLoad } from "@/constant/Style"
 import { schemeAtom, store, themeAtom } from "@/store"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import * as Font from "expo-font"
+import { useFonts } from "expo-font"
 import { Slot } from "expo-router"
+import * as SplashScreen from "expo-splash-screen"
 import { DarkTheme } from "@/constant/Theme"
 import { SQLiteDatabase, SQLiteProvider } from "expo-sqlite"
 import { Provider, useAtomValue } from "jotai"
-import { Suspense, useMemo } from "react"
+import { Suspense, useEffect, useMemo } from "react"
 import { StyleSheet, View } from "react-native"
 import { SystemBars } from "react-native-edge-to-edge"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
@@ -24,7 +25,9 @@ import { MD3DarkTheme, MD3LightTheme, PaperProvider } from "react-native-paper"
 import { initialWindowMetrics, SafeAreaProvider, SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 import { DATABASE_NAME, MemoType } from "../type"
 
-Font.loadAsync(customFontsToLoad)
+// 폰트 로드 전 첫 페인트를 막는다. TextInput placeholder(네이티브 hint)는 폰트가
+// 늦게 로드되면 Paint가 폴백으로 굳어 글리프가 깨진 채 갱신되지 않으므로, 로드 완료까지 스플래시 유지.
+SplashScreen.preventAutoHideAsync()
 const queryClient = new QueryClient()
 
 function AppContent() {
@@ -92,6 +95,15 @@ function AppContent() {
 }
 
 export default function RootLayout() {
+    const [fontsLoaded] = useFonts(customFontsToLoad)
+
+    useEffect(() => {
+        if (fontsLoaded) SplashScreen.hideAsync()
+    }, [fontsLoaded])
+
+    // 폰트가 준비되기 전엔 스플래시를 유지(null 렌더) → 모든 텍스트·placeholder가 폰트로 첫 페인트.
+    if (!fontsLoaded) return null
+
     return (
         <QueryClientProvider client={queryClient}>
             <Provider store={store}>

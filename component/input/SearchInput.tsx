@@ -53,12 +53,16 @@ export const SearchInput = () => {
     }, [width])
 
     return (
-        // key={theme.background}: Reanimated는 useAnimatedStyle 안의 color든 정적 style의 color든
-        // 테마 변경 시 Fabric 네이티브 뷰에 다시 push하지 않아(특히 화면 밖으로 translate된 닫힌 상태)
-        // 이전 테마색(검은/흰 띠)이 남는다. 테마가 바뀌면 remount해 새 배경색으로 다시 그린다.
-        // (FolderList 제목의 key={theme.text}와 동일한 검증된 패턴.)
-        // collapsable={false}는 height 0↔64로 레이어가 평탄화/재생성되며 생기는 깜빡임을 막는다.
-        <Animated.View key={theme.background} collapsable={false} style={[animatedStyle, { backgroundColor: theme.background }]}>
+        // 바깥 Animated.View는 overflow:hidden + transform 때문에 Fabric이 불투명 오프스크린 레이어를
+        // 강제 생성하는데, 거기에 backgroundColor를 직접 주면 두 가지 문제가 있었다:
+        // 1) Reanimated가 관리하는 뷰라 정적 backgroundColor가 테마 토글 시 Fabric에 다시 push되지 않아
+        //    이전 테마색(검은/흰 띠)이 남았고, key로 remount해 우회하면
+        // 2) remount된 새 레이어 버퍼가 흰색 → 첫 오픈에서 backgroundColor가 칠해지기 전 흰 깜빡임이 났다.
+        // 그래서 Animated.View 자체는 투명하게 두고, 그 안에 "일반 View"(absoluteFill)로 theme.background를
+        // 깐다. 일반 View는 Reanimated 간섭·remount 없이 React 커밋으로 색이 갱신되므로 토글 시 즉시 따라가고
+        // (stale 띠 없음), 흰 레이어 버퍼를 항상 덮으며(흰 패딩 없음), remount가 없으니 깜빡임도 없다.
+        <Animated.View collapsable={false} style={animatedStyle}>
+            <View pointerEvents='none' style={[StyleSheet.absoluteFill, { backgroundColor: theme.background }]} />
             <View collapsable={false} style={[styles.inputContainer, { backgroundColor: theme.surfaceVariant }]}>
                 <Search theme={theme} />
                 <Controller

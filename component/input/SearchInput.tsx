@@ -42,6 +42,9 @@ export const SearchInput = () => {
     const animatedStyle = useAnimatedStyle(() => {
         "worklet"
         return {
+            // 배경색을 워클릿 출력에 포함해야 테마 변경 시 다시 적용된다. 스타일 배열의 정적
+            // backgroundColor는 Reanimated가 Animated.View에 갱신하지 않아 이전 테마색이 남는다.
+            backgroundColor: theme.background,
             height: visibility.value * 64,
             paddingHorizontal: visibility.value * 16,
             paddingVertical: visibility.value * 6,
@@ -50,14 +53,13 @@ export const SearchInput = () => {
             transform: [{ translateX: (visibility.value - 1) * width }],
             overflow: "hidden" as const
         }
-    }, [width])
+    }, [width, theme.background])
 
     return (
-        // New Architecture(Fabric) Android에서 overflow:hidden+transform 뷰가 배경을 검게 렌더하는 버그가 있어
-        // 테마 배경색을 명시해 검은 띠를 방지한다. 또 height 0↔64로 레이어가 매 토글마다 생성/파괴되며
-        // 첫 프레임에 themed 배경이 합성되기 전 플랫폼 기본색이 번쩍이므로(라이트=검정·다크=흰색),
-        // collapsable={false}로 뷰 평탄화를 막아 레이어를 고정한다.
-        <Animated.View collapsable={false} style={[{ backgroundColor: theme.background }, animatedStyle]}>
+        // 배경색은 animatedStyle(워클릿) 안에서 적용한다 — Animated.View의 정적 backgroundColor는
+        // 테마 변경 시 Reanimated가 갱신하지 않아 이전 테마색이 남기 때문(검은 띠 방지 + 라이브 테마 추종).
+        // collapsable={false}는 height 0↔64로 레이어가 평탄화/재생성되며 생기는 깜빡임을 막는다.
+        <Animated.View collapsable={false} style={animatedStyle}>
             <View collapsable={false} style={[styles.inputContainer, { backgroundColor: theme.surfaceVariant }]}>
                 <Search theme={theme} />
                 <Controller

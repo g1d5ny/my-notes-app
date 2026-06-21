@@ -7,29 +7,37 @@ import { AddMemoController } from "@/component/modal/add"
 import { InfoModal } from "@/component/modal/InfoModal"
 import { MessageModal } from "@/component/modal/MessageModal"
 import RoutingHeader from "@/component/RoutingHeader"
-import { StatusBar } from "@/component/StatusBar"
-import { ThemeTransition } from "@/component/ThemeTransition"
 import { customFontsToLoad } from "@/constant/Style"
 import { schemeAtom, store, themeAtom } from "@/store"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import * as Font from "expo-font"
+import { useFonts } from "expo-font"
 import { Slot } from "expo-router"
+import * as SplashScreen from "expo-splash-screen"
+import { DarkTheme } from "@/constant/Theme"
 import { SQLiteDatabase, SQLiteProvider } from "expo-sqlite"
 import { Provider, useAtomValue } from "jotai"
-import { Suspense, useMemo } from "react"
-import { StyleSheet } from "react-native"
+import { Suspense, useEffect, useMemo } from "react"
+import { StyleSheet, View } from "react-native"
+import { SystemBars } from "react-native-edge-to-edge"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { KeyboardProvider, KeyboardToolbar } from "react-native-keyboard-controller"
 import { MD3DarkTheme, MD3LightTheme, PaperProvider } from "react-native-paper"
-import { initialWindowMetrics, SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context"
+import { initialWindowMetrics, SafeAreaProvider, SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 import { DATABASE_NAME, MemoType } from "../type"
 
-Font.loadAsync(customFontsToLoad)
+// 폰트 로드 전 첫 페인트를 막는다. TextInput placeholder(네이티브 hint)는 폰트가
+// 늦게 로드되면 Paint가 폴백으로 굳어 글리프가 깨진 채 갱신되지 않으므로, 로드 완료까지 스플래시 유지.
+SplashScreen.preventAutoHideAsync()
 const queryClient = new QueryClient()
 
 function AppContent() {
     const theme = useAtomValue(themeAtom)
     const scheme = useAtomValue(schemeAtom)
+
+    // 상태바 글씨색은 SystemBars로 앱 테마 기준 지정(시스템 scheme 아님). schemeAtom은 hydration 통지가
+    // 누락될 수 있어, 확실히 갱신되는 themeAtom으로 판정한다.
+    const isDark = theme.background === DarkTheme.background
+    const insets = useSafeAreaInsets()
 
     // Paper의 Modal 백드롭·Menu surface 등 기본값을 앱 팔레트/스킴에 맞춘다.
     const paperTheme = useMemo(() => {
@@ -51,6 +59,12 @@ function AppContent() {
         // edge-to-edge(app.json android.edgeToEdgeEnabled)로 윈도우가 풀블리드라, GHR 테마 배경이
         // 시스템 바 밑까지 깔린다. 인셋은 SafeAreaView가 "한 번만" 적용(이중 인셋/콜드 스타트 레이스 제거).
         <GestureHandlerRootView style={[styles.container, { backgroundColor: theme.background }]}>
+            {/* 아이콘색만 담당(다크 테마=흰 글씨). 배경은 GHR의 theme.background가 그린다.
+                key로 테마 전환 시 강제 재적용 → 앱 실행 중 라이트↔다크 토글에도 상태바가 즉시 갱신. */}
+            <SystemBars key={isDark ? "dark" : "light"} style={isDark ? "light" : "dark"} />
+            {/* 상태바 뒤(투명)에 테마색을 직접 그리는 절대배치 View. React가 그려서 라이브 토글에도 즉시 갱신.
+                (하단 내비바는 하단 바/FAB가 처리하므로 여기선 상단만.) */}
+            <View pointerEvents='none' style={[styles.topInset, { height: insets.top, backgroundColor: theme.background }]} />
             <Suspense fallback={<></>}>
                 <SQLiteProvider databaseName={DATABASE_NAME} options={{ enableChangeListener: true }} useSuspense onInit={migrateDbIfNeeded}>
                     <PaperProvider theme={paperTheme}>
@@ -58,7 +72,6 @@ function AppContent() {
                             {/* bottom은 제외: 하단 바·FAB가 absolute 오버레이로 각자 insets.bottom을 처리하므로
                                 여기서 bottom까지 패딩하면 그 부분만 인셋이 이중 적용된다. */}
                             <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]} edges={["top", "left", "right"]}>
-                                <StatusBar />
                                 <AppBar />
                                 <SearchInput />
                                 <RoutingHeader />
@@ -69,7 +82,6 @@ function AppContent() {
                                 <MessageModal />
                                 <InfoModal />
                                 <CommonToast />
-                                <ThemeTransition />
                             </SafeAreaView>
                             <KeyboardToolbar>
                                 <KeyboardToolbar.Done text='완료' />
@@ -83,6 +95,15 @@ function AppContent() {
 }
 
 export default function RootLayout() {
+    const [fontsLoaded] = useFonts(customFontsToLoad)
+
+    useEffect(() => {
+        if (fontsLoaded) SplashScreen.hideAsync()
+    }, [fontsLoaded])
+
+    // 폰트가 준비되기 전엔 스플래시를 유지(null 렌더) → 모든 텍스트·placeholder가 폰트로 첫 페인트.
+    if (!fontsLoaded) return null
+
     return (
         <QueryClientProvider client={queryClient}>
             <Provider store={store}>
@@ -98,6 +119,13 @@ export default function RootLayout() {
 const styles = StyleSheet.create({
     container: {
         flex: 1
+    },
+    topInset: {
+        position: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 10
     }
 })
 

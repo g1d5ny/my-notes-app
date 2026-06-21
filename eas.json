@@ -1,35 +1,37 @@
 {
-  "cli": {
-    "version": ">= 18.0.6",
-    "appVersionSource": "remote"
-  },
-  "build": {
-    "development": {
-      "developmentClient": true,
-      "distribution": "internal",
-      "channel": "development"
+    "cli": {
+        "version": ">= 18.0.6",
+        "appVersionSource": "remote"
     },
-    "preview": {
-      "distribution": "internal",
-      "channel": "preview"
+    "build": {
+        "development": {
+            "developmentClient": true,
+            "distribution": "internal",
+            "channel": "development"
+        },
+        "preview": {
+            "distribution": "internal",
+            "channel": "preview"
+        },
+        "production": {
+            "autoIncrement": true,
+            "channel": "production",
+            "ios": { "image": "macos-sequoia-15.6-xcode-26.2" }
+        }
     },
-    "production": {
-      "autoIncrement": true,
-      "channel": "production"
+    "submit": {
+        "production": {
+            "android": {
+                "serviceAccountKeyPath": "./credentials/google-play-service-account.json",
+                "track": "internal",
+                "releaseStatus": "draft"
+            },
+            "ios": {
+                "ascAppId": "6759505540",
+                "ascApiKeyPath": "./credentials/app-store-connect-api-key.p8",
+                "ascApiKeyIssuerId": "f1d53ae5-ddc6-4a42-b842-decb7a445842",
+                "ascApiKeyId": "34RKPZ9Z3U"
+            }
+        }
     }
-  },
-  "submit": {
-    "production": {
-      "android": {
-        "serviceAccountKeyPath": "./credentials/google-play-service-account.json",
-        "track": "internal",
-        "releaseStatus": "draft"
-      },
-      "ios": {
-        "ascApiKeyPath": "./credentials/app-store-connect-api-key.p8",
-        "ascApiKeyIssuerId": "f1d53ae5-ddc6-4a42-b842-decb7a445842",
-        "ascApiKeyId": "34RKPZ9Z3U"
-      }
-    }
-  }
 }

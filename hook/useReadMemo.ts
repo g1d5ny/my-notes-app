@@ -52,7 +52,8 @@ export const useReadMemo = (useLocal = false) => {
             // 파일 타입인 경우
             if (currentType === MemoType.FILE) {
                 const fileResult = await db.getAllAsync(`SELECT * FROM ${MemoType.FILE} WHERE id = ?`, [currentId])
-                return fileResult[0] as Memo
+                // 삭제된 파일을 조회하면 빈 배열 → undefined 대신 null 반환(React Query v5는 undefined 금지).
+                return (fileResult[0] as Memo) ?? null
             }
             // 폴더 타입인 경우
             const folderResult = await db.getAllAsync(`SELECT * FROM ${MemoType.FOLDER} WHERE parentId = ? ${ORDER_BY[sortType]}`, [currentId])

@@ -173,8 +173,8 @@ export const FolderList = ({ memos }: { memos: Memo[] }) => {
                                     onSelect={() => selectMemo(memo)}
                                     onDrop={(x, y) => handleDrop(memo, x, y)}
                                 >
-                                    <View style={[styles.iconWrap, selected && { backgroundColor: theme.accentSoft }]}>
-                                        {type === MemoType.FILE ? <File /> : filledFolder[id] ? <FilledFolder /> : <EmptyFolder />}
+                                    <View style={styles.iconWrap}>
+                                        <View style={[styles.iconBg, selected && { backgroundColor: theme.accentSoft }]}>{type === MemoType.FILE ? <File /> : filledFolder[id] ? <FilledFolder /> : <EmptyFolder />}</View>
                                         {selected && (
                                             <View style={[styles.badge, { backgroundColor: theme.accent, borderColor: theme.background }]}>
                                                 <CheckIcon color={theme.onAccent} size={13} />
@@ -191,6 +191,8 @@ export const FolderList = ({ memos }: { memos: Memo[] }) => {
                                             const inSelection = appBar === AppBar.FOLDER_ACTION
                                             return (
                                                 <TextInput
+                                                    // iOS TextInput은 color prop 변경을 라이브로 재적용 안 함 → 테마 바뀌면 remount해 글자색 갱신.
+                                                    key={theme.text}
                                                     ref={node => {
                                                         ref(node)
                                                         if (node) inputRefs.current.set(`${id}-${type}`, node)
@@ -297,7 +299,14 @@ const styles = StyleSheet.create({
         alignItems: "center"
     },
     iconWrap: {
+        // 배지가 모서리 밖으로 나오므로 여기선 클리핑하지 않는다.
+        alignItems: "center",
+        justifyContent: "center"
+    },
+    iconBg: {
         borderRadius: 16,
+        // Android(Fabric)에서 borderRadius가 배경에 안 먹는 경우가 있어 overflow로 강제 클리핑.
+        overflow: "hidden",
         padding: 4
     },
     badge: {

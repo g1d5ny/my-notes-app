@@ -2,7 +2,7 @@ import { DeleteOption, EditOption, ExportOption, InfoOption } from "@/assets/ico
 import { useDeleteMemo } from "@/hook/useDeleteMemo"
 import { useShareMemo } from "@/hook/useShareMemo"
 import { editModeAtom, infoModalVisibleAtom, modalAtom, themeAtom } from "@/store"
-import { useGlobalSearchParams } from "expo-router"
+import { router, useGlobalSearchParams } from "expo-router"
 import { useAtomValue, useSetAtom } from "jotai"
 import { useState } from "react"
 import { OptionMenu, OptionMenuList } from "../OptionMenu"
@@ -39,6 +39,7 @@ export const FileEditOption = () => {
                     visible: true,
                     message: "정말 삭제하시겠습니까?",
                     onConfirm: () => {
+                        router.back()
                         deleteFile({ id: currentId, parentId: params.parentId ? Number(params.parentId) : null })
                     },
                     confirmText: "삭제"

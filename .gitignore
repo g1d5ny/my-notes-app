@@ -39,3 +39,6 @@ yarn-error.*
 app-example
 yarn.lock
 yarn-error.log
+# EAS Submit - Google Play service account key (절대 커밋 금지)
+/credentials/
+*.keystore

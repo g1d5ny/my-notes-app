@@ -75,7 +75,8 @@
       "requestHeaders": {
         "expo-channel-name": "ver100"
       },
-      "url": "https://u.expo.dev/fcdbe492-fd9f-48b5-9479-731860e3e345"
+      "url": "https://u.expo.dev/fcdbe492-fd9f-48b5-9479-731860e3e345",
+      "checkAutomatically": "ON_ERROR_RECOVERY"
     }
   }
 }

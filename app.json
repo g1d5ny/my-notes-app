@@ -11,7 +11,10 @@
         "platforms": ["ios", "android"],
         "ios": {
             "supportsTablet": true,
-            "bundleIdentifier": "com.jiwonsuk.mynotesapp"
+            "bundleIdentifier": "com.jiwonsuk.mynotesapp",
+            "config": {
+                "usesNonExemptEncryption": false
+            }
         },
         "android": {
             "adaptiveIcon": {

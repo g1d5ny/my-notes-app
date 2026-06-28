@@ -7,6 +7,7 @@ import { AddMemoController } from "@/component/modal/add"
 import { InfoModal } from "@/component/modal/InfoModal"
 import { MessageModal } from "@/component/modal/MessageModal"
 import RoutingHeader from "@/component/RoutingHeader"
+import { useOtaUpdate } from "@/hook/useOtaUpdate"
 import { customFontsToLoad } from "@/constant/Style"
 import { schemeAtom, store, themeAtom } from "@/store"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
@@ -33,6 +34,9 @@ const queryClient = new QueryClient()
 function AppContent() {
     const theme = useAtomValue(themeAtom)
     const scheme = useAtomValue(schemeAtom)
+
+    // OTA 업데이트가 있으면 작은 모달로 물어보고, 확인 시 받아서 재시작한다.
+    useOtaUpdate()
 
     // 상태바 글씨색은 SystemBars로 앱 테마 기준 지정(시스템 scheme 아님). schemeAtom은 hydration 통지가
     // 누락될 수 있어, 확실히 갱신되는 themeAtom으로 판정한다.

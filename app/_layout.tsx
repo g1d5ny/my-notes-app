@@ -1,23 +1,24 @@
 import { AppBar } from "@/component/appBar"
 import { FolderActionBottomBar } from "@/component/appBar/FolderActionBottomBar"
 import { PasteBottomBar } from "@/component/appBar/PasteBottomBar"
+import { AppSplash } from "@/component/AppSplash"
 import { CommonToast } from "@/component/CommonToast"
 import { SearchInput } from "@/component/input/SearchInput"
 import { AddMemoController } from "@/component/modal/add"
 import { InfoModal } from "@/component/modal/InfoModal"
 import { MessageModal } from "@/component/modal/MessageModal"
 import RoutingHeader from "@/component/RoutingHeader"
-import { useOtaUpdate } from "@/hook/useOtaUpdate"
 import { customFontsToLoad } from "@/constant/Style"
+import { DarkTheme } from "@/constant/Theme"
+import { useOtaUpdate } from "@/hook/useOtaUpdate"
 import { schemeAtom, store, themeAtom } from "@/store"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { useFonts } from "expo-font"
 import { Slot } from "expo-router"
 import * as SplashScreen from "expo-splash-screen"
-import { DarkTheme } from "@/constant/Theme"
 import { SQLiteDatabase, SQLiteProvider } from "expo-sqlite"
 import { Provider, useAtomValue } from "jotai"
-import { Suspense, useEffect, useMemo } from "react"
+import { Suspense, useMemo, useState } from "react"
 import { StyleSheet, View } from "react-native"
 import { SystemBars } from "react-native-edge-to-edge"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
@@ -100,12 +101,10 @@ function AppContent() {
 
 export default function RootLayout() {
     const [fontsLoaded] = useFonts(customFontsToLoad)
+    // 인앱 스플래시 오버레이 표시 여부. 네이티브 스플래시는 이 오버레이가 화면을 덮은 뒤 내려간다.
+    const [splashVisible, setSplashVisible] = useState(true)
 
-    useEffect(() => {
-        if (fontsLoaded) SplashScreen.hideAsync()
-    }, [fontsLoaded])
-
-    // 폰트가 준비되기 전엔 스플래시를 유지(null 렌더) → 모든 텍스트·placeholder가 폰트로 첫 페인트.
+    // 폰트가 준비되기 전엔 (네이티브) 스플래시를 유지(null 렌더) → 모든 텍스트·placeholder가 폰트로 첫 페인트.
     if (!fontsLoaded) return null
 
     return (
@@ -114,6 +113,9 @@ export default function RootLayout() {
                 {/* initialMetrics로 첫 프레임부터 인셋 확정 → 콜드 스타트 시 헤더가 밀렸다 돌아오는 깜빡임 제거. */}
                 <SafeAreaProvider initialMetrics={initialWindowMetrics}>
                     <AppContent />
+                    {/* 풀 디자인 스플래시를 앱 위에 잠깐 덮었다가 페이드아웃. 폰트 로드 후 마운트되어
+                        네이티브 스플래시를 자연스럽게 이어받는다(흰 깜빡임 없음). */}
+                    {splashVisible && <AppSplash onFinish={() => setSplashVisible(false)} />}
                 </SafeAreaProvider>
             </Provider>
         </QueryClientProvider>

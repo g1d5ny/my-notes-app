@@ -44,6 +44,8 @@ export const FolderList = ({ memos }: { memos: Memo[] }) => {
     const { updateFolderTitle, updateFileTitle, moveMemo } = useUpdateMemo()
     // 드롭/hover 판정의 정본 Map(ref) — 동시 등록 race 없음.
     const itemRects = useRef<Map<string, RectMap[string]>>(new Map())
+    // 각 아이템의 측정용 노드 — 드래그 시작 시 직접 다시 측정해 좌표 staleness를 없앤다.
+    const itemNodes = useRef<Map<string, View>>(new Map())
     const hoveredRef = useRef<string | null>(null)
     // 제목 입력창 ref 맵 — 탭 시 프로그램적으로 focus()해서 키보드를 확실히 띄운다.
     const inputRefs = useRef<Map<string, TextInput>>(new Map())
@@ -76,6 +78,11 @@ export const FolderList = ({ memos }: { memos: Memo[] }) => {
     const registerRect = (key: string, rect: Rect | null) => {
         if (rect) itemRects.current.set(key, { ...rect, isFolder: key.endsWith(MemoType.FOLDER) })
         else itemRects.current.delete(key)
+    }
+
+    // 드래그 시작 시 모든 아이템 좌표를 직접 다시 측정 — onLayout 시점의 어긋난 좌표를 갱신.
+    const remeasureAll = () => {
+        itemNodes.current.forEach((node, key) => node.measureInWindow((x, y, w, h) => registerRect(key, { x, y, w, h })))
     }
 
     // 드래그 중: 손가락 밑 폴더 찾아 hover 표시(+햅틱). 바뀔 때만 갱신.
@@ -166,7 +173,9 @@ export const FolderList = ({ memos }: { memos: Memo[] }) => {
                                 <DraggableMemoIcon
                                     rectKey={`${id}-${type}`}
                                     registerRect={registerRect}
+                                    registerNode={node => (node ? itemNodes.current.set(`${id}-${type}`, node) : itemNodes.current.delete(`${id}-${type}`))}
                                     hoveredKey={hoveredKey}
+                                    onDragStart={remeasureAll}
                                     onDragMove={onDragMove}
                                     onDragEnd={onDragEnd}
                                     onTap={() => handleTap(memo, selected)}

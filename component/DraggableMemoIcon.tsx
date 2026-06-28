@@ -20,8 +20,12 @@ interface Props {
     onDragMove: (draggedKey: string, x: number, y: number) => void
     /** 드래그 종료 (hover 초기화) */
     onDragEnd: () => void
+    /** 드래그 시작 직전 호출 — 부모가 전체 아이템 좌표를 다시 측정하도록 */
+    onDragStart: () => void
     /** 드롭 대상 판정을 위해 자기 화면 위치 등록 */
     registerRect: (key: string, rect: Rect | null) => void
+    /** 측정용 노드를 부모에 등록 — 부모가 드래그 시작 시 직접 다시 측정한다 */
+    registerNode: (node: View | null) => void
     /** 현재 드래그가 올라가 있는 폴더 key (JS에서 설정, 여기선 애니메이션만 반응) */
     hoveredKey: SharedValue<string | null>
 }
@@ -30,7 +34,7 @@ const MOVE_THRESHOLD = 8
 // 원위치 복귀 스프링: 안드로이드에서도 확실히 0으로 수렴하도록 약간 단단하게.
 const SPRING_BACK = { damping: 18, stiffness: 260, mass: 0.6 }
 
-export const DraggableMemoIcon = ({ rectKey, children, onTap, onSelect, onDrop, onDragMove, onDragEnd, registerRect, hoveredKey }: Props) => {
+export const DraggableMemoIcon = ({ rectKey, children, onTap, onSelect, onDrop, onDragMove, onDragEnd, onDragStart, registerRect, registerNode, hoveredKey }: Props) => {
     const ref = useRef<View>(null)
     const tx = useSharedValue(0)
     const ty = useSharedValue(0)
@@ -58,6 +62,9 @@ export const DraggableMemoIcon = ({ rectKey, children, onTap, onSelect, onDrop, 
             ty.value = 0
             lifted.value = 1
             scale.value = withSpring(1.12)
+            // 저장된 좌표는 헤더/검색바가 자리잡기 전 측정돼 어긋날 수 있다(엉뚱한 폴더가 hover됨).
+            // 드래그 시작 시점엔 레이아웃이 안정돼 있으므로 전체 좌표를 다시 측정한다.
+            runOnJS(onDragStart)()
             runOnJS(hapticPress)()
         })
         .onUpdate(e => {
@@ -103,7 +110,16 @@ export const DraggableMemoIcon = ({ rectKey, children, onTap, onSelect, onDrop, 
 
     return (
         <GestureDetector gesture={gesture}>
-            <Animated.View ref={ref} onLayout={measure} style={animatedStyle}>
+            <Animated.View
+                // Animated.View ref는 애니메이션 컴포넌트 타입이지만 런타임 인스턴스엔 measureInWindow가 있다.
+                ref={node => {
+                    const view = node as unknown as View | null
+                    ref.current = view
+                    registerNode(view)
+                }}
+                onLayout={measure}
+                style={animatedStyle}
+            >
                 {children}
             </Animated.View>
         </GestureDetector>
